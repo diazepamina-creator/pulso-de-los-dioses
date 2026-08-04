@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!--
   EL PULSO DE LOS DIOSES · ἑλκυστίνδα
-  Manipulativo de números enteros para 2.º de ESO · versión 2.70
+  Manipulativo de números enteros para 2.º de ESO · versión 2.74
 
   © 2026 Andrés Asensio · Todos los derechos reservados sobre el diseño
   didáctico y la implementación.
@@ -290,6 +290,10 @@
     paint-order:stroke fill}
   .tirador .trazo{stroke:var(--piel);fill:none}
   .tirador .contorno{stroke:var(--linea);fill:none}
+  .tirador.venia-izq{--vieja:#FF5C6C;--vieja-linea:#8f2634}
+  .tirador.venia-der{--vieja:#25E6E6;--vieja-linea:#0b6a74}
+  .tirador.venia-izq .pata, .tirador.venia-der .pata{stroke:var(--vieja)}
+  .tirador.venia-izq .pata-c, .tirador.venia-der .pata-c{stroke:var(--vieja-linea)}
   .tirador .oscuro{fill:rgba(8,11,20,.55)}
   .tirador .brillo{fill:rgba(255,255,255,.26)}
   .tirador .sombraP{fill:rgba(0,0,0,.22)}
@@ -700,6 +704,7 @@
   .op-linea .der{color:var(--der);font-weight:700}
   .op-linea .op{color:var(--muted);margin:0 3px}
   .op-linea .poc{color:var(--rosa,#FF3DD0);font-weight:700;letter-spacing:.5px}
+  .op-linea sup, .ag-t sup{font-size:.62em;font-weight:700}
   .dn-op{font-size:17px;padding:11px 8px;margin-bottom:8px}
   .dn-op .hecho{opacity:.45}
   .op-linea .hueco{display:inline-block;min-width:56px;padding:2px 8px;margin-left:4px;
@@ -1317,8 +1322,8 @@ function dibujaTirador(p, U){
     '<line class="' + cl + '" x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) +
     '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) +
     '" stroke-width="' + gr.toFixed(1) + '" stroke-linecap="round"/>';
-  const linea = (x1, y1, x2, y2, gr, cl) =>
-    trazoUno(x1, y1, x2, y2, gr + 2.6, 'contorno') +
+  const linea = (x1, y1, x2, y2, gr, cl, clC) =>
+    trazoUno(x1, y1, x2, y2, gr + 2.6, 'contorno ' + (clC || '')) +
     trazoUno(x1, y1, x2, y2, gr, cl || 'trazo');
 
   let bloques = '';
@@ -1357,11 +1362,11 @@ function dibujaTirador(p, U){
     '<ellipse class="sombraP" cx="' + cx.toFixed(1) + '" cy="' + (suelo - 1) +
       '" rx="' + (d.pierna * .6).toFixed(1) + '" ry="2.5"/>' +
 
-    linea(kx, ky, p2x, suelo - 2, d.pierna * .30) +
-    linea(kx, ky, p1x, suelo - 2, d.pierna * .32) +
-    '<ellipse class="cuerpo" cx="' + (p1x + dir * 2).toFixed(1) + '" cy="' + (suelo - 2) +
+    linea(kx, ky, p2x, suelo - 3.4, d.pierna * .30, 'trazo pata', 'pata-c') +
+    linea(kx, ky, p1x, suelo - 3.4, d.pierna * .32, 'trazo pata', 'pata-c') +
+    '<ellipse class="cuerpo pie" cx="' + (p1x + dir * 2).toFixed(1) + '" cy="' + (suelo - 2) +
       '" rx="' + (d.pierna * .2).toFixed(1) + '" ry="2.2"/>' +
-    '<ellipse class="cuerpo" cx="' + (p2x - dir * 2).toFixed(1) + '" cy="' + (suelo - 2) +
+    '<ellipse class="cuerpo pie" cx="' + (p2x - dir * 2).toFixed(1) + '" cy="' + (suelo - 2) +
       '" rx="' + (d.pierna * .18).toFixed(1) + '" ry="2.2"/>' +
 
     '<g transform="rotate(' + (-dir * 19) + ' ' + cx.toFixed(1) + ' ' + suelo + ')">' +
@@ -1669,7 +1674,8 @@ function pinta(){
 
   tiradores.forEach((p, i) => {
     const el = document.createElement('button');
-    el.className = 'tirador ' + (p.f < 0 ? 'izq' : 'der');
+    el.className = 'tirador ' + (p.f < 0 ? 'izq' : 'der') +
+      (p.venia ? ' venia-' + p.venia : '');
     el.style.animationDelay = (i * 40) + 'ms';
     el.dataset.id = p.id;
     el.setAttribute('aria-pressed', String(sel === p.id));
@@ -1737,10 +1743,13 @@ function pinta(){
       (t === 0 ? 'cero' : (t < 0 ? 'izq' : 'der')) + '">' +
       (t === 0 ? '0' : conSigno(t)) + '</span>';
   }else{
+    const enCampo = tiradores.map((p, i) =>
+      (i ? '<span class="ig"> + </span>' : '') +
+      '<span class="f ' + (p.f < 0 ? 'izq' : 'der') + '">' +
+      termino(p.f, i === 0) + '</span>').join('');
     $('cuenta').innerHTML = tiradores.length
-      ? '<span class="ig">en el campo: </span>' + tiradores.map(p =>
-          '<span class="f ' + (p.f < 0 ? 'izq' : 'der') + '">' + conSigno(p.f) +
-          '</span>').join(' ') + '<span class="ig"> = </span><span class="tot ' +
+      ? '<span class="ig">en el campo: </span>' + enCampo +
+        '<span class="ig"> = </span><span class="tot ' +
         (t === 0 ? 'cero' : (t < 0 ? 'izq' : 'der')) + '">' +
         (t === 0 ? '0' : conSigno(t)) + '</span>'
       : '<span class="ig">nadie tira todavía</span>';
@@ -2023,6 +2032,7 @@ function hacePocion(p, antes, nuevo, nombre, cambiaBando, tono, color, etq){
              ' = ' + conSigno(nuevo));
   const antesNodo = document.querySelector('.tirador[data-id="' + p.id + '"]');
   const r0 = antesNodo ? antesNodo.getBoundingClientRect() : null;
+  if(cambiaBando) p.venia = antes < 0 ? 'izq' : 'der';
   p.f = nuevo;
   base = suma();
   if(!mudo) $('aviso').innerHTML = 'Poción <b>' + nombre + '</b>: ' + conSigno(antes) + ' pasa a ' +
@@ -2374,7 +2384,8 @@ const NIVELES_OP = [
   {ops:2, tipos:['mas','menos','por'],  t:'con pociones: el frasco va antes'},
   {ops:3, tipos:['mas','menos','por'],  t:'tres operaciones y pociones'},
   {ops:0, forma:'parentesis',           t:'paréntesis: todos beben'},
-  {ops:0, forma:'menosgrupo',           t:'menos delante del paréntesis'}
+  {ops:0, forma:'menosgrupo',           t:'menos delante del paréntesis'},
+  {ops:0, forma:'potencias',            t:'potencias: dónde está el paréntesis'}
 ];
 let oper = null;
 
@@ -2418,6 +2429,30 @@ function generaOperacion(nivel){
         (k ? '<span class="op"> + </span>' : '') + numHtml(f, !k));
       piezas.push('<span class="poc"> ' + po.e + '</span>');
       return {pasos, piezas, parentesis:true, valor: sumaSim(est)};
+    }
+  }
+
+  if(g.forma === 'potencias'){
+    for(let i = 0; i < 60; i++){
+      const base = pick([2, -2, -1, 2, -2]);
+      const n = pick([2, 3]);
+      const menos = base > 0 && Math.random() < 0.5;   // −2ⁿ solo con base positiva
+      const v = (menos ? -1 : 1) * Math.pow(base, n);
+      if(Math.abs(v) > TOPE || v === 0) continue;
+      const pasos = [{tipo:'potencia', f:base, n, menos}];
+      const cuerpo = base < 0 ? '(' + conSigno(base) + ')' : String(base);
+      const piezas = ['<span class="' + (base < 0 ? 'izq' : 'der') + '">' +
+        (menos ? '−' : '') + cuerpo + '<sup>' + n + '</sup></span>'];
+      let est = [v];
+      if(Math.random() < 0.55){
+        const f = pick(FUERZAS);
+        if(Math.abs(v + f) <= TOPE){
+          est.push(f);
+          pasos.push({tipo:'alta', f});
+          piezas.push('<span class="op"> + </span>' + numHtml(f));
+        }
+      }
+      return {pasos, piezas, parentesis:false, valor: sumaSim(est)};
     }
   }
 
@@ -2490,6 +2525,10 @@ function aplicaPaso(est, j, mal){
     }
     return c;
   }
+  if(j.tipo === 'potencia'){
+    c.push((j.menos ? -1 : 1) * Math.pow(j.f, j.n) * (mal ? -1 : 1));
+    return c;
+  }
   if(j.tipo === 'alta') c.push(mal ? -j.f : j.f);
   else if(j.tipo === 'baja'){
     const i = c.indexOf(j.f);
@@ -2541,7 +2580,8 @@ function rondaOper(){
   ajustaParentesis();
   oper.ej = generaOperacion();
   glosarioSegunHaga(oper.ej.pasos.some(j =>
-    j.tipo === 'termino' || j.tipo === 'bebe' || j.tipo === 'todos'));
+    j.tipo === 'termino' || j.tipo === 'bebe' || j.tipo === 'todos' ||
+    j.tipo === 'potencia'));
   oper.resp = '';
   $('opResp').value = '';
   oper.visto = false;
@@ -2583,6 +2623,20 @@ function vePaso(k, animado){
       sacoSobre(ids.map(id => document.querySelector('.tirador[data-id="' + id + '"]')), '−');
       ids.forEach((id, n) => setTimeout(() => { if(oper) retira(id); },
                                         ms(600 + n * 110)));
+    }else if(j.tipo === 'potencia'){
+      const po = POCIONES.find(x => x.k === j.f);
+      alta(j.f);
+      for(let r = 1; r < j.n; r++) setTimeout(() => {
+        if(!oper || !po) return;
+        const p = tiradores[tiradores.length - 1];
+        if(p){ sel = p.id; pocion(po.k, po.n, po.e); }
+      }, ms(1250 + (r - 1) * 2400));
+      if(j.menos) setTimeout(() => {
+        if(!oper) return;
+        const p = tiradores[tiradores.length - 1];
+        const tr = POCIONES.find(x => x.k === -1);
+        if(p && tr){ sel = p.id; pocion(tr.k, tr.n, tr.e); }
+      }, ms(1250 + (j.n - 1) * 2400));
     }else if(j.tipo === 'termino'){
       alta(j.f);
       setTimeout(() => {
@@ -2820,6 +2874,10 @@ function rondaArgos(){
 }
 
 function textoPaso(j){
+  if(j.tipo === 'potencia') return (j.menos ? 'entra un <b>' + j.f + '</b>, se bebe su ' +
+      'frasco hasta <b>' + j.f + '<sup>' + j.n + '</sup></b> y al final una Traición'
+    : 'entra un <b>' + conSigno(j.f) + '</b> y se bebe su frasco hasta <b>(' +
+      conSigno(j.f) + ')<sup>' + j.n + '</sup></b>');
   if(j.tipo === 'termino') return 'entra un tirador de <b>' + conSigno(j.f) +
     '</b> y se bebe <b>' + j.nom + ' (' + j.e + ')</b>';
   if(j.tipo === 'purga') return 'se retiran <b>' + conSigno(j.fs[0]) + '</b> y <b>' +
@@ -2876,6 +2934,13 @@ function juzgaArgos(i){
   else if(j.tipo === 'alta')
     porque = 'Al que entra se le suma su fuerza <b>con su signo</b>, y ese es <b>' +
       conSigno(j.f) + '</b>. Debía quedar en <b>' + conSigno(debia) + '</b>.';
+  else if(j.tipo === 'potencia')
+    porque = (j.menos
+      ? 'Ahí no hay paréntesis: en <b>−' + j.f + '<sup>' + j.n + '</sup></b> el menos ' +
+        'se aplica <b>al final</b>, no a la base. Entra un <b>' + j.f + '</b>.'
+      : 'El paréntesis mete el menos <b>dentro</b>: en <b>(' + conSigno(j.f) + ')<sup>' +
+        j.n + '</sup></b> el que entra al campo ya es un <b>' + conSigno(j.f) + '</b>.') +
+      ' Debía quedar en <b>' + conSigno(debia) + '</b>.';
   else
     porque = 'El frasco es <b>' + j.e + '</b>, con su signo: cambiarle el menos ' +
       'cambia de bando al que bebe. Y el producto se hace <b>antes</b> de sumar, ' +
@@ -2905,7 +2970,8 @@ function argosAlCampo(){
   $('panelCampo').hidden = false;
   $('opPasos').hidden = false;
   glosarioSegunHaga(argos.ej.pasos.some(j =>
-    j.tipo === 'termino' || j.tipo === 'bebe' || j.tipo === 'todos'));
+    j.tipo === 'termino' || j.tipo === 'bebe' || j.tipo === 'todos' ||
+    j.tipo === 'potencia'));
   vePaso(argos.malo + 1, false);
   if($('panelCampo').scrollIntoView)
     $('panelCampo').scrollIntoView({behavior:'smooth', block:'start'});
@@ -3213,6 +3279,9 @@ const MISIONES = [
   {t:'Menos delante del paréntesis', modo:'oper', n:7, meta:3,
    d:'Se retiran <b>dos a la vez</b>: <b>− ( (+2) + (−3) )</b>. Ojo, que el menos ' +
      'alcanza a los dos — caen dos rayos.'},
+  {t:'Potencias: dónde está el paréntesis', modo:'oper', n:8, meta:3,
+   d:'<b>(−2)²</b> y <b>−2²</b> no son lo mismo. Ábrelo y mira <b>quién entra al ' +
+     'campo</b>: ahí está toda la diferencia.'},
   {t:'El ojo de Argos', modo:'argos', n:2, meta:3,
    d:'Alguien ha resuelto la cadena y en un paso <b>se equivocó de signo</b>. ' +
      'Señala el primero que está mal.'},
