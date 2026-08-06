@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!--
   El pulso de los dioses · ἑλκυστίνδα
-  Manipulativo de números enteros para 2.º de ESO · versión 3.2
+  Manipulativo de números enteros para 2.º de ESO · versión 3.3
   © Andrés Asensio · Licencia CC BY-NC-SA 4.0
   https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
 -->
@@ -672,14 +672,11 @@
       filter calc(.35s * var(--lento,1)) ease}
   .zeus.fuera{transform:translateY(-14%)}
   .zeus svg{display:block;width:100%;height:100%;overflow:visible}
-      .zeus{filter:drop-shadow(0 0 2.5px rgba(233,184,78,.4))
-    drop-shadow(0 0 9px rgba(233,184,78,.16))}
-  .zeus .siluZ{fill:url(#zLuna);stroke:rgba(233,184,78,.3);stroke-width:2.2;
-    transition:stroke calc(.35s * var(--lento,1)) ease}
+        .zeus{filter:drop-shadow(0 0 3px rgba(233,184,78,.45))
+    drop-shadow(0 0 10px rgba(233,184,78,.22))}
+  .zeus .siluZ{fill:url(#zLuna);stroke:none}
   .zeus .siluTrazoZ{stroke:url(#zLuna)}
-  .zeus .rimTrazoZ{stroke:rgba(233,184,78,.4);
-    transition:stroke calc(.35s * var(--lento,1)) ease}
-  .zeus .rimZ{stroke:rgba(233,184,78,.42);
+  .zeus .rimTrazoZ{stroke:transparent}   .zeus .rimZ{stroke:rgba(233,184,78,.42);
     transition:stroke calc(.35s * var(--lento,1)) ease}
   .zeus .laurelZ ellipse, .zeus .laurelZ circle{fill:#E9B84E;opacity:.5;
     transition:opacity calc(.35s * var(--lento,1)) ease}
@@ -688,10 +685,9 @@
     transition:fill calc(.3s * var(--lento,1)) ease}
   .zeus .haloZ{fill:rgba(255,214,120,.28);
     transition:fill calc(.3s * var(--lento,1)) ease}
-    .zeus.resplandece{filter:drop-shadow(0 0 14px rgba(233,184,78,.75))
-    drop-shadow(0 0 34px rgba(233,184,78,.3))}
-  .zeus.resplandece .siluZ{stroke:rgba(240,197,94,.85)}
-  .zeus.resplandece .rimTrazoZ{stroke:rgba(240,197,94,.9)}
+    .zeus.resplandece{filter:drop-shadow(0 0 5px rgba(240,197,94,.85))
+    drop-shadow(0 0 16px rgba(240,197,94,.45))
+    drop-shadow(0 0 36px rgba(233,184,78,.22))}
   .zeus.resplandece .rimZ{stroke:rgba(240,197,94,.95)}
   .zeus.resplandece .laurelZ ellipse, .zeus.resplandece .laurelZ circle{opacity:1}
   .zeus.resplandece .ojoZ{fill:#FFF}
@@ -952,7 +948,7 @@
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v3.2</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v3.3</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -2055,6 +2051,9 @@ const ZEUS_SVG =
         '<path class="siluZ" d="M44.5 29 Q41 44 45.5 56 Q48.5 52.5 51.5 57.5 Q54 53.5 56.5 58 ' +
       'Q59 53.5 61.5 57.5 Q64.5 52.5 67.5 56 Q71.5 44 68.5 29 ' +
       'Q63 37 56.5 37 Q50 37 44.5 29 Z"/>' +
+        '<path class="rimZ" filter="url(#zSoft)" opacity=".5" stroke-width="1.3" ' +
+      'fill="none" d="M45.5 56 Q48.5 52.5 51.5 57.5 Q54 53.5 56.5 58 ' +
+      'Q59 53.5 61.5 57.5 Q64.5 52.5 67.5 56"/>' +
         '<path class="rimZ" filter="url(#zSoft)" opacity=".55" stroke-width="1.2" ' +
       'fill="none" d="M49.5 34 Q47.5 42 50.5 50 M62.5 34 Q64.5 42 61.5 50 ' +
       'M56 38 Q56 45 56 51"/>' +
