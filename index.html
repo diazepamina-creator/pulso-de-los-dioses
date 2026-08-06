@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!--
   El pulso de los dioses · ἑλκυστίνδα
-  Manipulativo de números enteros para 2.º de ESO · versión 3.3
+  Manipulativo de números enteros para 2.º de ESO · versión 4.2
   © Andrés Asensio · Licencia CC BY-NC-SA 4.0
   https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
 -->
@@ -308,6 +308,7 @@
     .tirador .laurel{display:none}
   .tirador.laureado .laurel{display:block}
   .tirador .laurel ellipse{fill:#A6C566;stroke:rgba(16,11,26,.45);stroke-width:.7}
+    .tirador .laurel .rama{stroke:#5E7F3C;stroke-width:1.05;stroke-linecap:round}
   .tirador .laurel .baya{fill:var(--oro)}
     .campo.tiron .brilloPuno, .campo.forcejeo .brilloPuno{fill:rgba(244,240,230,.55)}
     .tirador .sombraM2{transition:opacity .3s ease}
@@ -428,12 +429,12 @@
     22%{opacity:1;transform:translate(0,0) rotate(var(--subeF,0deg)) scale(1)}
         36%,66%{opacity:1;transform:translate(0,0) rotate(var(--vuelcaF,125deg)) scale(1)}
     71%{opacity:1;transform:translate(0,0) rotate(calc(var(--subeF,0deg) + 14deg)) scale(1)}
-        78%{opacity:1;transform:translate(calc(var(--lanzaX,-28px) * .5), -20px)
-      rotate(calc(var(--vuelcaF,125deg) * 1.35)) scale(1)}
+            78%{opacity:1;transform:translate(calc(var(--lanzaX,-28px) * .5), -20px)
+      rotate(calc(var(--vuelcaF,90deg) + var(--giraF,150deg) * .55)) scale(1)}
     86%{opacity:1;transform:translate(calc(var(--lanzaX,-28px) * .95), 2px)
-      rotate(calc(var(--vuelcaF,125deg) * 2.1)) scale(.96)}
+      rotate(calc(var(--vuelcaF,90deg) + var(--giraF,150deg))) scale(.96)}
     93%,100%{opacity:0;transform:translate(calc(var(--lanzaX,-28px) * 1.15), 14px)
-      rotate(calc(var(--vuelcaF,125deg) * 2.5)) scale(.9)}}
+      rotate(calc(var(--vuelcaF,90deg) + var(--giraF,150deg) * 1.45)) scale(.9)}}
     .tirador.trago .fr-liqG{animation:frascoVacia calc(2.1s * var(--lento,1)) ease-in-out}
     @keyframes frascoVacia{0%,34%{transform:scaleY(1)}
     41%{transform:scaleY(.72)} 46%{transform:scaleY(.70)}
@@ -669,8 +670,10 @@
     z-index:0;pointer-events:none;transform:translateY(-108%);
     transition:transform calc(.3s * var(--lento,1)) cubic-bezier(.3,1.2,.5,1),
       left calc(.24s * var(--lento,1)) ease,
+      opacity calc(.34s * var(--lento,1)) ease,
       filter calc(.35s * var(--lento,1)) ease}
-  .zeus.fuera{transform:translateY(-14%)}
+  .zeus.fuera{transform:translateY(var(--asomo,-14%))}
+    .zeus.disipa{opacity:0;filter:none}
   .zeus svg{display:block;width:100%;height:100%;overflow:visible}
         .zeus{filter:drop-shadow(0 0 3px rgba(233,184,78,.45))
     drop-shadow(0 0 10px rgba(233,184,78,.22))}
@@ -698,11 +701,12 @@
     .zeus .boltZ{transition:opacity calc(.08s * var(--lento,1)) ease}
     .zeus.sinCetro .boltZ{opacity:0}
     .campo.trueno{animation:trueno calc(.34s * var(--lento,1)) ease}
-  @keyframes trueno{20%{transform:translate(1.6px,-1px)}
-    45%{transform:translate(-2px,1.2px)}
-    70%{transform:translate(1.2px,.6px)}
+    @keyframes trueno{20%{transform:translate(calc(1.6px * var(--sac,1)),calc(-1px * var(--sac,1)))}
+    45%{transform:translate(calc(-2px * var(--sac,1)),calc(1.2px * var(--sac,1)))}
+    70%{transform:translate(calc(1.2px * var(--sac,1)),calc(.6px * var(--sac,1)))}
     100%{transform:translate(0,0)}}
-      .chamusca{position:absolute;bottom:46px;width:42px;height:11px;margin-left:-21px;
+      .chamusca{position:absolute;bottom:46px;width:calc(42px * var(--mn,1));
+    height:calc(11px * var(--mn,1));margin-left:calc(-21px * var(--mn,1));
     border-radius:50%;z-index:2;pointer-events:none;
     background:radial-gradient(ellipse at center,rgba(16,10,8,.85),rgba(16,10,8,0) 72%);
     animation:chamusca calc(4s * var(--lento,1)) ease-out forwards}
@@ -713,15 +717,17 @@
   @keyframes chamusca{0%{opacity:0}6%{opacity:1}55%{opacity:.75}100%{opacity:0}}
   .rayo{position:absolute;left:0;top:0;z-index:11;pointer-events:none;
     animation:relampago calc(.55s * var(--lento,1)) ease-out forwards}
-  .rayo .r-halo{fill:none;stroke:rgba(255,214,120,.55);stroke-width:7;
-    stroke-linecap:round;stroke-linejoin:round;filter:blur(2px)}
-  .rayo .r-nucleo{fill:none;stroke:#fff;stroke-width:2.2;
+    .rayo .r-halo{fill:none;stroke:rgba(255,214,120,var(--ah,.55));
+    stroke-width:var(--gh,7);
+    stroke-linecap:round;stroke-linejoin:round;filter:blur(var(--bh,2px))}
+  .rayo .r-nucleo{fill:none;stroke:#fff;stroke-width:var(--gn,2.2);
     stroke-linecap:round;stroke-linejoin:round}
   @keyframes relampago{
     0%{opacity:0}   8%{opacity:1}   22%{opacity:.25}
     34%{opacity:1}  62%{opacity:.9} 100%{opacity:0}}
   .fogonazo{position:absolute;inset:0;z-index:10;pointer-events:none;
-    background:radial-gradient(ellipse at center,rgba(255,246,214,.5),transparent 68%);
+    background:radial-gradient(ellipse at center,
+      rgba(255,246,214,var(--af,.5)),transparent 68%);
     animation:fogona calc(.4s * var(--lento,1)) ease-out forwards}
   @keyframes fogona{0%{opacity:0} 12%{opacity:1} 100%{opacity:0}}
     .tirador.fulminado svg{animation:achicharra calc(.5s * var(--lento,1)) ease-out}
@@ -948,7 +954,7 @@
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v3.3</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v4.2</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1178,10 +1184,11 @@ let sel = null;
 let sigId = 1;
 let cinta = [], base = 0, lineas = [];
 const bebiendoIds = new Set();
+const retirandoIds = new Set();
 const alguienBebe = () => bebiendoIds.size > 0;
 let prediccion = null;
 let VEL = 1;
-let AJ = {subida:0, vuelco:-7, hombro:0, codo:0, pausa:0};
+let AJ = {subida:0, vuelco:70, hombro:0, codo:0, pausa:0};
 const DEBUG = /[?&]debug=1/.test(location.search);
 if(!DEBUG) $('ajuste').remove();
 if(DEBUG){
@@ -1224,7 +1231,10 @@ $('ajProbar').addEventListener('click', () => {
   if(!nodo) return;
   nodo.style.setProperty('--pocion', 'var(--green)');
   nodo.style.setProperty('--subeF', (p.f < 0 ? -AJ.subida : AJ.subida) + 'deg');
-  nodo.style.setProperty('--vuelcaF', (p.f < 0 ? -AJ.vuelco : AJ.vuelco) + 'deg');
+  const vDef = p.f < 0 ? -AJ.vuelco : AJ.vuelco;
+  const vf = vuelcoQueEncaja(nodo, vDef);
+  nodo.style.setProperty('--vuelcaF', vf.toFixed(1) + 'deg');
+    nodo.style.setProperty('--giraF', (p.f < 0 ? -190 : 190) + 'deg');
   nodo.classList.remove('trago');
   void nodo.offsetWidth;
   nodo.classList.add('trago');
@@ -1281,6 +1291,22 @@ function medidasDe(fz, U){
       const w = Math.max(cab + 10, ancho + brazoL + 22);
   const h = pierna + torso + cab + 22;
   return {torso, ancho, m, cab, pierna, brazoL, brazoH, w, h, u:Math.max(3, torso/fz)};
+}
+function vuelcoQueEncaja(nodo, porDefecto){
+  try{
+    const g = nodo.querySelector('.frascoMano');
+    const boca = nodo.querySelector('rect.boca');
+    const svg = nodo.querySelector('svg');
+    if(!g || !boca || !svg || !g.parentNode.getScreenCTM) return porDefecto;
+    const gr = el => { const m = el.getScreenCTM(); return Math.atan2(m.b, m.a) * 180 / Math.PI; };
+        const cs = getComputedStyle(svg);
+    const n = v => parseFloat(cs.getPropertyValue(v)) || 0;
+    const brazo = n('--gHum') + n('--ajHum') + n('--gAnt') + n('--ajCod');
+    const marco = gr(g.parentNode) + brazo, labios = gr(boca);
+    let a = ((labios - marco - 90) % 180 + 180) % 180;
+        if(Math.sin((marco + a + 90) * Math.PI / 180) >= 0) a -= 180;
+    return a;
+  }catch(e){ return porDefecto; }
 }
 function frascoEnMano(mx, my, gr, parte){
   const an = gr * .8, al = gr * 1.4;
@@ -1481,20 +1507,42 @@ function dibujaTirador(p, U){
           (yCab - d.cab*.27).toFixed(1) + '" width="' + (d.cab*.88).toFixed(1) +
           '" height="1.6" rx=".8"/>'
         : '') +
-                  (() => {
-        const by = yCab - d.cab * .27;
-        let hojas = '';
-        for(const s of [-1, 1]) for(let i = 0; i < 4; i++){
-          const hx = cx + s * d.cab * (.42 - .105 * i), hy = by - i * 1.05 - .3;
-          const rot = -s * (12 + i * 17);
-          hojas += '<ellipse cx="' + hx.toFixed(1) + '" cy="' + hy.toFixed(1) +
-            '" rx="' + (2.2 - i * .25).toFixed(2) + '" ry="' + (.95 - i * .08).toFixed(2) +
-            '" transform="rotate(' + rot + ' ' + hx.toFixed(1) +
-            ' ' + hy.toFixed(1) + ')"/>';
+                        (() => {
+        const by = yCab - d.cab * .27, R = d.cab * .5;
+        let g = '';
+        for(const s of [-1, 1]){
+                    g += '<path class="rama" d="M' + (cx + s * R * .88).toFixed(1) + ' ' +
+            (by + 1.2).toFixed(1) + ' Q' + (cx + s * R * .72).toFixed(1) + ' ' +
+            (by - 3.1).toFixed(1) + ' ' + (cx + s * 1.2).toFixed(1) + ' ' +
+            (by - 4.1).toFixed(1) + '" fill="none"/>';
+          for(let i = 0; i < 5; i++){
+            const u = i / 4;
+            const hx = cx + s * (R * (.86 - .30 * u) - u * u * 1.6);
+            const hy = by + .9 - u * 5.1;
+            const lado = i % 2 ? -1 : 1;
+            const rot = -s * (16 + i * 15) + lado * 8 * s;
+            g += '<ellipse cx="' + (hx + s * lado * .55).toFixed(1) + '" cy="' +
+              (hy - lado * .5).toFixed(1) + '" rx="' + (2.35 - i * .21).toFixed(2) +
+              '" ry="' + (.86 - i * .07).toFixed(2) + '" transform="rotate(' +
+              rot.toFixed(0) + ' ' + hx.toFixed(1) + ' ' + hy.toFixed(1) + ')"/>';
+          }
         }
-        return '<g class="laurel">' + hojas +
-          '<circle class="baya" cx="' + (cx - 1.1).toFixed(1) + '" cy="' + (by - 3.6).toFixed(1) + '" r=".9"/>' +
-          '<circle class="baya" cx="' + (cx + 1.1).toFixed(1) + '" cy="' + (by - 3.6).toFixed(1) + '" r=".9"/></g>';
+        return '<g class="laurel">' + g +
+          '<circle class="baya" cx="' + (cx - 1.15).toFixed(1) + '" cy="' + (by - 4.15).toFixed(1) + '" r=".78"/>' +
+          '<circle class="baya" cx="' + (cx + 1.15).toFixed(1) + '" cy="' + (by - 4.15).toFixed(1) + '" r=".78"/>' +
+          '<circle class="baya" cx="' + cx.toFixed(1) + '" cy="' + (by - 5.3).toFixed(1) + '" r=".72"/></g>';
+      })() +
+            (() => {
+        const yOjo = yCab + 1.8;
+                const techo = d.cab * .28 - 2.75;
+        const ax = -2.45, ay = .55;
+        const k = Math.max(.40, Math.min(1, (techo - ay) / 3.22));
+        const bx = ax + .98 * k, by = ay + 2.19 * k;
+        const px = bx - 2.03 * k, py = by + 1.03 * k;
+        const X = f => (ojoX + dir * f).toFixed(1), Y = v => (yOjo + v).toFixed(1);
+        return '<path d="M' + X(ax) + ' ' + Y(ay) + ' L' + X(bx) + ' ' + Y(by) +
+          ' L' + X(px) + ' ' + Y(py) + '" fill="none" stroke="rgba(16,11,26,.72)" ' +
+          'stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>';
       })() +
       '<circle class="blanco" cx="' + ojoX.toFixed(1) + '" cy="' + (yCab + 1.8).toFixed(1) + '" r="2.3"/>' +
       '<circle class="blanco" cx="' + (ojoX - dir * 5).toFixed(1) + '" cy="' + (yCab + 1.8).toFixed(1) + '" r="2"/>' +
@@ -1507,16 +1555,7 @@ function dibujaTirador(p, U){
             '<g transform="translate(' + (cx - dir * d.cab * .36).toFixed(1) + ' ' +
         (yCab - d.cab * .04).toFixed(1) +
         ')"><path class="sudor" d="M0 -2.3 C1.6 -.4 1.6 1.1 0 2 C-1.6 1.1 -1.6 -.4 0 -2.3 Z"/></g>' +
-                              (() => {
-        const nx = ojoX - dir * 1.0;
-        return '<path d="M' + nx.toFixed(1) + ' ' + (yCab + 3.9).toFixed(1) +
-          ' L' + (nx - dir * .6).toFixed(1) + ' ' + (yCab + 5.35).toFixed(1) +
-          ' L' + (nx - dir * (1.9 + d.cab * .015)).toFixed(1) + ' ' +
-            (yCab + 5.85 + d.cab * .02).toFixed(1) +
-          '" fill="none" stroke="rgba(16,11,26,.72)" stroke-width="1.15" ' +
-          'stroke-linecap="round" stroke-linejoin="round"/>';
-      })() +
-      '<g transform="translate(' + (ojoX - dir * 1).toFixed(1) + ' ' +
+                        '<g transform="translate(' + (ojoX - dir * 1).toFixed(1) + ' ' +
         (yCab + d.cab*.28 + 1).toFixed(1) + ')"><rect class="rasgo boca" ' +
         'x="-2.5" y="-1" width="5" height="2" rx="1"/></g>' +
             '<g transform="translate(' + ojoX.toFixed(1) + ' ' + (yCab - d.cab*.13).toFixed(1) +
@@ -2062,7 +2101,9 @@ const ZEUS_SVG =
     '</g>' +
   '</svg>';
 let zeusTemp = 0;
-function zeusAsoma(elT){
+let zeusEncargos = [];
+function zeusAsoma(elT, alIrse){
+  if(typeof alIrse === 'function') zeusEncargos.push(alIrse);
   const campo = document.querySelector('.campo');
   const rc = campo.getBoundingClientRect(), rn = elT.getBoundingClientRect();
   const cxV = rn.left + rn.width / 2 - rc.left;
@@ -2079,9 +2120,12 @@ function zeusAsoma(elT){
   z.classList.toggle('zurdo', zurdo);
   z.style.left = cx.toFixed(0) + 'px';
   requestAnimationFrame(() => z.classList.add('fuera'));
-    const baseZeus = 94 * 0.86;
-  AWE = Math.max(0.5, Math.min(0.8, (rc.height - baseZeus - 8) / (rc.height - 20)));
+        const H = rc.height, ALTO_Z = 94, BASE_Z = ALTO_Z * .86, HUECO_Z = 6;
+  const objetivo = 1 - (BASE_Z + HUECO_Z) / H;
+  AWE = Math.max(0.35, Math.min(1, objetivo / ZOOM));
   aplicaCamara();
+    const yCenefa = H * (1 - ZOOM * AWE);
+  z.style.setProperty('--asomo', (yCenefa - HUECO_Z - ALTO_Z).toFixed(1) + 'px');
     setTimeout(() => {
     if(!document.body.contains(elT) || !z.classList.contains('fuera')) return;
     const rn2 = elT.getBoundingClientRect();
@@ -2092,11 +2136,24 @@ function zeusAsoma(elT){
   }, ms(500));
   clearTimeout(zeusTemp);
     zeusTemp = setTimeout(() => {
-    z.classList.remove('fuera');
-    z.classList.remove('resplandece');
-    AWE = 1;
-    aplicaCamara();
-        setTimeout(() => z.classList.remove('sinCetro'), ms(320));
+        z.classList.remove('resplandece');
+    z.classList.add('disipa');
+    setTimeout(() => {
+      z.classList.remove('fuera');
+            const escalaPrevia = ZOOM * AWE;
+      const encargos = zeusEncargos; zeusEncargos = [];
+      encargos.forEach(f => { try{ f(); }catch(e){} });
+      AWE = Math.max(0.2, Math.min(1, escalaPrevia / ZOOM));
+      aplicaCamara();
+      setTimeout(() => {
+        AWE = 1;
+        aplicaCamara();
+                          setTimeout(() => {
+          z.classList.remove('sinCetro');
+          z.classList.remove('disipa');
+        }, ms(430));
+      }, ms(340));
+    }, ms(560));
   }, ms(yaFuera ? 1150 : 1500));
     const espera = ms(yaFuera ? 140 : 560);
   setTimeout(() => {
@@ -2105,24 +2162,30 @@ function zeusAsoma(elT){
     setTimeout(() => z.classList.remove('lanza'), ms(240));
   }, Math.max(0, espera - ms(180)));   return espera;
 }
-function trueno(){
+function trueno(fza){
   const c = document.querySelector('.campo');
+  c.style.setProperty('--sac', (.55 + 1.15 * varaDe(fza)).toFixed(2));
   c.classList.remove('trueno');
   void c.offsetWidth;                c.classList.add('trueno');
   setTimeout(() => c.classList.remove('trueno'), ms(380));
 }
-function chamuscaEn(elT){
+function chamuscaEn(elT, fza){
   const campo = document.querySelector('.campo');
   const rc = campo.getBoundingClientRect(), rn = elT.getBoundingClientRect();
   const m = document.createElement('span');
   m.className = 'chamusca';
   m.style.left = (rn.left + rn.width / 2 - rc.left).toFixed(0) + 'px';
     m.style.bottom = Math.max(8, Math.round(46 * ZOOM * AWE)) + 'px';
+  m.style.setProperty('--mn', (.7 + .75 * varaDe(fza)).toFixed(2));
   campo.appendChild(m);
   setTimeout(() => m.remove(), ms(4200));
 }
-function rayoEn(elT){
+function varaDe(f){
+  return Math.max(0, Math.min(1, Math.log(Math.max(1, Math.abs(f))) / Math.log(12)));
+}
+function rayoEn(elT, fza){
   if(!elT) return;
+  const u = varaDe(fza);
   const campo = document.querySelector('.campo');
   const rc = campo.getBoundingClientRect(), rn = elT.getBoundingClientRect();
   const cx = rn.left + rn.width / 2 - rc.left;
@@ -2135,16 +2198,21 @@ function rayoEn(elT){
     sy = rz.top + rz.height - rc.top + 1;
   }
   let d = 'M' + sx.toFixed(0) + ' ' + sy.toFixed(0);
-  const tramos = 5;
+  const tramos = 4 + Math.round(3 * u);
+  const amplitud = 8 + 14 * u;
     const dirV = cx >= sx ? 1 : -1;
   for(let i = 1; i <= tramos; i++){
     const t = i / tramos;
-    const dx = (i === tramos ? 0 : dirV * (i % 2 ? 1 : -1) * (13 * (1 - t) + 3));
+    const dx = (i === tramos ? 0 : dirV * (i % 2 ? 1 : -1) * (amplitud * (1 - t) + 3));
     d += ' L' + (sx + (cx - sx) * t + dx).toFixed(0) + ' ' +
          (sy + (cy - sy) * t).toFixed(0);
   }
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', 'rayo');
+  svg.style.setProperty('--gh', (4.4 + 7.6 * u).toFixed(1));
+  svg.style.setProperty('--gn', (1.4 + 2.4 * u).toFixed(1));
+  svg.style.setProperty('--bh', (1.3 + 2.4 * u).toFixed(1) + 'px');
+  svg.style.setProperty('--ah', (.42 + .3 * u).toFixed(2));
   svg.setAttribute('width', String(Math.round(rc.width)));
   svg.setAttribute('height', String(Math.round(rc.height)));
   const p1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -2156,6 +2224,7 @@ function rayoEn(elT){
   setTimeout(() => svg.remove(), ms(700));
   const fog = document.createElement('span');
   fog.className = 'fogonazo';
+  fog.style.setProperty('--af', (.28 + .42 * u).toFixed(2));
   campo.appendChild(fog);
   setTimeout(() => fog.remove(), ms(420));
 }
@@ -2219,44 +2288,49 @@ function alta(f){
 }
 function retira(id){
   if(bebiendoIds.has(id)) return;
+  if(retirandoIds.has(id)) return;
   const p = tiradores.find(q => q.id === id);
   if(!p) return;
   vuelveAMontar();
   if(!cinta.length) base = suma();
   const antes = suma();
   const nodo = document.querySelector('.tirador[data-id="' + id + '"]');
-    let espera = 0;
+      const quitado0 = p.f;
+  const hazLaCuenta = () => {
+    retirandoIds.delete(id);
+    tiradores = tiradores.filter(q => q.id !== id);
+    if(sel === id) sel = null;
+    retiros++;
+    cinta.push({op:'−', f:quitado0});
+    const ahora = suma();
+    if(!mudo) $('aviso').innerHTML = 'Se retira un tirador de <b>' + conSigno(quitado0) + '</b>: eso es ' +
+      '<b>− (' + conSigno(quitado0) + ')</b>. El total pasa de ' + conSigno(antes) + ' a <b>' +
+      (ahora === 0 ? '0' : conSigno(ahora)) + '</b>' +
+      (quitado0 < 0
+        ? ', y <b>sube</b>: se ha ido alguien que tiraba en contra, así que restar un negativo suma.'
+        : ', y baja: se ha ido alguien que tiraba a tu favor.');
+    pinta();
+    asienta();
+  };
+  let espera = 0;
   if(nodo){
-    espera = zeusAsoma(nodo);
+    retirandoIds.add(id);
+    espera = zeusAsoma(nodo, hazLaCuenta);
     if(MOV_REDUCIDO) espera = 60;
     setTimeout(() => {
             const zz = document.querySelector('.campo .zeus');
       if(zz) zz.classList.add('sinCetro');
-      rayoEn(nodo);
-      trueno();
-      chamuscaEn(nodo);
+      rayoEn(nodo, p.f);
+      trueno(p.f);
+      chamuscaEn(nodo, p.f);
       nodo.classList.add('fulminado');
       nodo.classList.add('saliendo');
       flotaSobre(nodo, '− (' + conSigno(p.f) + ')');
       humoEn(nodo);
     }, espera);
   }
-  const quitado = p.f;
-  setTimeout(() => {
-    tiradores = tiradores.filter(q => q.id !== id);
-    if(sel === id) sel = null;
-    retiros++;
-    cinta.push({op:'−', f:quitado});
-    const ahora = suma();
-    if(!mudo) $('aviso').innerHTML = 'Se retira un tirador de <b>' + conSigno(quitado) + '</b>: eso es ' +
-      '<b>− (' + conSigno(quitado) + ')</b>. El total pasa de ' + conSigno(antes) + ' a <b>' +
-      (ahora === 0 ? '0' : conSigno(ahora)) + '</b>' +
-      (quitado < 0
-        ? ', y <b>sube</b>: se ha ido alguien que tiraba en contra, así que restar un negativo suma.'
-        : ', y baja: se ha ido alguien que tiraba a tu favor.');
-    pinta();
-    asienta();
-  }, ms(520) + espera); }
+    if(!nodo) setTimeout(hazLaCuenta, ms(520));
+}
 function cortaCinta(nota){
   const t = suma();
   if(cinta.length){
@@ -2303,7 +2377,10 @@ function pocion(k, nombre, etq){
         const haciaDentro = (antes < 0) ? 15 : -15;
         nodo.style.setProperty('--pocion', color);
         nodo.style.setProperty('--subeF', (antes < 0 ? -AJ.subida : AJ.subida) + 'deg');
-    nodo.style.setProperty('--vuelcaF', (antes < 0 ? -AJ.vuelco : AJ.vuelco) + 'deg');
+    const vDef = antes < 0 ? -AJ.vuelco : AJ.vuelco;
+    nodo.style.setProperty('--vuelcaF',
+      vuelcoQueEncaja(nodo, vDef).toFixed(1) + 'deg');
+    nodo.style.setProperty('--giraF', (p.f < 0 ? -190 : 190) + 'deg');
         nodo.classList.add('trago');
     setTimeout(() => nodo.classList.remove('trago'), ms(2200));
       }
@@ -3691,6 +3768,47 @@ function modoBotones(m){
   $('mCanon').setAttribute('aria-pressed', String(m === 'canon'));
   $('mTaller').setAttribute('aria-pressed', String(m === 'taller'));
   $('mDiana').setAttribute('aria-pressed', String(m === 'diana'));
+    if(m !== 'taller') vueltaTaller = null;
+  pintaBotonTaller();
+}
+let vueltaTaller = null;
+function pintaBotonTaller(){
+  const dentro = $('mTaller').getAttribute('aria-pressed') === 'true';
+  $('mTaller').textContent = !dentro ? 'Modo taller'
+    : (vueltaTaller && vueltaTaller.tipo === 'mision') ? 'Volver a la misión'
+    : 'Salir del taller';
+}
+function modoSuelto(){
+  const cuales = {mOper:'oper', mDiana:'diana', mCron:'cronista',
+                  mArgos:'argos', mCanon:'canon'};
+  for(const id in cuales)
+    if($(id).getAttribute('aria-pressed') === 'true') return cuales[id];
+  return null;
+}
+function alTallerBoton(){
+  const dentro = $('mTaller').getAttribute('aria-pressed') === 'true';
+  if(dentro){
+    const v = vueltaTaller;
+    vueltaTaller = null;
+    if(v && v.tipo === 'mision'){
+      arrancaMision(v.i);
+            ruta.hechas = v.hechas; ruta.hecho = v.hecho; ruta.cameo = v.cameo || '';
+      guardaTurno(); pintaRuta();
+    } else if(v && v.tipo === 'suelto'){
+      const arranques = {oper:arrancaOper, diana:arrancaDiana,
+        cronista:arrancaCronista, argos:arrancaArgos, canon:arrancaCanon};
+      alTaller(); modoBotones(v.modo); arranques[v.modo]();
+    } else if(!retomaTurno()){      // sin memoria de vuelta: a la ruta
+      arrancaMision(0);
+    }
+    return;
+  }
+  const suelto = modoSuelto();
+  vueltaTaller = ruta
+    ? {tipo:'mision', i:ruta.i, hechas:ruta.hechas, hecho:ruta.hecho, cameo:ruta.cameo}
+    : (suelto ? {tipo:'suelto', modo:suelto} : null);
+  alTaller();
+  pintaBotonTaller();
 }
 function caraJuego(on){
   document.getElementById('altas').parentElement.hidden = on;
@@ -3924,7 +4042,7 @@ if(false) [['+', '+'], ['−', '−']].forEach(([op, txt]) => {
 $('crOtra').addEventListener('click', verOtraVez);
 $('crSalir').addEventListener('click', alTaller);
 $('mOper').addEventListener('click', () => { alTaller(); modoBotones('oper'); arrancaOper(); });
-$('mTaller').addEventListener('click', alTaller);
+$('mTaller').addEventListener('click', alTallerBoton);
 $('mDiana').addEventListener('click', () => { alTaller(); modoBotones('diana'); arrancaDiana(); });
 $('mCron').addEventListener('click', () => { alTaller(); modoBotones('cronista'); arrancaCronista(); });
 $('mArgos').addEventListener('click', () => { alTaller(); modoBotones('argos'); arrancaArgos(); });
