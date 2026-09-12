@@ -926,6 +926,25 @@
   body.pizarra h1{font-size:24px}
   @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;
     transition-duration:.01ms !important}}
+
+/* ── EL MODO AULA ───────────────────────────────────────────────────────
+   Para la pizarra digital. Todo un tercio más grande, que es lo que se nota
+   desde el fondo de la clase; y, si hay sitio, el enunciado a la izquierda y el
+   manipulativo a la derecha, para que se vean a la vez. El zoom escala a la vez letra, botones y
+   dibujos, así que no hay que tocar ni un tamaño suelto.                  */
+@media (min-width:900px){
+  body[data-aula="si"]{zoom:1.32;max-width:1430px}
+}
+@media (min-width:1100px){
+  body[data-aula="si"] .aulaRejilla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.06fr);
+    gap:0 16px;align-items:start}
+  body[data-aula="si"] .colIzq,
+  body[data-aula="si"] .colDer{display:block;min-width:0}
+}
+.aulaRejilla,.colIzq,.colDer{display:contents}
+#bAula[aria-pressed="true"]{color:var(--oro, #E9B84E)}
+/* con la ventana ancha los cinco botones del menú se iban a los extremos */
+body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:auto}
 </style>
 </head>
 <body>
@@ -4405,6 +4424,47 @@ $('aviso').innerHTML = 'Pulsa un tirador para marcarlo: podrás darle una poció
   'retirarlo con la cruz. Retirar es <b>restar</b>. Los frascos <b>estrechos</b> ' +
   'reparten (dividen) y los de <b>calavera</b> cambian de bando.';
 if(!retomaTurno()) arrancaMision(0);
+
+/* ── EL MODO AULA ───────────────────────────────────────────────────────
+   Se guarda en su propia llave del almacén, aparte del turno, para no tocar
+   el guardado de la app. La rejilla —cuando la hay— se monta envolviendo lo
+   que ya existe; fuera del modo aula los envoltorios son display:contents y
+   la página se lee en fila, como siempre.                                 */
+(function(){
+  const LLAVE = 'aula.v1';
+  const el = s => document.querySelector(s);
+  const IZQ = ["#ruta", "#canon"], DER = ["#panelCampo", "#panelOper"];
+  if(IZQ.length && DER.length){
+    const primero = el(IZQ[0]);
+    if(primero){
+      const rej = document.createElement('div'); rej.className = 'aulaRejilla';
+      const izq = document.createElement('div'); izq.className = 'colIzq';
+      const der = document.createElement('div'); der.className = 'colDer';
+      primero.parentNode.insertBefore(rej, primero);
+      rej.appendChild(izq); rej.appendChild(der);
+      IZQ.forEach(s => { const e = el(s); if(e) izq.appendChild(e); });
+      DER.forEach(s => { const e = el(s); if(e) der.appendChild(e); });
+    }
+  }
+  const b = document.createElement('button');
+  b.id = 'bAula'; b.type = 'button'; b.className = ''; b.setAttribute('aria-pressed', 'false');
+  const donde = el('.menus .acciones');
+  if(donde) donde.appendChild(b);
+  const pinta = () => {
+    const si = document.documentElement.dataset.aula === 'si';
+    document.body.dataset.aula = si ? 'si' : 'no';
+    b.setAttribute('aria-pressed', String(si));
+    b.textContent = si ? 'Salir del aula' : 'Aula';
+  };
+  b.addEventListener('click', () => {
+    const si = document.documentElement.dataset.aula !== 'si';
+    document.documentElement.dataset.aula = si ? 'si' : 'no';
+    try{ localStorage.setItem(LLAVE, si ? 'si' : 'no'); }catch(e){}
+    pinta();
+  });
+  try{ document.documentElement.dataset.aula = localStorage.getItem(LLAVE) === 'si' ? 'si' : 'no'; }catch(e){}
+  pinta();
+})();
 </script>
 </body>
 </html>
