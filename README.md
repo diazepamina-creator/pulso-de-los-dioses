@@ -1,6 +1,6 @@
 # El pulso de los dioses · ἑλκυστίνδα
 
-**Manipulativo de números enteros para 2.º de ESO.** Un solo archivo HTML: se
+**Manipulativo de números enteros para 1.º y 2.º de ESO.** Un solo archivo HTML: se
 abre en cualquier navegador, funciona en móvil y en pizarra digital, no
 necesita instalar nada ni crear cuentas.
 

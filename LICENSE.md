@@ -1,7 +1,7 @@
 # Licencia
 
 **EL PULSO DE LOS DIOSES · ἑλκυστίνδα**
-Manipulativo de números enteros para 2.º de ESO
+Manipulativo de números enteros para 1.º y 2.º de ESO
 
 © 2026 Andrés Asensio
 
@@ -36,7 +36,7 @@ permitido por la licencia.
 ## Cómo citar
 
 > Asensio, A. (2026). *El pulso de los dioses · ἑλκυστίνδα: manipulativo de
-> números enteros para 2.º de ESO* [Aplicación web]. CC BY-NC-SA 4.0.
+> números enteros para 1.º y 2.º de ESO* [Aplicación web]. CC BY-NC-SA 4.0.
 
 ## Tipografías
 
