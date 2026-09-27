@@ -112,19 +112,19 @@
   /* las acciones, en una sola fila de lado a lado: se lee como una regleta de
      pestañas y no como un montón de botones */
   .acciones{display:flex;width:100%;justify-content:space-between;gap:6px}
-    .menus button{font-size:10px;padding:4px 0;min-height:0;letter-spacing:1px;
+    .menus button{font-size:11px;padding:4px 0;min-height:0;letter-spacing:1px;
     background:transparent;border:0;border-radius:0;color:var(--muted);
     border-bottom:1px solid transparent}
   .menus button:hover,.menus button:focus-visible{color:var(--ink);border-bottom-color:var(--ambar);outline:none}
   .menus button[aria-pressed="true"]{color:var(--ambar);border-bottom-color:var(--ambar)}
-  .chip{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1.3px;
+  .chip{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.3px;
     text-transform:uppercase;color:var(--ambar);white-space:nowrap;
     border:1px solid rgba(233,184,78,.4);border-radius:20px;padding:5px 10px}
   .sello{align-self:flex-start}
   h1{font-family:'Cinzel',serif;font-weight:700;letter-spacing:2.2px;
     text-transform:uppercase;font-size:16.5px;line-height:1.2;margin:0;
     color:var(--oro);text-shadow:0 1px 0 rgba(0,0,0,.4), 0 0 22px rgba(233,184,78,.22)}
-  .sub{font-size:9px;letter-spacing:1.2px;color:var(--muted);text-transform:uppercase;
+  .sub{font-size:10.5px;letter-spacing:1.2px;color:var(--muted);text-transform:uppercase;
     margin:3px 0 0}
     .sub .gr{text-transform:none;font-family:'Cardo',serif;font-size:14px;letter-spacing:.5px;
     color:var(--ambar)}
@@ -185,8 +185,11 @@
     .marca-n{position:absolute;bottom:5px;transform:translateX(-50%);text-align:center;
     font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);line-height:1.2;
     width:var(--paso,14px);padding:2px 0 1px;border-radius:5px}
-  .marca-n.par{background:rgba(242,237,226,.045)}
   .regla.ancha .marca-n{font-size:13px}
+  /* en el móvil no caben diecisiete números sin pisarse: los impares se
+     quedan en raya, como en una regla, salvo el que se marca o donde para */
+  .regla.estrecha .marca-n.impar:not(.cero):not(.diana):not(.elegida){color:transparent}
+  .regla.estrecha .marca-n.impar i{height:18px;margin-bottom:13px}
     .marca-n i{display:block;width:1px;height:26px;margin:0 auto 5px;
     background:linear-gradient(180deg,rgba(167,157,181,.06),rgba(167,157,181,.6));
     font-style:normal}
@@ -558,18 +561,18 @@
   .ajuste summary b{opacity:.6;font-weight:400}
   .aj-fila{display:flex;align-items:center;gap:8px;margin-top:8px}
   .aj-fila label{flex:0 0 96px;font-size:10.5px;color:var(--muted);line-height:1.2}
-  .aj-fila label span{display:block;font-size:9px;opacity:.7}
+  .aj-fila label span{display:block;font-size:10.5px;opacity:.7}
   .aj-b{flex:0 0 auto;min-width:34px;min-height:34px;padding:6px 7px;font-size:13px;
     border-radius:7px;border:1px solid var(--line);background:var(--panel-2);
     color:var(--ambar);cursor:pointer;font-family:'Oswald',sans-serif;line-height:1}
   .aj-b:active{background:var(--ambar);color:#1A1206}
-  .aj-b.ancho{min-width:0;flex:1;font-size:10px;letter-spacing:.8px;text-transform:uppercase}
+  .aj-b.ancho{min-width:0;flex:1;font-size:11px;letter-spacing:.8px;text-transform:uppercase}
   .aj-fila output{flex:1;text-align:center;font-family:'Space Mono',monospace;
     font-size:14px;color:var(--ink)}
-  .aj-nota{font-size:10px;color:var(--muted);margin:8px 0 0;line-height:1.5}
+  .aj-nota{font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.5}
   .ajustes{margin:0 0 10px;border:1px solid var(--line);border-radius:9px;
     background:var(--panel-2);padding:0 9px}
-  .ajustes summary{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1.4px;
+  .ajustes summary{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.4px;
     text-transform:uppercase;color:var(--muted);cursor:pointer;padding:8px 0;
     list-style:none}
   .ajustes summary::-webkit-details-marker{display:none}
@@ -581,9 +584,9 @@
   #pdMenos, #pdMas{flex:0 0 38px;font-size:14px;padding:4px 0}
   .pd-v{flex:0 0 54px;text-align:right;font-family:'Space Mono',monospace;
     font-size:12px;color:var(--ambar)}
-  .veloc span{font-size:9px;letter-spacing:1.3px;text-transform:uppercase;
+  .veloc span{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;
     color:var(--muted);margin-right:2px}
-  .vel-b{flex:1;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1px;
+  .vel-b{flex:1;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;
     text-transform:uppercase;padding:7px 4px;border-radius:7px;border:1px solid var(--line);
     background:var(--panel-2);color:var(--muted);cursor:pointer;min-height:0}
   .vel-b[aria-pressed="true"]{background:var(--ambar);color:#1A1206;border-color:var(--ambar)}
@@ -599,7 +602,7 @@
     .bloque{margin-top:12px}
     .plegable{border:1px solid var(--line);border-radius:9px;background:var(--panel-2);
     padding:0 10px;margin-top:10px}
-  .plegable > summary{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1.4px;
+  .plegable > summary{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.4px;
     text-transform:uppercase;color:var(--muted);cursor:pointer;padding:9px 0;
     list-style:none}
   .plegable > summary::-webkit-details-marker{display:none}
@@ -607,7 +610,7 @@
   .plegable[open] > summary::after{content:' ▴'}
   .plegable[open] > summary{border-bottom:1px solid var(--line);margin-bottom:8px}
   .plegable.letra{padding-bottom:2px}
-  .bloque h3{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1.5px;
+  .bloque h3{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;
     text-transform:uppercase;color:var(--muted);margin:0 0 6px;line-height:1.3}
     [hidden]{display:none !important}
   .fila{display:flex;flex-wrap:wrap;gap:6px}
@@ -627,7 +630,7 @@
   .m-lado{flex:1;display:flex;align-items:baseline;gap:6px}
   .marcador .i{justify-content:flex-end;padding-right:11px;text-align:right}
   .marcador .d{justify-content:flex-start;padding-left:11px}
-  .m-t{font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;
+  .m-t{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;
     color:var(--muted)}
   .m-n{font-size:15px;font-weight:700;line-height:1}
   .marcador .i .m-n{color:var(--izq)} .marcador .d .m-n{color:var(--der)}
@@ -635,7 +638,7 @@
     padding:10px 12px;border-radius:8px;border:1px dashed var(--line);
     background:var(--panel-2);position:relative}
   .reto span{display:block}
-  .reto .r-num{font-family:'Oswald',sans-serif;font-size:9.5px;letter-spacing:1.5px;
+  .reto .r-num{font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:1.5px;
     text-transform:uppercase;color:var(--muted);margin-bottom:4px}
   .reto .r-obj{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.6px}
   .reto .r-cond{font-size:11.5px;color:var(--muted);margin-top:3px}
@@ -684,7 +687,7 @@
     border-right:1px solid rgba(244,240,230,.22)}
   button.poc .corcho{position:absolute;left:6px;right:6px;top:0;height:5px;border-radius:2px;
     background:#8a6f45;box-shadow:inset 0 -2px 0 rgba(0,0,0,.25)}
-  button.poc .nom{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.6px;
+  button.poc .nom{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.6px;
     text-transform:uppercase;line-height:1.1;max-width:66px}
     button.poc .etq{letter-spacing:1px;font-size:12.5px;
     font-family:'Space Mono',monospace;font-size:11px;opacity:.75}
@@ -798,7 +801,7 @@
   @keyframes humea{0%{transform:translate(-50%,-50%) scale(.4);opacity:.8}
     100%{transform:translate(calc(-50% + var(--hx,10px)), calc(-50% + var(--hy,-10px))) scale(1.8);opacity:0}}
     .dn-marca{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 9px}
-  .dn-marca .fi{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1px;
+  .dn-marca .fi{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;
     text-transform:uppercase;color:var(--muted);border:1px solid var(--line);
     border-radius:20px;padding:4px 9px;background:var(--panel-2)}
   .dn-marca .fi b{color:var(--ink)}
@@ -858,7 +861,7 @@
   .op-resp:focus{outline:none;border-color:var(--oro);
     box-shadow:0 0 14px rgba(233,184,78,.3)}
   .op-resp::placeholder{color:var(--muted);font-size:13px}
-  .modo-b{font-size:10px}
+  .modo-b{font-size:11px}
       .ac-nom{margin-top:10px;font-size:14px;text-align:left}
   .ac-res{font-size:13.5px;line-height:1.7;color:var(--muted);margin:0 0 10px}
   .ac-res b{color:var(--ink);font-size:14px}
@@ -871,7 +874,7 @@
   .ac-p{font-family:'Oswald',sans-serif;color:var(--ambar);min-width:38px;text-align:right}
   .ruta{border-color:rgba(233,184,78,.35);padding:10px 12px}
   .rt-linea{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
-  .rt-cab{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1.4px;
+  .rt-cab{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.4px;
     text-transform:uppercase;color:var(--ambar)}
   .ruta h2{margin:0;color:var(--ink);font-size:12px}
   .rt-txt{font-size:13px;line-height:1.55;color:var(--muted);margin:0 0 6px}
@@ -880,7 +883,7 @@
      «Siguiente misión» merece caja, porque ese sí es el camino. */
   #rtBotones{justify-content:flex-end;min-height:0}
   #rtBotones:not(:has(#rtSigue:not([hidden]))){margin-top:-2px}
-  #rtSalta{background:none;border:0;padding:2px 0;min-height:0;font-size:10px;
+  #rtSalta{background:none;border:0;padding:2px 0;min-height:0;font-size:11px;
     letter-spacing:1px;color:var(--muted);border-bottom:1px solid transparent}
   #rtSalta:hover,#rtSalta:focus-visible{color:var(--ink);border-bottom-color:var(--ambar);outline:none}
   #rtSigue{margin-right:auto}
@@ -929,20 +932,41 @@
     transition-duration:.01ms !important}}
 
 /* ── EL MODO AULA ───────────────────────────────────────────────────────
-   Para la pizarra digital. Todo un tercio más grande, que es lo que se nota
-   desde el fondo de la clase; y, si hay sitio, el enunciado a la izquierda y el
-   manipulativo a la derecha, para que se vean a la vez. El zoom escala a la vez letra, botones y
-   dibujos, así que no hay que tocar ni un tamaño suelto.                  */
+   Para la pizarra digital (antes había además un botón «Pizarra» en Ajustes
+   que hacía casi lo mismo: ahora es uno solo). Todo un tercio más grande, que
+   es lo que se nota desde el fondo de la clase, y a lo ancho de la pantalla:
+   la misión y la pregunta a la izquierda, el campo a la derecha y siempre a
+   la vista. El zoom escala letra, botones y dibujos a la vez; las cuentas
+   de posición lo deshacen con rectZ().                                   */
 @media (min-width:900px){
-  body[data-aula="si"]{zoom:1.32;max-width:1430px}
+  body[data-aula="si"]{zoom:1.32;max-width:none;padding-left:22px;padding-right:22px}
+}
+/* pizarras y proyectores de 1366×768: con 1,32 el campo no cabía de alto */
+@media (min-width:900px) and (max-height:820px){
+  body[data-aula="si"]{zoom:1.12}
 }
 @media (min-width:1100px){
-  body[data-aula="si"] .aulaRejilla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.06fr);
-    gap:0 16px;align-items:start}
+  body[data-aula="si"] .aulaRejilla{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+    gap:0 18px;align-items:start}
   body[data-aula="si"] .colIzq,
   body[data-aula="si"] .colDer{display:block;min-width:0}
+  body[data-aula="si"] .colDer{position:sticky;top:8px}
+  body[data-aula="si"] #diana, body[data-aula="si"] #cronista{order:0}
 }
-.aulaRejilla,.colIzq,.colDer{display:contents}
+/* los enunciados, más grandes en el aula: es lo que se lee desde el fondo */
+body[data-aula="si"] .op-linea{font-size:25px}
+body[data-aula="si"] .rt-txt, body[data-aula="si"] .cr-txt,
+body[data-aula="si"] .anuncio p, body[data-aula="si"] .aviso{font-size:15px}
+body[data-aula="si"] .reto{font-size:16px}
+/* fuera del aula los envoltorios no cuentan y todo va en una columna; el
+   orden pone la pregunta encima del campo y los mandos de la Diana y del
+   Cronista debajo, pegados a donde se arrastra */
+.aulaRejilla{display:flex;flex-direction:column}
+.colIzq,.colDer{display:contents}
+#diana,#cronista,#zonaEncargo{order:2}
+#panelCampo{order:1}
+/* el campo en espera: se ve, vacío, hasta que se pide verlo */
+#panelCampo.espera #zonaCuenta, #panelCampo.espera .marcador{visibility:hidden}
 #bAula[aria-pressed="true"]{color:var(--oro, #E9B84E)}
 /* con la ventana ancha los cinco botones del menú se iban a los extremos */
 body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:auto}
@@ -1035,7 +1059,6 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
   <button class="vel-b" data-v="1" aria-pressed="true">Normal</button>
   <button class="vel-b" data-v="2" aria-pressed="false">Lenta</button>
   <button class="vel-b" data-v="4" aria-pressed="false">Muy lenta</button>
-  <button class="vel-b" id="pizarra" aria-pressed="false">Pizarra</button>
 </div>
 <div class="veloc">
   <span>Suelto</span>
@@ -1043,7 +1066,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v5.6</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v5.7</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1118,7 +1141,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
       <button id="opVale" class="scan">Comprobar</button>
     </div>
   </div>
-  <p class="aviso" id="opAviso"></p>
+  <p class="aviso" id="opAviso" role="status"></p>
 </div>
 <div class="panel" id="panelCampo">
   <h2>Tira y afloja</h2>
@@ -1181,7 +1204,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
     <summary id="tituloPociones">Pociones · pulsa antes a un tirador</summary>
     <div class="fila" id="pociones"></div>
   </details>
-  <p class="aviso" id="aviso"></p>
+  <p class="aviso" id="aviso" role="status"></p>
 </div>
       <div id="diana" hidden>
     <p class="dn-marca" id="dnMarca"></p>
@@ -1191,7 +1214,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
         <button id="dnClava" class="scan ancho" disabled>Comprobar</button>
       </div>
     </div>
-    <p class="aviso" id="dnAviso"></p>
+    <p class="aviso" id="dnAviso" role="status"></p>
     <div class="fila" style="margin-top:8px">
       <button id="dnSalir">Volver al taller</button>
     </div>
@@ -1207,13 +1230,13 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
       <button id="cnVer">Verlo en el campo</button>
       <button id="cnVale" class="scan">Comprobar</button>
     </div>
-    <p class="aviso" id="cnAviso"></p>
+    <p class="aviso" id="cnAviso" role="status"></p>
   </div>
     <div id="argos" hidden>
     <p class="dn-marca" id="agMarca"></p>
     <p class="cr-txt" id="agTxt"></p>
     <div id="agLista"></div>
-    <p class="aviso" id="agAviso"></p>
+    <p class="aviso" id="agAviso" role="status"></p>
     <div class="fila" style="margin-top:8px">
       <button id="agVer">Verlo en el campo</button>
       <button id="agOtra" class="scan" hidden>Siguiente</button>
@@ -1229,7 +1252,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
         <div id="crTeclas" hidden>
       <div class="cr-ops" id="crOpciones"></div>
     </div>
-        <p class="aviso" id="crAviso"></p>
+        <p class="aviso" id="crAviso" role="status"></p>
     <div class="fila" style="margin-top:8px">
       <button id="crSalir">Volver al taller</button>
     </div>
@@ -1386,12 +1409,6 @@ document.querySelectorAll('.vel-b[data-v]').forEach(b => b.addEventListener('cli
   document.querySelectorAll('.vel-b[data-v]').forEach(o =>
     o.setAttribute('aria-pressed', String(o === b)));
 }));
-$('pizarra').addEventListener('click', () => {
-  const on = document.body.classList.toggle('pizarra');
-  $('pizarra').setAttribute('aria-pressed', String(on));
-  ajustaPaso();
-  pinta();
-});
 let tirado = false;
 let diana = null;
 let cron = null;
@@ -1842,8 +1859,9 @@ function pintaRegla(){
     const clase = (v === 0 ? ' cero' : (tirado && v === t ? ' diana' : '')) +
       (prediccion !== null && v === prediccion ? ' elegida' : '') +
                   (viva && prediccion === v ? ' elegida' : '');
-    h += '<span class="marca-n' + clase + '" data-v="' + v +
-         (v % 2 === 0 ? ' par' : '') +
+    /* «par» iba por error dentro de data-v y nunca llegaba a la clase */
+    h += '<span class="marca-n' + clase + (v % 2 === 0 ? ' par' : ' impar') +
+         '" data-v="' + v +
          '" style="left:calc(50% + ' + (v * PASO) + 'px)">' +
          '<i></i>' + v + '</span>';
   }
@@ -1856,6 +1874,7 @@ function pintaRegla(){
   $('regla').innerHTML = h;
     $('regla').style.setProperty('--paso', PASO + 'px');
   $('regla').classList.toggle('ancha', PASO >= 19);
+  $('regla').classList.toggle('estrecha', PASO < 18);
   $('regla').classList.toggle('viva', viva);
   document.querySelector('.campo').classList.toggle('eligiendo', viva);
   $('dial').hidden = !viva;
@@ -1932,9 +1951,23 @@ function marcaElegida(){
   document.querySelectorAll('#regla .marca-n').forEach(m =>
     m.classList.toggle('elegida', parseInt(m.dataset.v, 10) === prediccion));
 }
+/* EL ZOOM DEL AULA. El modo aula agranda el cuerpo con zoom: el navegador
+   mide la pantalla ya agrandada, pero el campo se dibuja en sus píxeles de
+   siempre. Sin deshacer el factor, el dedo sobre +3 marcaba +4 y Zeus, los
+   números flotantes o el humo caían fuera de sitio. */
+function zoomCuerpo(){
+  const b = document.body, w = b.offsetWidth;
+  return w ? (b.getBoundingClientRect().width / w) || 1 : 1;
+}
+function rectZ(el){
+  const r = el.getBoundingClientRect(), k = zoomCuerpo();
+  if(k === 1) return r;
+  return {left:r.left / k, right:r.right / k, top:r.top / k, bottom:r.bottom / k,
+          width:r.width / k, height:r.height / k};
+}
 function valorEnX(x){
-  const r = document.querySelector('.campo').getBoundingClientRect();
-  const v = Math.round((x - (r.left + r.width / 2 + PAN)) / (PASO * ZOOM * AWE));
+  const r = rectZ(document.querySelector('.campo'));
+  const v = Math.round((x / zoomCuerpo() - (r.left + r.width / 2 + PAN)) / (PASO * ZOOM * AWE));
   return clampEstaca(Math.max(-9, Math.min(9, v)));
 }
 let arrastrando = false;
@@ -2156,7 +2189,8 @@ function pinta(){
   document.querySelectorAll('#pociones button').forEach(b =>
     b.disabled = (!sel && !cuadrilla.size) ||        // v4.6: o uno, o la cuadrilla
       (sel && bebiendoIds.has(sel)) || !!diana || !!cron);
-    $('aviso').hidden = !!(diana || argos || (canon && !canon.visto));
+    $('aviso').hidden = !!(diana || argos || (canon && !canon.visto) ||
+      $('panelCampo').classList.contains('espera'));
   if(diana) pintaDiana(); else if(cron) pintaCron(); else pintaReto();
 }
 function asienta(){
@@ -2194,7 +2228,7 @@ function vuelveAMontar(){ previo = suma(); }
 function flotaSobre(elT, texto, color){
   if(!elT || mudo) return;
   const campo = document.querySelector('.campo');
-  const rc = campo.getBoundingClientRect(), rn = elT.getBoundingClientRect();
+  const rc = rectZ(campo), rn = rectZ(elT);
   const fl = document.createElement('span');
   fl.className = 'flota';
   if(color) fl.style.color = color;
@@ -2202,16 +2236,16 @@ function flotaSobre(elT, texto, color){
   fl.style.left = (rn.left + rn.width / 2 - rc.left).toFixed(0) + 'px';
   fl.style.top = Math.max(2, rn.top - rc.top - 4).toFixed(0) + 'px';
   campo.appendChild(fl);
-    const anc = fl.getBoundingClientRect().width;
+    const anc = rectZ(fl).width;
   const izq = Math.max(anc / 2 + 4, Math.min(rc.width - anc / 2 - 4,
     parseFloat(fl.style.left)));
   fl.style.left = izq.toFixed(0) + 'px';
-  const mio = () => { const r = fl.getBoundingClientRect();
+  const mio = () => { const r = rectZ(fl);
     return {x1:r.left, x2:r.right, y1:r.top, y2:r.bottom}; };
   const otros = [...campo.querySelectorAll('.flota')].filter(e => e !== fl);
   for(let intento = 0; intento < 6; intento++){
     const m = mio();
-    const choca = otros.some(e => { const r = e.getBoundingClientRect();
+    const choca = otros.some(e => { const r = rectZ(e);
       return m.x1 < r.right + 6 && m.x2 > r.left - 6 &&
              m.y1 < r.bottom + 2 && m.y2 > r.top - 2; });
     if(!choca) break;
@@ -2224,10 +2258,10 @@ function sacoSobre(nodos, etq){
   const lista = nodos.filter(Boolean);
   if(!lista.length) return;
   const campo = document.querySelector('.campo');
-  const rc = campo.getBoundingClientRect();
+  const rc = rectZ(campo);
   let x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity;
   lista.forEach(n => {
-    const r = n.getBoundingClientRect();
+    const r = rectZ(n);
     x1 = Math.min(x1, r.left); x2 = Math.max(x2, r.right);
     y1 = Math.min(y1, r.top);  y2 = Math.max(y2, r.bottom);
   });
@@ -2324,7 +2358,7 @@ let zeusEncargos = [];
 function zeusAsoma(elT, alIrse){
   if(typeof alIrse === 'function') zeusEncargos.push(alIrse);
   const campo = document.querySelector('.campo');
-  const rc = campo.getBoundingClientRect(), rn = elT.getBoundingClientRect();
+  const rc = rectZ(campo), rn = rectZ(elT);
   const cxV = rn.left + rn.width / 2 - rc.left;
     let cx = cxV - 72, zurdo = false;
   if(cx < 66){ cx = Math.min(rc.width - 66, cxV + 72); zurdo = true; }
@@ -2347,7 +2381,7 @@ function zeusAsoma(elT, alIrse){
   z.style.setProperty('--asomo', (yCenefa - HUECO_Z - ALTO_Z).toFixed(1) + 'px');
     setTimeout(() => {
     if(!document.body.contains(elT) || !z.classList.contains('fuera')) return;
-    const rn2 = elT.getBoundingClientRect();
+    const rn2 = rectZ(elT);
     const cx2 = rn2.left + rn2.width / 2 - rc.left;
     let cxZ = zurdo ? Math.min(rc.width - 66, cx2 + 72)
                     : Math.max(66, cx2 - 72);
@@ -2390,7 +2424,7 @@ function trueno(fza){
 }
 function chamuscaEn(elT, fza){
   const campo = document.querySelector('.campo');
-  const rc = campo.getBoundingClientRect(), rn = elT.getBoundingClientRect();
+  const rc = rectZ(campo), rn = rectZ(elT);
   const m = document.createElement('span');
   m.className = 'chamusca';
   m.style.left = (rn.left + rn.width / 2 - rc.left).toFixed(0) + 'px';
@@ -2406,13 +2440,13 @@ function rayoEn(elT, fza){
   if(!elT) return;
   const u = varaDe(fza);
   const campo = document.querySelector('.campo');
-  const rc = campo.getBoundingClientRect(), rn = elT.getBoundingClientRect();
+  const rc = rectZ(campo), rn = rectZ(elT);
   const cx = rn.left + rn.width / 2 - rc.left;
   const cy = Math.max(12, rn.top - rc.top + 6);
     let sx = cx, sy = 12;
   const punoZ = campo.querySelector('.zeus.fuera .punoZ');
   if(punoZ){
-    const rz = punoZ.getBoundingClientRect();
+    const rz = rectZ(punoZ);
     sx = rz.left + rz.width / 2 - rc.left;
     sy = rz.top + rz.height - rc.top + 1;
   }
@@ -2450,7 +2484,7 @@ function rayoEn(elT, fza){
 function humoEn(elT){
   if(!elT) return;
   const campo = document.querySelector('.campo');
-  const rc = campo.getBoundingClientRect(), rn = elT.getBoundingClientRect();
+  const rc = rectZ(campo), rn = rectZ(elT);
   const cx = rn.left + rn.width / 2 - rc.left;
   const cy = rn.top + rn.height * 0.55 - rc.top;
   for(let i = 0; i < 7; i++){
@@ -2631,7 +2665,7 @@ function hacePocion(p, antes, nuevo, nombre, cambiaBando, tono, color, etq){
     cortaCinta('poción ' + nombre + ' · (' + conSigno(antes) + ') ' + etq +
              ' = ' + conSigno(nuevo));
     const antesNodo = document.querySelector('.tirador[data-id="' + p.id + '"]');
-  const r0 = antesNodo ? antesNodo.getBoundingClientRect() : null;
+  const r0 = antesNodo ? rectZ(antesNodo) : null;
     if(cambiaBando) p.venia = antes < 0 ? 'izq' : 'der';
   p.f = nuevo;
   base = suma();
@@ -2672,7 +2706,7 @@ function hacePocion(p, antes, nuevo, nombre, cambiaBando, tono, color, etq){
   }
   if(cambiaBando && r0){
         const campo = document.querySelector('.campo');
-    const r1 = nodo.getBoundingClientRect();
+    const r1 = rectZ(nodo);
     nodo.style.setProperty('--dx0',
       (r0.left + r0.width / 2 - (r1.left + r1.width / 2)).toFixed(0) + 'px');
     nodo.style.setProperty('--dy0', (r0.bottom - r1.bottom).toFixed(0) + 'px');
@@ -2949,6 +2983,7 @@ function rondaDiana(){
   pideEstaca();
 }
 function arrancaDiana(grado){
+  campoDespierta();
   cron = null; oper = null; mudo = false;
   $('cronista').hidden = true;
   $('panelOper').hidden = true;
@@ -3144,7 +3179,7 @@ function pintaOper(){
     '<span class="fi">nivel <b>' + (oper.nivel + 1) + '</b>/' + NIVELES_OP.length + '</span>' +
     '<span class="fi">resueltas <b>' + oper.aciertos + '</b></span>' +
     '<span class="fi ambar">solo <b>' + oper.solas + '</b></span>';
-    const abierto = !$('panelCampo').hidden;
+    const abierto = oper.visto;
   const piezas = oper.ej.piezas.map((h, i) => {
     if(!abierto) return h;
     const cl = i < oper.paso ? 'hecho' : (i === oper.paso ? 'ahora' : '');
@@ -3173,19 +3208,43 @@ function rondaOper(){
   oper.visto = false;
   oper.paso = 0;
   oper.fase = 'pensando';
-  $('opAviso').innerHTML = 'Si no la ves, ábrela y pásala fotograma a fotograma.';
-  $('panelCampo').hidden = true;
-  $('opPasos').hidden = true;
+  $('opAviso').innerHTML = 'Si no la ves, ábrela en el campo y pásala fotograma a fotograma.';
+  campoEnEspera();
   pintaOper();
+}
+/* EL CAMPO EN ESPERA. Antes se escondía hasta pulsar «Ver»: la misión
+   arrancaba pareciendo un cuestionario de texto. Ahora se ve siempre, vacío,
+   con la regla a la vista; los tiradores entran al pedirlo. */
+function campoEnEspera(){
+  if(oper) oper.tokPaso = (oper.tokPaso || 0) + 1;   // los fotogramas que quedaban, fuera
+  quitaHitos();
+  tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
+  $('opPasos').hidden = true;
+  $('aviso').hidden = true;
+  $('aviso').textContent = '';      // si no, asomaba el «Encargo nuevo» del taller
+  $('panelCampo').hidden = false;
+  $('panelCampo').classList.add('espera');
+  pinta();
+}
+function campoDespierta(){
+  $('panelCampo').classList.remove('espera');
+  $('panelCampo').hidden = false;
+}
+/* baja hasta el campo solo si no está a la vista (en el aula ya lo está) */
+function asomaCampo(){
+  const c = $('panelCampo');
+  if(!c.scrollIntoView) return;
+  const r = c.getBoundingClientRect();
+  if(r.top < 0 || r.top > window.innerHeight * 0.45)
+    c.scrollIntoView({behavior:'smooth', block:'start'});
 }
 function abreCampo(){
   if(!oper) return;
   oper.visto = true;
-  $('panelCampo').hidden = false;
+  campoDespierta();
   $('opPasos').hidden = false;
   vePaso(0, false);
-    if($('panelCampo').scrollIntoView)
-    $('panelCampo').scrollIntoView({behavior:'smooth', block:'start'});
+  asomaCampo();
   $('opAviso').innerHTML = 'Cada <b>▶</b> es un término.';
 }
 /* LOS FOTOGRAMAS. Cada paso lleva su ficha (tok): si se retrocede o se
@@ -3353,8 +3412,7 @@ function rondaCanon(){
   canon.visto = false;
   $('cnResp').value = '';
   $('cnAviso').innerHTML = 'Si no lo ves, ábrelo en el campo.';
-  $('panelCampo').hidden = true;
-  quitaHitos();
+  campoEnEspera();
   pintaCanon();
 }
 function pintaCanon(){
@@ -3372,7 +3430,7 @@ function pintaCanon(){
 function canonAlCampo(){
   if(!canon) return;
   canon.visto = true;
-  $('panelCampo').hidden = false;
+  campoDespierta();
   $('opPasos').hidden = true;
   sel = null; cinta = []; lineas = []; base = 0;
   if(canon.ej.tipo === 'fuerza'){
@@ -3392,8 +3450,7 @@ function canonAlCampo(){
     $('aviso').innerHTML = 'Los dos, clavados en la regla. <b>El de más a la izquierda ' +
       'es el menor</b>.';
   }
-  if($('panelCampo').scrollIntoView)
-    $('panelCampo').scrollIntoView({behavior:'smooth', block:'start'});
+  asomaCampo();
   pintaCanon();
 }
 /* un número entero de verdad: un «−» suelto no es una respuesta, y no
@@ -3460,6 +3517,7 @@ let argos = null;
 function rondaArgos(){
   if(!argos) return;
   argos.ej = generaOperacion(argos.nivel);
+  campoEnEspera();
   const pasos = argos.ej.pasos;
       const buenos = [];
   for(let i = 1; i <= pasos.length; i++) buenos.push(sumaSim(estadoDe(pasos, i)));
@@ -3572,14 +3630,13 @@ function argosAlCampo(){
   if(!argos) return;
   oper = {nivel:argos.nivel, aciertos:0, solas:0, seguidas:0, tropiezos:0,
           ej:argos.ej, resp:'', visto:true, paso:0, fase:'viendo'};
-  $('panelCampo').hidden = false;
+  campoDespierta();
   $('opPasos').hidden = false;
   glosarioSegunHaga(argos.ej.pasos.some(j =>
     j.tipo === 'termino' || j.tipo === 'bebe' || j.tipo === 'todos' ||
     j.tipo === 'potencia'));
   vePaso(argos.malo + 1, false);
-  if($('panelCampo').scrollIntoView)
-    $('panelCampo').scrollIntoView({behavior:'smooth', block:'start'});
+  asomaCampo();
 }
 function arrancaArgos(nivel){
   argos = {nivel:2, aciertos:0, fallos:0, ej:null, malo:0, dichos:[],
@@ -3590,13 +3647,12 @@ function arrancaArgos(nivel){
   $('diana').hidden = true;
   $('cronista').hidden = true;
   $('zonaEncargo').hidden = true;
-  $('panelCampo').hidden = true;
   caraJuego(true);
   if(nivel !== undefined) argos.nivel = nivel;
   rondaArgos();
 }
 $('agVer').addEventListener('click', argosAlCampo);
-$('agOtra').addEventListener('click', () => { $('panelCampo').hidden = true; rondaArgos(); });
+$('agOtra').addEventListener('click', rondaArgos);
 const CGRADOS = [
   {n:1, t:'una operación'},
   {n:2, t:'dos operaciones seguidas'},
@@ -3823,6 +3879,7 @@ function juzgaCron(){
   pintaCron();
 }
 function arrancaCronista(grado){
+  campoDespierta();
   oper = null;
   glosarioSegunHaga(false);              // el cronista no usa pociones: fuera el glosario
   $('panelOper').hidden = true;
@@ -4087,7 +4144,7 @@ let vueltaTaller = null;
 function pintaBotonTaller(){
   const dentro = $('mTaller').getAttribute('aria-pressed') === 'true';
   $('mTaller').textContent = !dentro ? 'Taller'
-    : (vueltaTaller && vueltaTaller.tipo === 'mision') ? 'Volver a la misión'
+    : (vueltaTaller && vueltaTaller.tipo === 'mision') ? 'A la misión'
     : 'Salir del taller';
 }
 function modoSuelto(){
@@ -4144,7 +4201,7 @@ function alTaller(){
   quitaHitos();
   $('acta').hidden = true;
   $('panelOper').hidden = true;
-  $('panelCampo').hidden = false;
+  campoDespierta();
   $('opPasos').hidden = true;
   $('cronista').hidden = true;
   prediccion = null; quitaEstaca();
@@ -4310,15 +4367,16 @@ function colocaFoco(){
   if(!p || $('tour').hidden) return;
   const el = document.querySelector(p.sel);
   if(!seVe(el)) return;
-  const r = el.getBoundingClientRect(), m = 8, foco = $('tourFoco');
+  const r = rectZ(el), m = 8, foco = $('tourFoco');
   foco.style.top    = (r.top - m) + 'px';
   foco.style.left   = (r.left - m) + 'px';
   foco.style.width  = (r.width + m * 2) + 'px';
   foco.style.height = (r.height + m * 2) + 'px';
   const globo = $('tourGlobo');
   const alto = globo.offsetHeight || 170, ancho = globo.offsetWidth || 300;
-  const vh = (typeof window !== 'undefined' && window.innerHeight) || 700;
-  const vw = (typeof window !== 'undefined' && window.innerWidth) || 360;
+  const kz = zoomCuerpo();
+  const vh = ((typeof window !== 'undefined' && window.innerHeight) || 700) / kz;
+  const vw = ((typeof window !== 'undefined' && window.innerWidth) || 360) / kz;
   const abajo = r.bottom + m + 12, arriba = r.top - m - 12 - alto;
   globo.style.top = (abajo + alto < vh - 8 ? abajo
                     : (arriba > 8 ? arriba : Math.max(8, (vh - alto) / 2))) + 'px';
@@ -4501,7 +4559,8 @@ if(!retomaTurno()) arrancaMision(0);
 (function(){
   const LLAVE = 'aula.v1';
   const el = s => document.querySelector(s);
-  const IZQ = ["#ruta", "#canon"], DER = ["#panelCampo", "#panelOper"];
+  const IZQ = ["#ruta", "#panelOper", "#canon", "#argos", "#diana", "#cronista", "#zonaEncargo"],
+        DER = ["#panelCampo"];
   if(IZQ.length && DER.length){
     const primero = el(IZQ[0]);
     if(primero){
@@ -4518,9 +4577,11 @@ if(!retomaTurno()) arrancaMision(0);
   b.id = 'bAula'; b.type = 'button'; b.className = ''; b.setAttribute('aria-pressed', 'false');
   const donde = el('.menus .acciones');
   if(donde) donde.appendChild(b);
-  const pinta = () => {
+  const pintaAula = () => {
     const si = document.documentElement.dataset.aula === 'si';
     document.body.dataset.aula = si ? 'si' : 'no';
+    document.body.classList.toggle('pizarra', si);   // campo y regla, a tamaño de pizarra
+    ajustaPaso(); pinta();
     b.setAttribute('aria-pressed', String(si));
     b.textContent = si ? 'Salir del aula' : 'Aula';
   };
@@ -4528,10 +4589,10 @@ if(!retomaTurno()) arrancaMision(0);
     const si = document.documentElement.dataset.aula !== 'si';
     document.documentElement.dataset.aula = si ? 'si' : 'no';
     try{ localStorage.setItem(LLAVE, si ? 'si' : 'no'); }catch(e){}
-    pinta();
+    pintaAula();
   });
   try{ document.documentElement.dataset.aula = localStorage.getItem(LLAVE) === 'si' ? 'si' : 'no'; }catch(e){}
-  pinta();
+  pintaAula();
 })();
 </script>
 </body>
