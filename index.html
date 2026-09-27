@@ -969,6 +969,7 @@
   body[data-aula="si"] .colIzq,
   body[data-aula="si"] .colDer{display:block;min-width:0}
   body[data-aula="si"] .colDer{position:sticky;top:8px}
+  body[data-aula="si"] .habla:has(> #clEscena){display:none}
   body[data-aula="si"] #diana, body[data-aula="si"] #cronista{order:0}
 }
 /* los enunciados, más grandes en el aula: es lo que se lee desde el fondo */
@@ -1091,6 +1092,56 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 .sellito.s0{color:var(--sello-oro)} .sellito.s1{color:var(--sello-rojo)} .sellito.s2{color:var(--sello-azul)}
 [data-tema="tablilla"] .sellito.s2{animation:estampa .45s cubic-bezier(.3,1.6,.5,1)}
 @keyframes estampa{from{transform:rotate(-14deg) scale(1.8);opacity:0}}
+
+/* ── LA TABLILLA DE LISTILLÓN ── es de barro en los dos temas: por eso lleva
+   su propia paleta, en variables locales que heredan sus botones */
+.calc{--panel:#efe4ca; --panel-2:#f7f0de; --line:#c4b08a; --ink:#241b36; --muted:#5f5040;
+  --oro:#7f5a0e; --ambar:#7f5a0e; --green:#2f6b28; --izq:#a8432d; --der:#1f6a88;
+  --habla-l:#eef5f8; --habla-l-b:#77b0c6;
+  background:var(--panel);color:var(--ink);border:3px solid #8a6a3b;border-radius:14px;
+  box-shadow:inset 0 0 0 2px var(--panel), inset 0 0 0 3px #b8a589, 0 2px 0 rgba(90,64,30,.25)}
+.calc h2{color:var(--muted)}
+.calc button{background:var(--panel-2);border-color:var(--line);color:var(--ink)}
+.calc button.scan{background:#d7a646;border-color:#a67a1f;color:#241b36}
+.cl-tabla{position:relative;min-height:66px;margin:0 0 10px;padding:12px 14px;border-radius:10px;
+  font-family:'Space Mono',monospace;font-size:20px;line-height:1.5;word-break:break-word;
+  background:linear-gradient(180deg,#e6d6b3,#efe3c6);border:1.5px solid #b8a589;
+  box-shadow:inset 0 2px 6px rgba(90,64,30,.25)}
+.cl-tabla .op{color:var(--muted)}
+.cl-tabla .poc{color:#8a2f7a;font-weight:700}
+.cl-tabla .cl-res{color:var(--ink);font-size:23px}
+.cl-vacia{color:rgba(95,80,64,.55);font-style:italic;font-family:'Atkinson Hyperlegible',sans-serif;font-size:15px}
+.cl-cursor{display:inline-block;width:2px;height:1.1em;margin-left:2px;vertical-align:-3px;
+  background:var(--ink);animation:parpadea 1s steps(1) infinite}
+@keyframes parpadea{50%{opacity:0}}
+#clTeclas{display:flex;flex-direction:column;gap:6px}
+.cl-fila{display:grid;gap:6px}
+.cl-tir{grid-template-columns:repeat(5,1fr)}
+.cl-poc{grid-template-columns:repeat(4,1fr)}
+.cl-ops{grid-template-columns:repeat(6,1fr)}
+.calc .cl-t{display:flex;align-items:center;justify-content:center;gap:2px;padding:4px 2px;min-height:44px;
+  font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:0}
+.calc .cl-t svg{width:24px;height:24px;flex:0 0 auto}
+.calc .cl-t.izq{color:var(--izq);border-color:rgba(168,67,45,.5)}
+.calc .cl-t.der{color:var(--der);border-color:rgba(31,106,136,.5);flex-direction:row-reverse}
+.calc button.cl-p{min-width:0;padding:5px 2px 4px;min-height:52px}
+.calc button.cl-p .etq{font-size:12px;letter-spacing:0}
+.calc button.poc.crece{color:var(--green)} .calc button.poc.mengua{color:#3d63b0}
+.calc button.poc.bando{color:#a5308f}
+.calc .cl-o{font-size:22px;font-family:'Space Mono',monospace;min-height:46px;padding:4px 0}
+.calc .cl-igual{font-size:24px}
+/* el banco: los frascos escritos delante esperan aquí a que haya a quién dárselos */
+.banco{position:absolute;top:22px;left:8px;z-index:13;display:flex;gap:5px;align-items:center;
+  padding:3px 8px 3px 6px;border-radius:8px;background:rgba(20,14,30,.55);
+  border:1px dashed rgba(233,184,78,.6);pointer-events:none}
+[data-tema="tablilla"] .banco{background:rgba(247,240,222,.9);border-color:#a67a1f}
+.banco[hidden]{display:none}
+.banco-t{font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--muted)}
+.banco-f{display:flex;align-items:center;gap:2px;transition:transform .6s ease, opacity .6s ease}
+.banco-f .frasco{zoom:.55}
+.banco-f i{font-style:normal;font-family:'Space Mono',monospace;font-size:13px;font-weight:700}
+.banco-f.baja{transform:translateY(40px) scale(.6);opacity:0}
 </style>
 </head>
 <body>
@@ -1188,11 +1239,11 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 </div>
 <div class="veloc">
   <span>Suelto</span>
-  <button class="vel-b" id="aMostrarModos" aria-pressed="false">Los cinco modos</button>
+  <button class="vel-b" id="aMostrarModos" aria-pressed="false">Los modos</button>
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.1</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.2</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1232,12 +1283,24 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
     <button id="rtSalta">Saltar esta misión</button>
   </div>
 </div>
+<div class="panel calc" id="calc" hidden>
+  <h2>La tablilla de Listillón</h2>
+  <div class="cl-tabla" aria-live="polite"><span id="clEscrito"></span><span class="cl-cursor" aria-hidden="true"></span></div>
+  <div id="clTeclas"></div>
+  <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="clAviso" role="status"></p></div>
+  <div class="fila" style="margin-top:8px">
+    <button id="clOtra">▶ Otra vez la función</button>
+    <button id="clLimpia">Tablilla limpia</button>
+    <button id="clSalir">Volver al taller</button>
+  </div>
+</div>
 <div class="modos" id="modos" hidden>
   <button id="mOper" class="modo-b" aria-pressed="true">Operaciones</button>
   <button id="mDiana" class="modo-b" aria-pressed="false">La Diana</button>
   <button id="mCron" class="modo-b" aria-pressed="false">El Cronista</button>
   <button id="mArgos" class="modo-b" aria-pressed="false">Argos</button>
   <button id="mCanon" class="modo-b" aria-pressed="false">El canon</button>
+  <button id="mCalc" class="modo-b" aria-pressed="false">La tablilla</button>
 </div>
 <div class="tour-capa" id="tour" hidden>
   <div class="tour-foco" id="tourFoco"></div>
@@ -1331,6 +1394,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
     <div class="fila" id="pociones"></div>
   </details>
   <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="aviso" role="status"></p></div>
+  <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="clEscena" hidden></p></div>
 </div>
       <div id="diana" hidden>
     <p class="dn-marca" id="dnMarca"></p>
@@ -1389,6 +1453,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
     <div class="fila">
       <button id="otroReto">Otro encargo</button>
       <button id="vaciar">Vaciar el campo</button>
+      <button id="aCalc">La tablilla de Listillón</button>
     </div>
   </div>
   <div id="letraChica" hidden>
@@ -1538,6 +1603,7 @@ document.querySelectorAll('.vel-b[data-v]').forEach(b => b.addEventListener('cli
 let tirado = false;
 let diana = null;
 let cron = null;
+let calc = null;
 let mudo = false;
 const suma = () => tiradores.reduce((t, p) => t + p.f, 0);
 const conSigno = n => n === 0 ? '0' : (n > 0 ? '+' : '−') + Math.abs(n);
@@ -2205,7 +2271,7 @@ function pinta(){
         let tocLargo = 0, movido = false;
     const sueltaLarga = () => { clearTimeout(tocLargo); tocLargo = 0; };
     el.addEventListener('pointerdown', ev => {
-      if(bebiendoIds.has(p.id) || diana || cron) return;
+      if(bebiendoIds.has(p.id) || diana || cron || calc) return;
       if(ev.target.classList.contains('fuera')) return;
       movido = false;
       tocLargo = setTimeout(() => {
@@ -2224,13 +2290,13 @@ function pinta(){
     /* con teclado: marcado el tirador, Supr o Retroceso lo retira */
     el.addEventListener('keydown', ev => {
       if(ev.key !== 'Delete' && ev.key !== 'Backspace') return;
-      if(bebiendoIds.has(p.id) || diana || cron || sel !== p.id) return;
+      if(bebiendoIds.has(p.id) || diana || cron || calc || sel !== p.id) return;
       ev.preventDefault();
       retira(p.id);
     });
     el.addEventListener('click', ev => {
       if(bebiendoIds.has(p.id)) return;
-      if(diana || cron) return;
+      if(diana || cron || calc) return;
       if(ev.target.classList.contains('fuera')){ ev.stopPropagation(); retira(p.id); return; }
       if(cuadrilla.size){              // con la cuadrilla abierta, tocar es sumar o quitar
         if(cuadrilla.has(p.id)) cuadrilla.delete(p.id); else cuadrilla.add(p.id);
@@ -2317,9 +2383,9 @@ function pinta(){
   document.querySelectorAll('#pociones button').forEach(b =>
     b.disabled = (!sel && !cuadrilla.size) ||        // v4.6: o uno, o la cuadrilla
       (sel && bebiendoIds.has(sel)) || !!diana || !!cron);
-    $('aviso').hidden = !!(diana || argos || (canon && !canon.visto) ||
+    $('aviso').hidden = !!(diana || argos || calc || (canon && !canon.visto) ||
       $('panelCampo').classList.contains('espera'));
-  if(diana) pintaDiana(); else if(cron) pintaCron(); else pintaReto();
+  if(diana) pintaDiana(); else if(cron) pintaCron(); else if(!calc) pintaReto();   // la tablilla no tiene encargo
 }
 function asienta(){
   const campo = document.querySelector('.campo');
@@ -2636,11 +2702,11 @@ function cuentaBandera(desde, hasta){
 }
 function alta(f){
   if(alguienBebe()){ $('aviso').textContent = 'Espera: hay alguien bebiendo.'; return; }
-  if(!diana && !cron && RETOS[reto].sinAltas){
+  if(!diana && !cron && !calc && RETOS[reto].sinAltas){
     $('aviso').textContent = 'En este encargo no entra nadie nuevo: solo se puede retirar gente.';
     return;
   }
-  if(!diana && !cron && RETOS[reto].soloDerecha && f < 0){
+  if(!diana && !cron && !calc && RETOS[reto].soloDerecha && f < 0){
     $('aviso').textContent = 'En este encargo solo puedes meter gente por la derecha.';
     return;
   }
@@ -2742,7 +2808,7 @@ function pocion(k, nombre, etq){
     return;
   }
   if(bebiendoIds.has(sel)) return;
-    const lim = (diana || cron) ? null : RETOS[reto].pociones;
+    const lim = (diana || cron || calc) ? null : RETOS[reto].pociones;
   if(lim && !lim.some(x => Math.abs(x - k) < 1e-9)){
     $('aviso').textContent = 'Ese frasco no entra en este encargo.';
     return;
@@ -4442,6 +4508,7 @@ function modoBotones(m){
   $('mCanon').setAttribute('aria-pressed', String(m === 'canon'));
   $('mTaller').setAttribute('aria-pressed', String(m === 'taller'));
   $('mDiana').setAttribute('aria-pressed', String(m === 'diana'));
+  $('mCalc').setAttribute('aria-pressed', String(m === 'calc'));
     if(m !== 'taller') vueltaTaller = null;
   pintaBotonTaller();
 }
@@ -4454,7 +4521,7 @@ function pintaBotonTaller(){
 }
 function modoSuelto(){
   const cuales = {mOper:'oper', mDiana:'diana', mCron:'cronista',
-                  mArgos:'argos', mCanon:'canon'};
+                  mArgos:'argos', mCanon:'canon', mCalc:'calc'};
   for(const id in cuales)
     if($(id).getAttribute('aria-pressed') === 'true') return cuales[id];
   return null;
@@ -4470,7 +4537,7 @@ function alTallerBoton(){
       guardaTurno(); pintaRuta();
     } else if(v && v.tipo === 'suelto'){
       const arranques = {oper:arrancaOper, diana:arrancaDiana,
-        cronista:arrancaCronista, argos:arrancaArgos, canon:arrancaCanon};
+        cronista:arrancaCronista, argos:arrancaArgos, canon:arrancaCanon, calc:arrancaCalc};
       alTaller(); modoBotones(v.modo); arranques[v.modo]();
     } else if(!retomaTurno()){      // sin memoria de vuelta: a la ruta
       arrancaMision(0);
@@ -4499,6 +4566,9 @@ function glosarioSegunHaga(hace){
 }
 function alTaller(){
     diana = null; cron = null; oper = null; argos = null; canon = null;
+  if(calc){ calc.teatro++; calc = null; pintaBanco([]); }
+  $('clEscena').hidden = true; $('clEscena').textContent = '';
+  $('calc').hidden = true;
   ruta = null; mudo = false;
   $('argos').hidden = true;
   $('canon').hidden = true;
@@ -4856,6 +4926,423 @@ $('aviso').innerHTML = 'Pulsa un tirador para marcarlo: podrás darle una poció
   'reparten (dividen) y los de <b>calavera</b> cambian de bando.';
 if(!retomaTurno()) arrancaMision(0);
 
+/* ── LA TABLILLA DE LISTILLÓN ─────────────────────────────────────────────
+   Una calculadora cuyas teclas son tiradores y frascos. Se escribe como en
+   el cuaderno, de izquierda a derecha, y al pulsar «=» se representa en el
+   campo como en un teatro.
+   El problema que enseña: en −2 + 3·(−2 + 1) el Triplón aparece escrito
+   ANTES de que exista nadie que se lo beba. Así que el frasco se queda en
+   el banco, esperando, hasta que la cuadrilla del paréntesis está en el
+   campo; entonces baja y se lo beben todos. Se escribe en un orden y se
+   juega en otro: eso es la jerarquía de las operaciones.
+   Primero se simula la cuenta entera (sin dibujar nada) para que Listillón
+   avise de lo que no se puede jugar; luego se juega de verdad.            */
+const MAX_F = 8;                     // fuerza máxima de un tirador en la palestra
+const esFactor = t => t && (t.t === 'n' || t.t === ')' || (t.t === 'p' && !t.pre));
+function frascoHtml(po){
+  return '<span class="frasco">' +
+      '<span class="corcho"></span><span class="cuello"></span>' +
+      '<span class="asa i"></span><span class="asa d"></span>' +
+      '<span class="vidrio"><span class="liquido"></span></span>' +
+      (po.k < 0 ? '<span class="calavera">' + CALAVERA + '</span>' : '') +
+    '</span>';
+}
+const clasePoc = po => 'poc ' + (po.k < 0 ? 'bando' : (Math.abs(po.k) > 1 ? 'crece' : 'mengua')) +
+  (Math.abs(po.k) < 1 ? ' mengua' : '');
+function miniTirador(f){
+  const c = f < 0 ? 'var(--izq)' : 'var(--der)', s = f < 0 ? 1 : -1;
+  return '<svg viewBox="0 0 26 26" aria-hidden="true">' +
+    '<path d="M' + (13 + 11 * s) + ' 15 H' + (13 - 12 * s) + '" stroke="#8a7442" stroke-width="2.2" stroke-linecap="round"/>' +
+    '<circle cx="' + (13 + 3 * s) + '" cy="6" r="4.4" fill="' + c + '" stroke="#241C36" stroke-width="1"/>' +
+    '<path d="M' + (13 + 4 * s) + ' 10.5 L' + (13 - 1 * s) + ' 18.5" stroke="' + c + '" stroke-width="5.5" stroke-linecap="round"/>' +
+    '<path d="M' + (13 - 1 * s) + ' 18.5 L' + (13 - 5 * s) + ' 24 M' + (13 - 1 * s) + ' 18.5 L' + (13 + 3 * s) + ' 24"' +
+    ' stroke="' + c + '" stroke-width="2.6" stroke-linecap="round"/></svg>';
+}
+function arrancaCalc(){
+  calc = {tok:[], jugando:false, teatro:0, ultimo:null};
+  diana = null; cron = null; oper = null; argos = null; canon = null; mudo = false;
+  $('calc').hidden = false;
+  $('panelOper').hidden = true;
+  $('argos').hidden = true;
+  $('canon').hidden = true;
+  $('diana').hidden = true;
+  $('cronista').hidden = true;
+  $('zonaEncargo').hidden = true;
+  $('opPasos').hidden = true;
+  caraJuego(true);
+  glosarioSegunHaga(false);
+  campoDespierta();
+  tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
+  pintaBanco([]);
+  pinta();
+  $('clAviso').innerHTML = 'Escribe una cuenta con las teclas, como en el cuaderno, y pulsa ' +
+    '<b>=</b>: la jugamos en el campo. Prueba con <b>−2 + 3·(−2 + 1)</b>.';
+  pintaCalc();
+}
+/* ── la escritura ── */
+function teclaCalc(tk){
+  if(!calc) return;
+  if(calc.jugando){ $('clAviso').innerHTML = 'Espera a que acabe la función, que están actuando.'; return; }
+  const T = calc.tok, ult = T[T.length - 1];
+  const abiertos = T.filter(t => t.t === '(').length - T.filter(t => t.t === ')').length;
+  if(tk.t === 'n'){
+    if(esFactor(ult)) T.push({t:'+'});
+    T.push({t:'n', f:tk.f});
+  }else if(tk.t === '+' || tk.t === '-'){
+    if(!ult || ult.t === '('){
+      if(tk.t === '-') T.push({t:'-'});        // un menos delante del todo: vale
+    }else if(ult.t === '+' || ult.t === '-') T[T.length - 1] = {t:tk.t};
+    else if(ult.t === 'p' && ult.pre){
+      $('clAviso').innerHTML = 'Después de <b>' + preTxt(ult.k) + '</b> tiene que venir a quién se lo das: un tirador o un paréntesis.';
+      return;
+    }else T.push({t:tk.t});
+  }else if(tk.t === '('){
+    if(esFactor(ult)) T.push({t:'+'});
+    T.push({t:'('});
+  }else if(tk.t === ')'){
+    if(abiertos <= 0){ $('clAviso').innerHTML = 'No hay ningún paréntesis abierto que cerrar.'; return; }
+    if(!esFactor(ult)){ $('clAviso').innerHTML = 'Antes de cerrar, termina lo de dentro.'; return; }
+    T.push({t:')'});
+  }else if(tk.t === 'p'){
+    const po = POCIONES.find(p => Math.abs(p.k - tk.k) < 1e-9);
+    if(!po) return;
+    if(esFactor(ult)) T.push({t:'p', k:po.k, pre:false});
+    else if(Number.isInteger(po.k)) T.push({t:'p', k:po.k, pre:true});
+    else{
+      $('clAviso').innerHTML = 'Un frasco de repartir no se puede poner <b>delante</b>: <b>2 : (…)</b> no es lo ' +
+        'mismo que <b>(…) : 2</b>. Escribe primero a quién se reparte y luego el frasco.';
+      return;
+    }
+  }else if(tk.t === 'borra'){
+    T.pop();
+  }
+  calc.ultimo = null;
+  pintaCalc();
+}
+const preTxt = k => (k < 0 ? '(' + conSigno(k) + ')' : String(k)) + '·';
+/* en la tablilla se escribe como en el cuaderno: el primero sin paréntesis,
+   los negativos de después entre paréntesis y los positivos sin signo */
+const numCuaderno = (f, primero) => primero ? (f < 0 ? conSigno(f) : String(f))
+  : (f < 0 ? '(' + conSigno(f) + ')' : String(f));
+const numCalc = (f, primero) => '<span class="' + (f < 0 ? 'izq' : 'der') + '">' +
+  numCuaderno(f, primero) + '</span>';
+function pintaCalc(){
+  if(!calc) return;
+  let h = '', primero = true;
+  calc.tok.forEach(t => {
+    if(t.t === 'n'){ h += numCalc(t.f, primero); primero = false; }
+    else if(t.t === '+'){ h += '<span class="op"> + </span>'; primero = false; }
+    else if(t.t === '-'){ h += '<span class="op">' + (primero ? '−' : ' − ') + '</span>'; primero = false; }
+    else if(t.t === '('){ h += '<span class="op">(</span>'; primero = true; }
+    else if(t.t === ')') h += '<span class="op">)</span>';
+    else if(t.t === 'p'){ h += '<span class="poc">' + (t.pre ? preTxt(t.k) : etqDe(t.k)) + '</span>'; primero = false; }
+  });
+  if(calc.ultimo !== null) h += '<span class="op"> = </span><b class="cl-res">' +
+    (calc.ultimo < 0 ? conSigno(calc.ultimo) : String(calc.ultimo)) + '</b>';
+  $('clEscrito').innerHTML = h || '<span class="cl-vacia">escribe aquí…</span>';
+  $('clIgual').disabled = calc.jugando;
+}
+/* ── de la escritura al árbol ── */
+function parseCalc(T){
+  let i = 0, banco = 0;
+  const err = m => { throw new Error(m); };
+  function expr(){
+    const terms = [];
+    let sign = '+';
+    if(T[i] && T[i].t === '-'){ sign = '-'; i++; }
+    for(;;){
+      terms.push(Object.assign({sign}, term()));
+      if(T[i] && (T[i].t === '+' || T[i].t === '-')){ sign = T[i].t; i++; continue; }
+      break;
+    }
+    return {terms};
+  }
+  function term(){
+    const pre = [], post = [];
+    while(T[i] && T[i].t === 'p' && T[i].pre){ pre.push({k:T[i].k, b:banco++}); i++; }
+    let factor;
+    if(!T[i]) err('La cuenta se ha quedado a medias: falta a quién darle el frasco o el número de detrás.');
+    if(T[i].t === 'n'){ factor = {t:'n', f:T[i].f}; i++; }
+    else if(T[i].t === '('){
+      i++;
+      const dentro = expr();
+      if(!T[i] || T[i].t !== ')') err('Falta cerrar un paréntesis.');
+      i++;
+      factor = {t:'g', expr:dentro};
+    }else err('Ahí falta un tirador o un paréntesis.');
+    while(T[i] && T[i].t === 'p' && !T[i].pre){ post.push(T[i].k); i++; }
+    return {pre, factor, post};
+  }
+  if(!T.length) err('Todavía no has escrito nada.');
+  const e = expr();
+  if(i < T.length) err('Sobra algo al final: ' + (T[i].t === ')' ? 'un paréntesis que no se abrió.' : 'revisa la cuenta.'));
+  return {arbol:e, bancos:banco};
+}
+/* ── la misma cuenta, escrita o como se juega (frascos de delante, detrás) ── */
+function escribeArbol(e, jugado, primero){
+  let h = '';
+  e.terms.forEach((t, n) => {
+    if(t.sign === '-') h += (n === 0 ? '−' : ' − ');
+    else if(n > 0) h += ' + ';
+    const ini = primero && n === 0 && t.sign === '+';
+    if(!jugado) t.pre.forEach(p => { h += preTxt(p.k); });
+    h += t.factor.t === 'n' ? numCuaderno(t.factor.f, ini && (jugado || !t.pre.length))
+                            : '(' + escribeArbol(t.factor.expr, jugado, true) + ')';
+    t.post.forEach(k => { h += etqDe(k); });
+    if(jugado) t.pre.slice().reverse().forEach(p => { h += etqDe(p.k); });
+  });
+  return h;
+}
+/* ── el intérprete: el mismo guion para la simulación y para el teatro ── */
+async function juegaExpr(e, ambito, B){
+  for(const t of e.terms){
+    const suelto = t.factor.t === 'n' && !t.pre.length && !t.post.length;
+    if(t.sign === '-' && suelto){
+      const f = t.factor.f;
+      const id = ambito.find(q => B.f(q) === f);
+      if(id !== undefined){
+        ambito.splice(ambito.indexOf(id), 1);
+        await B.retira(id, 'Se retira el <b>' + conSigno(f) + '</b>: <b>− (' + conSigno(f) + ')</b>.');
+      }else{
+        const [idF, idN] = await B.pareja(f, 'No hay nadie de <b>' + conSigno(f) + '</b> a quien retirar: ' +
+          'entra una <b>pareja nula</b> (' + conSigno(f) + ' y ' + conSigno(-f) + ') y se va el de ' + conSigno(f) + '.');
+        ambito.push(idN);
+        await B.retira(idF, 'Se retira el <b>' + conSigno(f) + '</b> de la pareja.');
+      }
+    }else{
+      const ids = await juegaTermino(t, B);
+      if(t.sign === '-')
+        await B.bebe(ids, -1, null, 'El <b>menos de delante</b> alcanza a toda la cuadrilla: <b>todos cambian de bando</b>, ' +
+          'como con una Traición. Restar un grupo es darle la vuelta.');
+      ambito.push(...ids);
+    }
+  }
+  return ambito;
+}
+async function juegaTermino(t, B){
+  let ids;
+  if(t.factor.t === 'n'){
+    ids = [await B.entra(t.factor.f, 'Entra el <b>' + conSigno(t.factor.f) + '</b>.')];
+  }else{
+    ids = await juegaExpr(t.factor.expr, [], B);
+    if(t.pre.length || t.post.length)
+      await B.saco(ids, 'La cuadrilla del paréntesis ya está en el campo' +
+        (ids.length ? '' : ', aunque se ha quedado vacía: vale 0') + '.');
+  }
+  /* primero los que esperaban en el banco (el más cercano antes), luego los de detrás */
+  for(const p of t.pre.slice().reverse()){
+    const po = POCIONES.find(x => x.k === p.k);
+    await B.bebe(ids, p.k, p.b, 'El <b>' + po.n + ' (' + preTxt(p.k) + ')</b> esperaba en el banco: ahora que ' +
+      (ids.length > 1 ? 'están todos, baja y <b>se lo beben todos</b>.' : 'ya está en el campo, baja y se lo bebe.'));
+  }
+  for(const k of t.post){
+    const po = POCIONES.find(x => Math.abs(x.k - k) < 1e-9);
+    await B.bebe(ids, k, null, (ids.length > 1 ? 'Se beben todos ' : 'Se bebe ') + 'el <b>' + po.n +
+      ' (' + po.e + ')</b>.');
+  }
+  return ids;
+}
+/* la simulación: sin dibujar, para avisar antes de salir a escena */
+function simulador(){
+  const m = new Map(); let n = 1;
+  const suma = () => [...m.values()].reduce((a, b) => a + b, 0);
+  const mira = () => {
+    const izq = [...m.values()].filter(f => f < 0).length, der = m.size - izq;
+    if(izq > 5 || der > 5) throw new Error('No caben: en cada lado tiran <b>cinco</b> como mucho, y aquí serían ' +
+      Math.max(izq, der) + '. Prueba con menos gente.');
+    const s = suma();
+    if(Math.abs(s) > MAX_F) throw new Error('La bandera se saldría de la regla: llegaría a <b>' + conSigno(s) +
+      '</b>. Prueba con números más pequeños.');
+  };
+  return {
+    f: id => m.get(id), suma,
+    entra: async f => { const id = n++; m.set(id, f); mira(); return id; },
+    retira: async id => { m.delete(id); mira(); },
+    pareja: async f => { const a = n++, b = n++; m.set(a, f); m.set(b, -f); mira(); return [a, b]; },
+    saco: async () => {},
+    bebe: async (ids, k) => {
+      ids.forEach(id => {
+        const v = m.get(id) * k;
+        if(!Number.isInteger(v)) throw new Error('El de <b>' + conSigno(m.get(id)) + '</b> no se puede repartir ' +
+          'así: le tocaría <b>' + (Math.round(v * 100) / 100) + '</b>, y aquí se tira con fuerzas enteras.' +
+          (ids.length > 1 ? ' En un paréntesis el frasco se lo bebe <b>cada uno</b> de dentro.' : ''));
+        if(Math.abs(v) > MAX_F) throw new Error('Un tirador de fuerza <b>' + Math.abs(v) + '</b> no cabe en la ' +
+          'palestra: como mucho ' + MAX_F + '.');
+        m.set(id, v);
+      });
+      mira();
+    }
+  };
+}
+/* el teatro: lo mismo, pero en el campo y con sus tiempos */
+function teatro(tokT){
+  const vivo = () => calc && calc.teatro === tokT;
+  const pausa = t => new Promise((ok, mal) => setTimeout(() => vivo() ? ok() : mal(new Error('corte')), ms(t)));
+  const quieto = () => new Promise((ok, mal) => {
+    const t0 = Date.now();
+    const mira = () => {
+      if(!vivo()) return mal(new Error('corte'));
+      if((!alguienBebe() && !retirandoIds.size) || Date.now() - t0 > 9000) ok();
+      else setTimeout(mira, 90);
+    };
+    mira();
+  });
+  const dice = h => { $('clAviso').innerHTML = h; $('clEscena').innerHTML = h; };
+  return {
+    f: id => { const p = tiradores.find(q => q.id === id); return p ? p.f : undefined; },
+    entra: async (f, txt) => { await quieto(); dice(txt); const id = sigId; alta(f); await pausa(1100); return id; },
+    retira: async (id, txt) => {
+      await quieto(); dice(txt); retira(id);
+      await new Promise(ok => trasRetirar(id, ok)); if(!vivo()) throw new Error('corte');
+    },
+    pareja: async (f, txt) => { await quieto(); const id = entraPareja(f); dice(txt); await pausa(2500); return [id, id + 1]; },
+    saco: async (ids, txt) => {
+      await quieto(); dice(txt);
+      if(ids.length) sacoSobre(ids.map(id => document.querySelector('.tirador[data-id="' + id + '"]')), '( )', 1900);
+      await pausa(1300);
+    },
+    bebe: async (ids, k, banco, txt) => {
+      await quieto(); dice(txt);
+      if(banco !== null && banco !== undefined){
+        const ch = document.querySelector('.banco [data-b="' + banco + '"]');
+        if(ch) ch.classList.add('baja');
+        await pausa(650);
+      }
+      const po = POCIONES.find(x => Math.abs(x.k - k) < 1e-9) || {n:'el menos', e:'·(−1)'};
+      const nom = banco === null && k === -1 && /menos de delante/.test(txt) ? 'el menos de delante' : po.n;
+      ids.forEach((id, i) => setTimeout(() => {
+        if(!vivo() || !tiradores.some(q => q.id === id)) return;
+        sel = id; pocion(k, nom, po.e); sel = null;
+      }, ms(i * 130)));
+      await pausa(ids.length * 130 + 2500);
+      await quieto();
+    }
+  };
+}
+function pintaBanco(lista){
+  const campo = document.querySelector('.campo');
+  let b = campo.querySelector('.banco');
+  if(!b){ b = document.createElement('div'); b.className = 'banco'; campo.appendChild(b); }
+  b.innerHTML = lista.length ? '<span class="banco-t">banco</span>' + lista.map(p => {
+    const po = POCIONES.find(x => x.k === p.k);
+    return '<span class="banco-f ' + clasePoc(po) + '" data-b="' + p.b + '" title="' + po.n + '">' +
+      frascoHtml(po) + '<i>' + preTxt(p.k) + '</i></span>';
+  }).join('') : '';
+  b.hidden = !lista.length;
+}
+function prefijos(e, out){
+  e.terms.forEach(t => {
+    t.pre.forEach(p => out.push(p));
+    if(t.factor.t === 'g') prefijos(t.factor.expr, out);
+  });
+  return out;
+}
+function grupoQueBebe(e){
+  for(const t of e.terms){
+    if(t.factor.t === 'g' && (t.pre.length || t.post.length) && t.factor.expr.terms.length > 1) return t;
+    if(t.factor.t === 'g'){ const r = grupoQueBebe(t.factor.expr); if(r) return r; }
+  }
+  return null;
+}
+async function igualCalc(){
+  if(!calc || calc.jugando) return;
+  let p;
+  try{ p = parseCalc(calc.tok); }
+  catch(e){ $('clAviso').innerHTML = e.message; return; }
+  let valor;
+  try{ const S = simulador(); await juegaExpr(p.arbol, [], S); valor = S.suma(); }
+  catch(e){ $('clAviso').innerHTML = e.message; return; }
+  /* a escena */
+  const tokT = calc.teatro = calc.teatro + 1;
+  calc.jugando = true; calc.ultimo = null; calc.arbol = p.arbol;
+  $('clEscena').hidden = false;
+  quitaHitos();
+  tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
+  bebiendoIds.clear(); retirandoIds.clear();
+  pinta();
+  const bancos = prefijos(p.arbol, []);
+  pintaBanco(bancos);
+  pintaCalc();
+  asomaCampo();
+  if(bancos.length)
+    $('clAviso').innerHTML = $('clEscena').innerHTML = 'Los frascos escritos <b>delante</b> no tienen ' +
+      'todavía a quién dárselos: se quedan en el <b>banco</b>, esperando.';
+  else $('clEscena').innerHTML = 'Empieza la función.';
+  try{
+    if(bancos.length) await new Promise(ok => setTimeout(ok, ms(1800)));
+    await juegaExpr(p.arbol, [], teatro(tokT));
+  }catch(e){ if(e.message === 'corte') return; throw e; }
+  if(!calc || calc.teatro !== tokT) return;
+  calc.jugando = false;
+  calc.ultimo = suma();
+  pintaBanco([]);
+  pintaCalc();
+  let h = 'La bandera acaba en <b>' + totalHtml(calc.ultimo) + '</b>.';
+  if(calc.ultimo !== valor) h += ' (Y debería haber acabado en ' + totalHtml(valor) + ': algo se ha torcido en escena.)';
+  if(bancos.length)
+    h += ' Lo escribiste <b>' + escribeArbol(p.arbol, false, true) + '</b> y se jugó <b>' +
+      escribeArbol(p.arbol, true, true) + '</b>: el frasco tuvo que esperar a que estuviera ' +
+      'a quién dárselo. Es la misma cuenta, porque para multiplicar da igual el orden.';
+  const g = grupoQueBebe(p.arbol);
+  if(g){
+    const k = (g.pre[0] && g.pre[0].k) || g.post[0];
+    const partes = g.factor.expr.terms.filter(t => t.factor.t === 'n');
+    if(partes.length === g.factor.expr.terms.length && Number.isInteger(k))
+      h += ' Y como <b>cada uno</b> de dentro bebió su frasco: <b>' +
+        partes.map((t, n) => (t.sign === '-' ? (n ? ' − ' : '−') : (n ? ' + ' : '')) +
+          (k < 0 ? '(' + conSigno(k) + ')' : k) + '·' + numCuaderno(t.factor.f, false)).join('') + '</b>.';
+  }
+  $('clAviso').innerHTML = h;
+  $('clEscena').innerHTML = h;
+}
+(function montaCalc(){
+  const el = $('clTeclas');
+  const fila = cls => { const d = document.createElement('div'); d.className = 'cl-fila ' + cls; el.appendChild(d); return d; };
+  const tecla = (fil, html, cls, etq, fn) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = cls; b.innerHTML = html;
+    b.setAttribute('aria-label', etq); b.title = etq;
+    b.addEventListener('click', fn);
+    fil.appendChild(b);
+    return b;
+  };
+  const fi = fila('cl-tir');
+  [-1, -2, -3, -4, -5].forEach(f => tecla(fi, miniTirador(f) + '<b>' + conSigno(f) + '</b>', 'cl-t izq',
+    'Tirador de ' + conSigno(f), () => teclaCalc({t:'n', f})));
+  const fd = fila('cl-tir');
+  [1, 2, 3, 4, 5].forEach(f => tecla(fd, miniTirador(f) + '<b>' + conSigno(f) + '</b>', 'cl-t der',
+    'Tirador de ' + conSigno(f), () => teclaCalc({t:'n', f})));
+  const fp = fila('cl-poc');
+  POCIONES.forEach(po => tecla(fp, frascoHtml(po) + '<span class="etq">' + po.e + '</span>',
+    clasePoc(po) + ' cl-p', po.n + ', ' + po.e, () => teclaCalc({t:'p', k:po.k})));
+  const fo = fila('cl-ops');
+  tecla(fo, '+', 'cl-o', 'Más: que entre', () => teclaCalc({t:'+'}));
+  tecla(fo, '−', 'cl-o', 'Menos: que se retire', () => teclaCalc({t:'-'}));
+  tecla(fo, '(', 'cl-o', 'Abre paréntesis', () => teclaCalc({t:'('}));
+  tecla(fo, ')', 'cl-o', 'Cierra paréntesis', () => teclaCalc({t:')'}));
+  tecla(fo, '⌫', 'cl-o', 'Borra lo último', () => teclaCalc({t:'borra'}));
+  tecla(fo, '=', 'cl-o cl-igual scan', 'Igual: que empiece el teatro', igualCalc).id = 'clIgual';
+  $('clOtra').addEventListener('click', () => { if(calc && !calc.jugando && calc.tok.length) igualCalc(); });
+  $('clLimpia').addEventListener('click', () => {
+    if(!calc) return;
+    calc.teatro++; calc.jugando = false; calc.tok = []; calc.ultimo = null;
+    tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
+    bebiendoIds.clear(); retirandoIds.clear();
+    pintaBanco([]); pinta(); pintaCalc();
+    $('clAviso').innerHTML = 'Tablilla limpia. Escribe otra cuenta.';
+  });
+  $('clSalir').addEventListener('click', alTaller);
+  document.addEventListener('keydown', ev => {
+    if(!calc || $('calc').hidden) return;
+    if(ev.target && /INPUT|TEXTAREA/.test(ev.target.tagName)) return;
+    const m = {'+':{t:'+'}, '-':{t:'-'}, '(':{t:'('}, ')':{t:')'}, 'Backspace':{t:'borra'}};
+    if(ev.key === '=' || ev.key === 'Enter'){ ev.preventDefault(); igualCalc(); }
+    else if(m[ev.key]){ ev.preventDefault(); teclaCalc(m[ev.key]); }
+  });
+})();
+$('mCalc').addEventListener('click', () => { alTaller(); modoBotones('calc'); arrancaCalc(); });
+$('aCalc').addEventListener('click', () => { alTaller(); modoBotones('calc'); arrancaCalc(); });
+
 /* ── EL TEMA ─────────────────────────────────────────────────────────── */
 (function(){
   const bs = document.querySelectorAll('#fTema .vel-b');
@@ -4882,7 +5369,7 @@ if(!retomaTurno()) arrancaMision(0);
 (function(){
   const LLAVE = 'aula.v1';
   const el = s => document.querySelector(s);
-  const IZQ = ["#ruta", "#panelOper", "#canon", "#argos", "#diana", "#cronista", "#zonaEncargo"],
+  const IZQ = ["#ruta", "#panelOper", "#canon", "#calc", "#argos", "#diana", "#cronista", "#zonaEncargo"],
         DER = ["#panelCampo"];
   if(IZQ.length && DER.length){
     const primero = el(IZQ[0]);
