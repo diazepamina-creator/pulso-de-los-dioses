@@ -409,9 +409,9 @@
   .tirador .blanco{fill:#f2f6fb} .tirador .pupila{fill:#140F1F}
   .tirador .rasgo{fill:rgba(16,11,26,.72)}
     .tirador .ceja{opacity:.9}
-  .tirador .fuera{position:absolute;top:-4px;right:-4px;width:19px;height:19px;
-    border-radius:50%;border:1px solid var(--red);background:var(--panel);
-    color:var(--red);font-size:12px;line-height:1;padding:0;display:none;
+  .tirador .fuera{position:absolute;top:-8px;right:-8px;width:26px;height:26px;
+    border-radius:50%;border:1.5px solid var(--red);background:var(--panel);
+    color:var(--red);font-size:17px;font-weight:700;line-height:1;padding:0;display:none;
     align-items:center;justify-content:center;min-height:0;cursor:pointer;z-index:9}
   .tirador[aria-pressed="true"] .fuera{display:flex}
   .tirador.saliendo{animation:seVa calc(.5s * var(--lento,1)) ease forwards}
@@ -1043,7 +1043,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v5.4</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v5.6</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1180,8 +1180,9 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
   <details class="bloque plegable" id="cajonPociones">
     <summary id="tituloPociones">Pociones · pulsa antes a un tirador</summary>
     <div class="fila" id="pociones"></div>
-  </div>
+  </details>
   <p class="aviso" id="aviso"></p>
+</div>
       <div id="diana" hidden>
     <p class="dn-marca" id="dnMarca"></p>
     <div class="anuncio" id="dnJugada" hidden>
@@ -1271,7 +1272,6 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
   </p>
   </details>
   </div>
-</div>
 <script>
 const $ = id => document.getElementById(id);
 const R = (a,b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -2040,7 +2040,7 @@ function pinta(){
     el.style.setProperty('--boca-x', bocaX.toFixed(1) + 'px');
     el.style.setProperty('--boca-y', (bocaY - 9).toFixed(1) + 'px');
     el.innerHTML = dibujaTirador(p, U) +
-      '<span class="fuera" role="button" tabindex="0" aria-label="Que se retire">×</span>';
+      '<span class="fuera" aria-hidden="true" title="Que se retire (tecla Supr)">×</span>';
         let tocLargo = 0, movido = false;
     const sueltaLarga = () => { clearTimeout(tocLargo); tocLargo = 0; };
     el.addEventListener('pointerdown', ev => {
@@ -2060,6 +2060,13 @@ function pinta(){
     });
     ['pointerup','pointercancel','pointerleave'].forEach(e =>
       el.addEventListener(e, sueltaLarga));
+    /* con teclado: marcado el tirador, Supr o Retroceso lo retira */
+    el.addEventListener('keydown', ev => {
+      if(ev.key !== 'Delete' && ev.key !== 'Backspace') return;
+      if(bebiendoIds.has(p.id) || diana || cron || sel !== p.id) return;
+      ev.preventDefault();
+      retira(p.id);
+    });
     el.addEventListener('click', ev => {
       if(bebiendoIds.has(p.id)) return;
       if(diana || cron) return;
@@ -2496,11 +2503,14 @@ function retira(id){
   if(!p) return;
   vuelveAMontar();
   if(!cinta.length) base = suma();
-  const antes = suma();
   const nodo = document.querySelector('.tirador[data-id="' + id + '"]');
-      const quitado0 = p.f;
+  const quitado0 = p.f;
   const hazLaCuenta = () => {
     retirandoIds.delete(id);
+    /* si entretanto se vació el campo o se cambió de modo, ya no está: no
+       se apunta una retirada fantasma */
+    if(!tiradores.some(q => q.id === id)) return;
+    const antes = suma();                   // el total justo antes de irse, no el de cuando cayó el rayo
     tiradores = tiradores.filter(q => q.id !== id);
     if(sel === id) sel = null;
     retiros++;
@@ -2510,8 +2520,8 @@ function retira(id){
       '<b>− (' + conSigno(quitado0) + ')</b>. El total pasa de ' + conSigno(antes) + ' a <b>' +
       (ahora === 0 ? '0' : conSigno(ahora)) + '</b>' +
       (quitado0 < 0
-        ? ', y <b>sube</b>: se ha ido alguien que tiraba en contra, así que restar un negativo suma.'
-        : ', y baja: se ha ido alguien que tiraba a tu favor.');
+        ? ', y <b>sube</b>: se ha ido alguien que tiraba hacia los negativos, así que restar un negativo suma.'
+        : ', y baja: se ha ido alguien que tiraba hacia los positivos.');
     pinta();
     asienta();
   };
@@ -2788,16 +2798,30 @@ function planDiana(){
   }
   return plan;
 }
+/* TRAS RETIRAR, esperar a que se haya ido DE VERDAD. El rayo tarda lo que
+   tarda Zeus en asomarse; con una espera fija, la jugada siguiente —o el
+   veredicto— llegaba antes de que la bandera se moviera */
+function trasRetirar(id, cb){
+  const t0 = Date.now();
+  const mira = () => {
+    if(!retirandoIds.has(id) || !tiradores.some(q => q.id === id) || Date.now() - t0 > 8000)
+      setTimeout(cb, ms(350));
+    else setTimeout(mira, 90);
+  };
+  setTimeout(mira, 90);
+}
 function ejecutaJugada(j, cb){
+  const yo = diana || cron;
+  const sigue = () => { if((diana || cron) === yo && yo) cb(); };
   let espera = ms(1400);
   if(j.tipo === 'alta') alta(j.f);
   else{
-    const p = tiradores.find(q => q.f === j.f);
+    const p = tiradores.find(q => q.f === j.f && !retirandoIds.has(q.id) && !bebiendoIds.has(q.id));
     if(!p){ cb(); return; }
-    if(j.tipo === 'baja'){ retira(p.id); espera = ms(1700); }
+    if(j.tipo === 'baja'){ retira(p.id); trasRetirar(p.id, sigue); return; }
     else{ sel = p.id; pocion(j.k, j.nom, j.e); sel = null; espera = ms(3600); }
   }
-  setTimeout(() => { if(diana || cron) cb(); }, espera);
+  setTimeout(sigue, espera);
 }
 function opDeJugada(j){
   if(j.tipo === 'alta') return '<span class="op"> + </span>' + numHtml(j.f);
@@ -2911,7 +2935,7 @@ function cierraRonda(){
       $('dnAviso').innerHTML = 'Bajamos un peldaño: ' + GRADOS[diana.grado].t + '.';
     }
   }
-  setTimeout(() => { if(diana) rondaDiana(); }, ms(1700));
+  { const yo = diana; setTimeout(() => { if(diana && diana === yo) rondaDiana(); }, ms(1700)); }
 }
 function rondaDiana(){
   if(!diana) return;
@@ -2924,7 +2948,7 @@ function rondaDiana(){
   diana.bien = true;
   pideEstaca();
 }
-function arrancaDiana(){
+function arrancaDiana(grado){
   cron = null; oper = null; mudo = false;
   $('cronista').hidden = true;
   $('panelOper').hidden = true;
@@ -2942,15 +2966,16 @@ function arrancaDiana(){
   caraJuego(true);
   $('dnAviso').innerHTML = 'Clava la estaca donde va a parar la bandera.';
   pinta();
+  if(grado !== undefined) diana.grado = grado;
   rondaDiana();
 }
 const NIVELES_OP = [
   {ops:1, tipos:['mas'],                t:'sumar'},
   {ops:2, tipos:['mas'],                t:'sumar tres'},
-  {ops:2, tipos:['mas','menos'],        t:'sumar y restar'},
+  {ops:2, tipos:['mas','menos'],        t:'sumar y restar', obliga:'baja'},
   {ops:3, tipos:['mas','menos'],        t:'tres operaciones'},
-  {ops:2, tipos:['mas','menos','por'],  t:'con pociones: el frasco va antes'},
-  {ops:3, tipos:['mas','menos','por'],  t:'tres operaciones y pociones'},
+  {ops:2, tipos:['mas','menos','por'],  t:'con pociones: el frasco va antes', obliga:'termino'},
+  {ops:3, tipos:['mas','menos','por'],  t:'tres operaciones y pociones', obliga:'termino'},
   {ops:0, forma:'parentesis',           t:'paréntesis: todos beben'},
   {ops:0, forma:'menosgrupo',           t:'menos delante del paréntesis'},
   {ops:0, forma:'potencias',            t:'potencias: dónde está el paréntesis'}
@@ -3071,6 +3096,9 @@ function generaOperacion(nivel){
       if(Math.abs(sumaSim(est)) > TOPE){ bien = false; break; }
     }
     if(!bien) continue;
+    /* si el nivel es de restar, que haya una resta; si es de pociones, que
+       haya un frasco: antes, «Las pociones» podía no tener ninguna */
+    if(g.obliga && !pasos.some(p => p.tipo === g.obliga)) continue;
     return {pasos, piezas, parentesis:false, valor: sumaSim(est)};
   }
   return {pasos:[{tipo:'alta', f:1}, {tipo:'alta', f:1}],
@@ -3160,64 +3188,84 @@ function abreCampo(){
     $('panelCampo').scrollIntoView({behavior:'smooth', block:'start'});
   $('opAviso').innerHTML = 'Cada <b>▶</b> es un término.';
 }
+/* LOS FOTOGRAMAS. Cada paso lleva su ficha (tok): si se retrocede o se
+   reinicia antes de que acabe, sus temporizadores ya no tocan el campo. Y
+   mientras un paso se está jugando, ▶ espera: si no, dos pasos a la vez
+   daban la poción a quien no era */
 function vePaso(k, animado){
   if(!oper) return;
+  const tok = oper.tokPaso = (oper.tokPaso || 0) + 1;
+  const vivo = () => oper && oper.tokPaso === tok;
+  oper.ocupado = false;
   congelaTotal = null; congelaLados = null;
   const pasos = oper.ej.pasos;
   k = Math.max(0, Math.min(pasos.length, k));
   if(animado && k === oper.paso + 1){
     const j = pasos[k - 1];
+    /* el que acaba de entrar, por su número: la poción es para él */
+    const entra = f => { const n = sigId; alta(f); const p = tiradores.find(q => q.id === n); return p ? p.id : null; };
+    const suyo = id => tiradores.find(q => q.id === id);
+    let dura = 900;
     if(j.tipo === 'alta') alta(j.f);
     else if(j.tipo === 'baja'){
-      const p = tiradores.find(q => q.f === j.f);
+      const p = tiradores.find(q => q.f === j.f && !retirandoIds.has(q.id));
       if(p) retira(p.id);
+      dura = 2300;
     }else if(j.tipo === 'purga'){
-                  const ids = [];
+      const ids = [];
       j.fs.forEach(f => {
-        const p = tiradores.find(q => q.f === f && ids.indexOf(q.id) < 0);
+        const p = tiradores.find(q => q.f === f && ids.indexOf(q.id) < 0 && !retirandoIds.has(q.id));
         if(p) ids.push(p.id);
       });
       sacoSobre(ids.map(id => document.querySelector('.tirador[data-id="' + id + '"]')), '−');
-      ids.forEach((id, n) => setTimeout(() => { if(oper) retira(id); },
+      ids.forEach((id, n) => setTimeout(() => { if(vivo()) retira(id); },
                                         ms(600 + n * 110)));
+      dura = 600 + ids.length * 110 + 2300;
     }else if(j.tipo === 'potencia'){
-            congelaTotal = suma();
-      setTimeout(() => { cierraTermino(); },
-                 ms(1250 + Math.max(0, j.n - 1) * 2400 + 2270));
-            const po = POCIONES.find(x => x.k === j.f);
-      alta(j.f);
+      congelaTotal = suma();
+      const fin = 1250 + Math.max(0, j.n - 1) * 2400 + 2270;
+      setTimeout(() => { if(vivo()) cierraTermino(); }, ms(fin));
+      const po = POCIONES.find(x => x.k === j.f);
+      const id = entra(j.f);
       for(let r = 1; r < j.n; r++) setTimeout(() => {
-        if(!oper || !po) return;
-        const p = tiradores[tiradores.length - 1];
+        if(!vivo() || !po) return;
+        const p = suyo(id);
         if(p){ sel = p.id; pocion(po.k, po.n, po.e); sel = null; }
       }, ms(1250 + (r - 1) * 2400));
       if(j.menos) setTimeout(() => {
-        if(!oper) return;
-        const p = tiradores[tiradores.length - 1];
+        if(!vivo()) return;
+        const p = suyo(id);
         const tr = POCIONES.find(x => x.k === -1);
         if(p && tr){ sel = p.id; pocion(tr.k, tr.n, tr.e); sel = null; }
       }, ms(1250 + (j.n - 1) * 2400));
+      dura = fin + (j.menos ? 2400 : 0) + 200;
     }else if(j.tipo === 'termino'){
       congelaTotal = suma();
-      setTimeout(() => { cierraTermino(); }, ms(3520));
-            alta(j.f);
+      setTimeout(() => { if(vivo()) cierraTermino(); }, ms(3520));
+      const id = entra(j.f);
       setTimeout(() => {
-        if(!oper) return;
-        const p = tiradores[tiradores.length - 1];
+        if(!vivo()) return;
+        const p = suyo(id);
         if(p){ sel = p.id; pocion(j.k, j.nom, j.e); sel = null; }
       }, ms(1250));
+      dura = 3700;
     }else if(j.tipo === 'bebe'){
       const p = tiradores[tiradores.length - 1];
       if(p){ sel = p.id; pocion(j.k, j.nom, j.e); sel = null; }
+      dura = 2500;
     }else{
             const cola = tiradores.slice();
       sacoSobre([...document.querySelectorAll('.tirador')], j.e);
-            cola.forEach((p, i) => setTimeout(() => {
-        if(!oper) return;
-        const vivo = tiradores.find(q => q.id === p.id);
-        if(vivo){ sel = vivo.id; pocion(j.k, j.nom, j.e); sel = null; }
+      cola.forEach((p, i) => setTimeout(() => {
+        if(!vivo()) return;
+        const sigue = tiradores.find(q => q.id === p.id);
+        if(sigue){ sel = sigue.id; pocion(j.k, j.nom, j.e); sel = null; }
       }, ms(600 + i * 90)));
+      dura = 600 + cola.length * 90 + 2500;
     }
+    /* mientras se juega el paso, ▶ espera */
+    oper.ocupado = true;
+    setTimeout(() => { if(vivo()){ oper.ocupado = false; $('opSig').disabled = oper.paso >= pasos.length; } }, ms(dura));
   }else{
     const est = estadoEn(k);
     tiradores = est.map(f => ({id: sigId++, f}));
@@ -3228,12 +3276,13 @@ function vePaso(k, animado){
   oper.paso = k;
   $('opPasoTxt').textContent = 'fotograma ' + k + ' de ' + pasos.length;
   $('opAtras').disabled = k === 0;
-  $('opSig').disabled = k >= pasos.length;
+  $('opSig').disabled = k >= pasos.length || oper.ocupado;
   pintaOper();
 }
 function compruebaOper(){
   if(!oper || oper.resp === '' || oper.fase === 'bien') return;
-  const dicho = parseInt(oper.resp.replace('−', '-'), 10);
+  if(!esEntero(oper.resp)){ $('opAviso').innerHTML = 'Escribe un número: con cifras, y el signo delante si lo lleva.'; return; }
+  const dicho = parseInt(oper.resp.replace(/[−–]/g, '-'), 10);
   if(dicho === oper.ej.valor){
     oper.fase = 'bien';
     oper.aciertos++;
@@ -3249,7 +3298,7 @@ function compruebaOper(){
       $('opAviso').innerHTML += ' <b>Sube el nivel: ' + NIVELES_OP[oper.nivel].t + '.</b>';
     }
     pintaOper();
-    setTimeout(() => { if(oper) rondaOper(); }, ms(2200));
+    { const yo = oper; setTimeout(() => { if(oper && oper === yo) rondaOper(); }, ms(2200)); }
   }else{
     oper.seguidas = 0;
     oper.tropiezos++;
@@ -3266,7 +3315,7 @@ function compruebaOper(){
     pintaOper();
   }
 }
-function arrancaOper(){
+function arrancaOper(nivel){
   oper = {nivel:0, aciertos:0, solas:0, seguidas:0, tropiezos:0,
           ej:null, resp:'', visto:false, paso:0, fase:'pensando'};
   diana = null; cron = null; mudo = false;
@@ -3276,6 +3325,7 @@ function arrancaOper(){
   $('cronista').hidden = true;
   $('zonaEncargo').hidden = true;
   caraJuego(true);
+  if(nivel !== undefined) oper.nivel = nivel;
   rondaOper();
 }
 const CANON = [
@@ -3286,6 +3336,7 @@ const CANON = [
 let canon = null;
 function rondaCanon(){
   if(!canon) return;
+  canon.fase = 'pensando';
   const tipo = pick(CANON[canon.nivel].tipos);
   if(tipo === 'fuerza'){
     const f = pick(FUERZAS);
@@ -3315,7 +3366,7 @@ function pintaCanon(){
   $('cnLinea').innerHTML = canon.ej.txt +
     '<span class="op"> </span><span class="hueco">' +
     (canon.resp === '' ? '?' : canon.resp) + '</span>';
-  $('cnVale').disabled = canon.resp === '';
+  $('cnVale').disabled = canon.resp === '' || canon.fase === 'bien';
   $('cnVer').textContent = canon.visto ? 'Seguir viéndolo' : 'Verlo en el campo';
 }
 function canonAlCampo(){
@@ -3345,11 +3396,16 @@ function canonAlCampo(){
     $('panelCampo').scrollIntoView({behavior:'smooth', block:'start'});
   pintaCanon();
 }
+/* un número entero de verdad: un «−» suelto no es una respuesta, y no
+   cuenta como fallo */
+function esEntero(t){ return /^[-+]?\d+$/.test(String(t).replace(/[−–]/g, '-').replace(/\s+/g, '')); }
 function compruebaCanon(){
-  if(!canon || canon.resp === '') return;
-  const dicho = parseInt(canon.resp.replace('−', '-'), 10);
+  if(!canon || canon.resp === '' || canon.fase === 'bien') return;
+  if(!esEntero(canon.resp)){ $('cnAviso').innerHTML = 'Escribe un número: con cifras, y el signo delante si lo lleva.'; return; }
+  const dicho = parseInt(canon.resp.replace(/[−–]/g, '-'), 10);
   const e = canon.ej;
   if(dicho === e.valor){
+    canon.fase = 'bien';                // ya está: otro «Comprobar» no suma otro acierto
     canon.aciertos++;
     if(!canon.visto) canon.solas++;
     $('cnAviso').innerHTML = e.tipo === 'fuerza'
@@ -3361,7 +3417,7 @@ function compruebaCanon(){
     destella(true);
     confeti();
     apuntaLogro();
-    setTimeout(() => { if(canon) rondaCanon(); }, ms(2200));
+    { const yo = canon; setTimeout(() => { if(canon && canon === yo) rondaCanon(); }, ms(2200)); }
   }else{
     $('cnAviso').innerHTML = e.tipo === 'fuerza'
       ? 'No. La fuerza va <b>sin signo</b>: el de ' + conSigno(e.f) + ' tira con <b>' +
@@ -3374,7 +3430,7 @@ function compruebaCanon(){
     pintaCanon();
   }
 }
-function arrancaCanon(){
+function arrancaCanon(nivel){
   canon = {nivel:0, aciertos:0, solas:0, ej:null, resp:'', visto:false};
   diana = null; cron = null; oper = null; argos = null; mudo = false;
   $('canon').hidden = false;
@@ -3386,6 +3442,7 @@ function arrancaCanon(){
   $('opPasos').hidden = true;
   caraJuego(true);
   glosarioSegunHaga(false);
+  if(nivel !== undefined) canon.nivel = nivel;
   rondaCanon();
 }
 $('cnResp').addEventListener('input', () => {
@@ -3524,7 +3581,7 @@ function argosAlCampo(){
   if($('panelCampo').scrollIntoView)
     $('panelCampo').scrollIntoView({behavior:'smooth', block:'start'});
 }
-function arrancaArgos(){
+function arrancaArgos(nivel){
   argos = {nivel:2, aciertos:0, fallos:0, ej:null, malo:0, dichos:[],
            hecho:false, elegido:-1};
   diana = null; cron = null; oper = null; mudo = false;
@@ -3535,6 +3592,7 @@ function arrancaArgos(){
   $('zonaEncargo').hidden = true;
   $('panelCampo').hidden = true;
   caraJuego(true);
+  if(nivel !== undefined) argos.nivel = nivel;
   rondaArgos();
 }
 $('agVer').addEventListener('click', argosAlCampo);
@@ -3627,7 +3685,7 @@ function rondaCron(){
     'va a pasar <b>' + CGRADOS[cron.grado].t + '</b>.';
   $('aviso').innerHTML = 'Mira lo que pasa en el campo…';
   pinta(); pintaCron();
-  setTimeout(() => { if(cron) correSucesos(0); }, ms(1100));
+  { const yo = cron, r = cron.ronda; setTimeout(() => { if(cron && cron === yo && cron.ronda === r) correSucesos(0); }, ms(1100)); }
 }
 function correSucesos(i){
   if(!cron) return;
@@ -3687,7 +3745,7 @@ function compruebaCron(){
   montaInicial();
   $('crTxt').innerHTML = 'Se juega lo que has escrito…';
   pinta(); pintaCron();
-  setTimeout(() => { if(cron) correTokens(0); }, ms(700));
+  { const yo = cron; setTimeout(() => { if(cron && cron === yo) correTokens(0); }, ms(700)); }
 }
 function correTokens(i){
   if(!cron) return;
@@ -3695,13 +3753,13 @@ function correTokens(i){
   const tk = cron.tokens[i];
   if(tk.op === '+'){
     alta(tk.f);
-    setTimeout(() => { if(cron) correTokens(i + 1); }, ms(1400));
+    { const yo = cron; setTimeout(() => { if(cron && cron === yo) correTokens(i + 1); }, ms(1400)); }
     return;
   }
-  const p = tiradores.find(q => q.f === tk.f);
+  const p = tiradores.find(q => q.f === tk.f && !retirandoIds.has(q.id));
   if(!p){ cron.imposible = tk; juzgaCron(); return; }   // no se puede retirar a quien no está
   retira(p.id);
-  setTimeout(() => { if(cron) correTokens(i + 1); }, ms(1700));
+  { const yo = cron; trasRetirar(p.id, () => { if(cron && cron === yo) correTokens(i + 1); }); }
 }
 function equivale(){
   if(cron.tokens.length !== 1 || cron.sucesos.length !== 1) return '';
@@ -3764,7 +3822,7 @@ function juzgaCron(){
     ' = ' + conSigno(cron.fin) + '</b>';
   pintaCron();
 }
-function arrancaCronista(){
+function arrancaCronista(grado){
   oper = null;
   glosarioSegunHaga(false);              // el cronista no usa pociones: fuera el glosario
   $('panelOper').hidden = true;
@@ -3780,6 +3838,7 @@ function arrancaCronista(){
   caraJuego(true);
   $('crAviso').innerHTML = 'Escribe con signos lo que pase en el campo. Se corrige ' +
     'jugando tu operación: si dice lo mismo, pasa lo mismo.';
+  if(grado !== undefined) cron.grado = grado;
   rondaCron();
 }
 const MISIONES = [
@@ -3792,7 +3851,7 @@ const MISIONES = [
    d:'El que entra <b>suma</b> su fuerza con su signo.'},
   {t:'¿Dónde va a parar?', modo:'diana', n:0, meta:3,
    d:'Al revés: pasa una jugada y tú dices dónde para la bandera. Arrastra el dedo.'},
-  {t:'Alguien se retira', modo:'oper', n:1, meta:4,
+  {t:'Alguien se retira', modo:'oper', n:2, meta:4,
    d:'Retirar es <b>restar</b>. Si se va uno que tiraba hacia la izquierda, la bandera se va <b>hacia la derecha</b>.'},
   {t:'Escríbelo con signos', modo:'cron', n:0, meta:3,
    d:'Mira lo que pasa y <b>escríbelo como una operación</b>: + (−3), − (+2)… ' +
@@ -3949,12 +4008,14 @@ function apuntaLogro(){
   pintaRuta();
 }
 const GUARDADO = 'pulso.turno.v1';
-const CADUCA = 4 * 60 * 60 * 1000;
+const CADUCA = 90 * 60 * 1000;     // un turno de clase, contado desde que empezó
+let turnoDesde = 0;
 function guardaTurno(){
   if(!ruta) return;
+  if(!turnoDesde) turnoDesde = Date.now();
   try{
     localStorage.setItem(GUARDADO, JSON.stringify({
-      v:1, ts:Date.now(), i:ruta.i, hechas:ruta.hechas, sesion:sesion,
+      v:1, ts:Date.now(), t0:turnoDesde, i:ruta.i, hechas:ruta.hechas, sesion:sesion,
       cameos:cameosVistos
     }));
   }catch(e){  }
@@ -3963,7 +4024,7 @@ function leeTurno(){
   try{
     const d = JSON.parse(localStorage.getItem(GUARDADO) || 'null');
     if(!d || d.v !== 1 || typeof d.i !== 'number') return null;
-    if(Date.now() - d.ts > CADUCA){ borraTurno(); return null; }
+    if(Date.now() - (d.t0 || d.ts) > CADUCA){ borraTurno(); return null; }
     return d;
   }catch(e){ return null; }
 }
@@ -3971,10 +4032,12 @@ function borraTurno(){ try{ localStorage.removeItem(GUARDADO); }catch(e){} }
 function retomaTurno(){
   const d = leeTurno();
   if(!d || d.i < 0 || d.i >= MISIONES.length) return false;
+  turnoDesde = d.t0 || d.ts;         // el turno sigue siendo el mismo: no se alarga al recargar
   arrancaMision(d.i);
   ruta.hechas = Math.min(d.hechas || 0, MISIONES[d.i].meta);
   if(d.sesion) sesion = d.sesion;
   cameosVistos = d.cameos || 0;
+  guardaTurno();                     // antes se quedaba guardado con 0 aciertos
   pintaRuta();
   $('rtTxt').innerHTML = '<b>Seguimos donde lo dejaste.</b> ' + MISIONES[d.i].d;
   return true;
@@ -3984,11 +4047,13 @@ function arrancaMision(i){
   ruta = {i, hechas:0, hecho:false, cameo:''};
   guardaTurno();
   const m = MISIONES[i];
-  if(m.modo === 'oper'){ modoBotones('oper'); arrancaOper(); oper.nivel = m.n; rondaOper(); }
-  else if(m.modo === 'diana'){ modoBotones('diana'); arrancaDiana(); diana.grado = m.n; rondaDiana(); }
-  else if(m.modo === 'cron'){ modoBotones('cronista'); arrancaCronista(); cron.grado = m.n; rondaCron(); }
-  else if(m.modo === 'argos'){ modoBotones('argos'); arrancaArgos(); argos.nivel = m.n; rondaArgos(); }
-  else if(m.modo === 'canon'){ modoBotones('canon'); arrancaCanon(); canon.nivel = m.n; rondaCanon(); }
+  /* cada modo arranca ya con su nivel y lanza UNA ronda: antes se lanzaba
+     otra encima y el cronista jugaba cada suceso dos veces */
+  if(m.modo === 'oper'){ modoBotones('oper'); arrancaOper(m.n); }
+  else if(m.modo === 'diana'){ modoBotones('diana'); arrancaDiana(m.n); }
+  else if(m.modo === 'cron'){ modoBotones('cronista'); arrancaCronista(m.n); }
+  else if(m.modo === 'argos'){ modoBotones('argos'); arrancaArgos(m.n); }
+  else if(m.modo === 'canon'){ modoBotones('canon'); arrancaCanon(m.n); }
   else modoBotones('taller');
   pintaRuta();
 }
@@ -4005,7 +4070,8 @@ $('aMostrarModos').addEventListener('click', () => {
 });
 $('aVolverRuta').addEventListener('click', () => {
   $('modos').hidden = true;
-  arrancaMision(ruta ? ruta.i : 0);
+  if(ruta) arrancaMision(ruta.i);
+  else if(!retomaTurno()) arrancaMision(0);   // vuelve a la misión y los aciertos que llevaba
 });
 function modoBotones(m){
   $('mOper').setAttribute('aria-pressed', String(m === 'oper'));
@@ -4146,6 +4212,7 @@ $('acRepasa').addEventListener('click', () => {
 });
 $('aBorrar').addEventListener('click', () => {
   borraTurno();
+  turnoDesde = 0;
   sesion = {t0: Date.now(), bien:0, mal:0, mision:{}};
   cameosVistos = 0;
   arrancaMision(0);
@@ -4273,7 +4340,7 @@ $('tSig').addEventListener('click', () => vaVisita(visita + 1));
 $('tSalta').addEventListener('click', paraVisita);
 $('opVer').addEventListener('click', abreCampo);
 $('opSig').addEventListener('click', () => {
-  if(oper) vePaso(oper.paso + 1, true);
+  if(oper){ if(!oper.ocupado) vePaso(oper.paso + 1, true); }
   else if(cron) cronVePaso(cron.paso + 1, true);
 });
 $('opAtras').addEventListener('click', () => {
