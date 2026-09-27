@@ -985,8 +985,7 @@ html[data-tema="tablilla"]{
   --oro:#7f5a0e; --ambar:#7f5a0e; --cyan:#1f6a88;
   --green:#2f6b28; --red:#a82e1c; --izq:#a8432d; --der:#1f6a88;
   --marco:#8a6a3b; --marco-2:#b8a589; --sello-oro:#875b12; --sello-rojo:#9e412b;
-  --sello-azul:#26789a; --rosa:#faf1ef; --rosa-b:#d48b7a; --celeste:#eef5f8;
-  --celeste-b:#77b0c6;
+  --sello-azul:#26789a;
   color-scheme:light;
 }
 [data-tema="tablilla"] body{background:transparent}
@@ -1043,24 +1042,29 @@ html[data-tema="tablilla"]{min-height:100%;
 [data-tema="tablilla"] .veredicto.der{border-color:rgba(31,106,136,.45)}
 [data-tema="tablilla"] #altas button.i{border-color:rgba(168,67,45,.45)}
 [data-tema="tablilla"] #altas button.d{border-color:rgba(31,106,136,.45)}
-/* Jeferión y Listillón: solo salen con la tablilla */
-.cara{display:none}
-[data-tema="tablilla"] .cara{display:block;flex:0 0 auto}
-.rt-habla{display:contents}
-[data-tema="tablilla"] .ruta .rt-habla{display:flex;gap:10px;align-items:center}
-[data-tema="tablilla"] .ruta .rt-txt{flex:1;background:var(--rosa);border:1.5px solid var(--rosa-b);
+/* Jeferión y Listillón, en los dos temas: Jeferión plantea la misión en su
+   bocadillo rosa y Listillón explica en el azul. Cada tema pone sus tonos. */
+:root{--habla-j:rgba(226,114,91,.10); --habla-j-b:rgba(226,114,91,.5);
+  --habla-l:rgba(87,184,214,.09); --habla-l-b:rgba(87,184,214,.45)}
+html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
+  --habla-l:#eef5f8; --habla-l-b:#77b0c6}
+.cara{display:block;flex:0 0 auto}
+.cara svg{display:block;width:100%;height:auto}
+.ruta .rt-habla{display:flex;gap:10px;align-items:center}
+.ruta .rt-txt{flex:1;background:var(--habla-j);border:1.5px solid var(--habla-j-b);
   border-radius:10px;padding:8px 12px;margin:4px 0 6px;color:var(--ink);font-style:italic}
-[data-tema="tablilla"] .ruta .rt-txt b{color:var(--ink)}
-[data-tema="tablilla"] .cara.jef{width:58px}
+.ruta .rt-txt b{color:var(--ink)}
+.cara.jef{width:58px}
 .habla{display:contents}
-[data-tema="tablilla"] .habla:has(> .aviso:not(:empty):not([hidden])){display:flex;gap:10px;align-items:center;
-  background:var(--celeste);border:1.5px solid var(--celeste-b);border-radius:10px;
+.habla:has(> .aviso:not(:empty):not([hidden])){display:flex;gap:10px;align-items:center;
+  background:var(--habla-l);border:1.5px solid var(--habla-l-b);border-radius:10px;
   padding:6px 8px 6px 12px;margin:8px 0 0}
-[data-tema="tablilla"] .habla > .aviso{flex:1;margin:0;color:var(--ink);font-style:italic;min-height:0}
-[data-tema="tablilla"] .habla:has(> .aviso:empty) .cara,
-[data-tema="tablilla"] .habla:has(> .aviso[hidden]) .cara{display:none}
-[data-tema="tablilla"] .habla .cara.lis{width:38px;order:2}
-[data-tema="tablilla"] .habla .aviso b{color:var(--ink)}
+.habla > .aviso{flex:1;margin:0;color:var(--ink);font-style:italic;min-height:0}
+.habla:has(> .aviso:empty) .cara,
+.habla:has(> .aviso[hidden]) .cara{display:none}
+.habla .cara.lis{width:38px;order:2}
+.habla .aviso b{color:var(--ink)}
+@media (max-width:420px){ .cara.jef{width:46px} .habla .cara.lis{width:32px} }
 /* los sellos: la misión empieza en Δοκιμή (probar), a mitad es Ἀγών (la
    lucha) y al cumplirla se estampa Νίκη (la victoria) */
 .sellito{display:none}
@@ -1171,7 +1175,7 @@ html[data-tema="tablilla"]{min-height:100%;
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v5.8</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v5.9</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
