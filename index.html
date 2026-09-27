@@ -618,6 +618,11 @@
     #pociones{display:grid;grid-template-columns:repeat(4, 1fr);gap:6px}
   #altas{display:grid;grid-template-columns:repeat(5, 1fr);gap:5px}
   #altas button{min-width:0;padding:9px 2px;font-size:11px;min-height:38px}
+  .pares{margin-top:6px;align-items:center}
+  .pares-t{flex:0 0 auto;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.2px;
+    text-transform:uppercase;color:var(--muted);margin-right:2px}
+  .pares button.par{flex:1;min-width:0;color:var(--ink);font-size:12px;
+    border-color:rgba(233,184,78,.35)}
   #altas button.i{color:var(--izq);border-color:rgba(226,114,91,.35)}
   #altas button.d{color:var(--der);border-color:rgba(87,184,214,.35)}
   @media (max-width: 340px){ #pociones{grid-template-columns:repeat(3, 1fr)} }
@@ -1175,7 +1180,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v5.9</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.0</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -2363,7 +2368,7 @@ function flotaSobre(elT, texto, color){
   }
   setTimeout(() => fl.remove(), ms(2000));
 }
-function sacoSobre(nodos, etq){
+function sacoSobre(nodos, etq, dura){
   const lista = nodos.filter(Boolean);
   if(!lista.length) return;
   const campo = document.querySelector('.campo');
@@ -2384,7 +2389,7 @@ function sacoSobre(nodos, etq){
   b.textContent = etq;
   sa.appendChild(b);
   campo.appendChild(sa);
-  setTimeout(() => sa.remove(), ms(3400));
+  setTimeout(() => sa.remove(), ms(dura || 3400));
 }
 const ZEUS_SVG =
   '<svg viewBox="0 0 120 90">' +
@@ -2837,6 +2842,35 @@ function hacePocion(p, antes, nuevo, nombre, cambiaBando, tono, color, etq){
   bd.addEventListener('click', () => alta(f));
   $('altas').appendChild(bd);
 });
+/* la pareja nula: uno de cada bando con la misma fuerza. La bandera no se
+   mueve —suman 0— y a partir de ahí se puede retirar a cualquiera de los
+   dos. Devuelve el id del de fuerza f */
+function entraPareja(f){
+  const n = sigId;
+  alta(f); alta(-f);
+  const ids = [n, n + 1].filter(id => tiradores.some(q => q.id === id));
+  /* un saco para cada uno de la pareja (uno solo abarcaba también a los
+     de en medio, que no son de la pareja) */
+  setTimeout(() => ids.forEach(id =>
+    sacoSobre([document.querySelector('.tirador[data-id="' + id + '"]')], '±' + Math.abs(f), 1400)),
+    ms(1000));      // cuando ya han llegado a su sitio
+  if(!mudo) $('aviso').innerHTML = 'Entra una <b>pareja nula</b>: ' + conSigno(f) +
+    ' y ' + conSigno(-f) + '. Tiran lo mismo en contra, así que la bandera <b>no se mueve</b>: ' +
+    conSigno(f) + ' + (' + conSigno(-f) + ') = 0.';
+  return n;
+}
+const filaPar = document.createElement('div');
+filaPar.className = 'fila pares';
+filaPar.innerHTML = '<span class="pares-t">Pareja nula</span>';
+[1,2,3,4,5].forEach(f => {
+  const b = document.createElement('button');
+  b.className = 'par'; b.textContent = '±' + f;
+  b.title = 'Entran un ' + f + ' por cada lado: la bandera no se mueve';
+  b.setAttribute('aria-label', 'Pareja nula de ' + f + ': uno por cada lado');
+  b.addEventListener('click', () => entraPareja(f));
+  filaPar.appendChild(b);
+});
+$('altas').after(filaPar);
 const CALAVERA =
   '<svg viewBox="0 0 16 16" aria-hidden="true">' +
     '<path fill="#2b0a22" d="M8 2.1c-3.1 0-5.2 2.1-5.2 4.9 0 1.6.7 2.8 1.7 3.5v1.3' +
@@ -2855,6 +2889,7 @@ const POCIONES = [
   {k:1/3,  e:':3',    n:'Aguachirle',    d:'se queda en un tercio'},
   {k:-1,   e:'·(−1)', n:'Traición',      d:'misma fuerza, otro bando'},
   {k:-2,   e:'·(−2)', n:'Traición doble',d:'el doble de fuerza, y en contra'},
+  {k:-3,   e:'·(−3)', n:'Traición triple',d:'el triple de fuerza, y en contra'},
   {k:-1/2, e:':(−2)', n:'Traición aguada', d:'la mitad de fuerza, y en contra'}
 ];
 function etqDe(k){
@@ -3117,9 +3152,14 @@ const NIVELES_OP = [
   {ops:1, tipos:['mas'],                t:'sumar'},
   {ops:2, tipos:['mas'],                t:'sumar tres'},
   {ops:2, tipos:['mas','menos'],        t:'sumar y restar', obliga:'baja'},
-  {ops:3, tipos:['mas','menos'],        t:'tres operaciones'},
+  /* PARES NULOS. Hasta aquí solo se podía restar a quien ya estaba en el
+     campo, y restar se volvía tachar términos iguales. Ahora, si no hay
+     nadie de −3 a quien retirar, entra una pareja (+3 y −3: la bandera ni
+     se mueve, suman 0) y se retira el −3 de la pareja. */
+  {ops:2, tipos:['mas','menos'],        t:'restar al que no está', libre:true, obliga:'nulo'},
+  {ops:3, tipos:['mas','menos'],        t:'tres operaciones', libre:true},
   {ops:2, tipos:['mas','menos','por'],  t:'con pociones: el frasco va antes', obliga:'termino'},
-  {ops:3, tipos:['mas','menos','por'],  t:'tres operaciones y pociones', obliga:'termino'},
+  {ops:3, tipos:['mas','menos','por'],  t:'tres operaciones y pociones', libre:true, obliga:'termino'},
   {ops:0, forma:'parentesis',           t:'paréntesis: todos beben'},
   {ops:0, forma:'menosgrupo',           t:'menos delante del paréntesis'},
   {ops:0, forma:'potencias',            t:'potencias: dónde está el paréntesis'}
@@ -3136,11 +3176,12 @@ function ajustaParentesis(){
     ? 'todos' : 'necesarios';
 }
 function termino(f, primero){
+  if(f === 0) return '0';           // el cero no lleva signo ni paréntesis
   if(PARENTESIS === 'todos') return '(' + conSigno(f) + ')';
   if(primero) return f < 0 ? conSigno(f) : String(f);
   return f < 0 ? '(' + conSigno(f) + ')' : String(Math.abs(f));
 }
-const numHtml = (f, primero) => '<span class="' + (f < 0 ? 'izq' : 'der') + '">' +
+const numHtml = (f, primero) => '<span class="' + (f < 0 ? 'izq' : (f > 0 ? 'der' : 'cero')) + '">' +
   termino(f, primero) + '</span>';
 const totalHtml = t => PARENTESIS === 'todos'
   ? (t === 0 ? '0' : conSigno(t))
@@ -3210,24 +3251,41 @@ function generaOperacion(nivel){
       return {pasos, piezas, parentesis:false, valor: sumaSim(quedan)};
     }
   }
-  for(let intento = 0; intento < 80; intento++){
+  /* EL CERO. Una de cada cinco cadenas largas se busca que acabe en empate:
+     el 0 también es un resultado, y no es de ningún bando */
+  const buscaCero = g.ops >= 2 && Math.random() < 0.12;
+  const conPocion = g.tipos.indexOf('por') >= 0;
+  for(let intento = 0; intento < 120; intento++){
     let est = [], bien = true;
     const pasos = [], piezas = [];
-    const primera = pick(FUERZAS);
-    est.push(primera);
-    pasos.push({tipo:'alta', f:primera});
-    piezas.push(numHtml(primera, true));
+    /* con pociones, a veces la cadena arranca con un producto suelto:
+       (−4) · (−2) + … */
+    if(conPocion && Math.random() < 0.35){
+      const f = pick(FUERZAS), po = pick(POCIONES), r = f * po.k;
+      if(!Number.isInteger(r) || r === 0 || Math.abs(r) > TOPE) continue;
+      est.push(r);
+      pasos.push({tipo:'termino', f, k:po.k, nom:po.n, e:po.e});
+      piezas.push(numHtml(f, true) + '<span class="poc">' + po.e + '</span>');
+    }else{
+      const primera = pick(FUERZAS);
+      est.push(primera);
+      pasos.push({tipo:'alta', f:primera});
+      piezas.push(numHtml(primera, true));
+    }
     for(let i = 0; i < g.ops; i++){
-      const tipo = pick(g.tipos.filter(t => t !== 'menos' || est.length > 0));
+      const tipo = pick(g.tipos.filter(t => t !== 'menos' || est.length > 0 || g.libre));
       if(tipo === 'mas'){
         const f = pick(FUERZAS);
         est.push(f);
         pasos.push({tipo:'alta', f});
         piezas.push('<span class="op"> + </span>' + numHtml(f));
       }else if(tipo === 'menos'){
-        const f = pick(est);
-        est.splice(est.indexOf(f), 1);
-        pasos.push({tipo:'baja', f});
+        /* con resta libre, la mitad de las veces se resta a cualquiera,
+           esté o no: si no está, entra su pareja nula */
+        const f = g.libre && (Math.random() < 0.55 || !est.length) ? pick(FUERZAS) : pick(est);
+        const i0 = est.indexOf(f);
+        if(i0 >= 0){ est.splice(i0, 1); pasos.push({tipo:'baja', f}); }
+        else{ est.push(-f); pasos.push({tipo:'baja', f, nulo:true}); }
         piezas.push('<span class="op"> − </span>' + numHtml(f));
       }else{
                 const f = pick(FUERZAS), po = pick(POCIONES), r = f * po.k;
@@ -3242,7 +3300,8 @@ function generaOperacion(nivel){
     if(!bien) continue;
     /* si el nivel es de restar, que haya una resta; si es de pociones, que
        haya un frasco: antes, «Las pociones» podía no tener ninguna */
-    if(g.obliga && !pasos.some(p => p.tipo === g.obliga)) continue;
+    if(g.obliga && !pasos.some(p => g.obliga === 'nulo' ? p.nulo : p.tipo === g.obliga)) continue;
+    if(buscaCero && intento < 100 && sumaSim(est) !== 0) continue;
     return {pasos, piezas, parentesis:false, valor: sumaSim(est)};
   }
   return {pasos:[{tipo:'alta', f:1}, {tipo:'alta', f:1}],
@@ -3268,6 +3327,7 @@ function aplicaPaso(est, j, mal){
     const i = c.indexOf(j.f);
     if(mal) c.push(j.f);
     else if(i >= 0) c.splice(i, 1);
+    else c.push(-j.f);              // entra la pareja (f y −f) y se va el f: queda −f
   }
   else if(j.tipo === 'termino') c.push(mal ? -(j.f * j.k) : j.f * j.k);
   else if(j.tipo === 'bebe') c[c.length - 1] = c[c.length - 1] * j.k * (mal ? -1 : 1);
@@ -3377,8 +3437,12 @@ function vePaso(k, animado){
     if(j.tipo === 'alta') alta(j.f);
     else if(j.tipo === 'baja'){
       const p = tiradores.find(q => q.f === j.f && !retirandoIds.has(q.id));
-      if(p) retira(p.id);
-      dura = 2300;
+      if(p){ retira(p.id); dura = 2300; }
+      else{
+        const idF = entraPareja(j.f);
+        setTimeout(() => { if(vivo() && suyo(idF)) retira(idF); }, ms(2400));
+        dura = 2400 + 2300;
+      }
     }else if(j.tipo === 'purga'){
       const ids = [];
       j.fs.forEach(f => {
@@ -3447,6 +3511,79 @@ function vePaso(k, animado){
   $('opSig').disabled = k >= pasos.length || oper.ocupado;
   pintaOper();
 }
+/* LAS CORRECCIONES QUE EXPLICAN. En vez de un «vuelve a mirar» genérico,
+   se rehace la cuenta con cada uno de los errores típicos y, si alguno da
+   justo lo que ha escrito el alumno, se le dice cuál ha sido. */
+function queHaPasado(ej, dicho){
+  const pasos = ej.pasos, v = ej.valor;
+  const conMal = cual => sumaSim(pasos.reduce((est, j, i) => aplicaPaso(est, j, cual(j, i)), []));
+  const hay = t => pasos.some(j => j.tipo === t);
+  /* 1. el menos de delante del paréntesis, solo al primero */
+  if(hay('purga') && conMal(j => j.tipo === 'purga') === dicho && dicho !== v)
+    return 'Has quitado solo al primero de dentro del paréntesis. El menos de delante ' +
+      'alcanza a <b>todos</b>: caen <b>dos rayos</b>.';
+  /* 2. potencias: −2² leído como (−2)², o al revés */
+  if(hay('potencia')){
+    const j = pasos.find(x => x.tipo === 'potencia');
+    if(conMal(x => x.tipo === 'potencia') === dicho && dicho !== v)
+      return j.menos
+        ? 'En <b>−' + j.f + '<sup>' + j.n + '</sup></b> no hay paréntesis: se eleva el <b>' + j.f +
+          '</b> y el menos va <b>al final</b>. No es lo mismo que (−' + j.f + ')<sup>' + j.n + '</sup>.'
+        : 'En <b>(' + conSigno(j.f) + ')<sup>' + j.n + '</sup></b> el paréntesis mete el menos ' +
+          '<b>dentro</b>: se multiplica ' + j.n + ' veces el ' + conSigno(j.f) + ', con su signo. ' +
+          (j.n % 2 === 0 ? 'Menos por menos, más.' : 'Con un número impar de menos, queda menos.');
+  }
+  /* 3. paréntesis: el frasco solo para el último */
+  if(hay('todos')){
+    const j = pasos.find(x => x.tipo === 'todos');
+    const dentro = pasos.filter(x => x.tipo === 'alta').map(x => x.f);
+    const soloUltimo = sumaSim(dentro.slice(0, -1)) + dentro[dentro.length - 1] * j.k;
+    if(soloUltimo === dicho && dicho !== v)
+      return 'El frasco <b>' + j.e + '</b> es para <b>todos</b> los de dentro del paréntesis, ' +
+        'no solo para el último: todos beben.';
+  }
+  /* 4. la jerarquía: el frasco se lo bebe el campo entero en vez del que entra */
+  if(hay('termino')){
+    let r = 0;
+    pasos.forEach(j => {
+      if(j.tipo === 'alta') r += j.f;
+      else if(j.tipo === 'baja') r -= j.f;
+      else if(j.tipo === 'termino') r = (r + j.f) * j.k;
+    });
+    if(Number.isInteger(r) && r === dicho && dicho !== v)
+      return 'Has sumado antes de multiplicar. El frasco se lo bebe <b>solo el tirador que ' +
+        'entra</b>, no todo el campo: primero el producto y luego la suma.';
+    if(conMal(j => j.tipo === 'termino') === dicho && dicho !== v)
+      return 'Mira el signo del producto: un frasco con calavera cambia de bando al que bebe, ' +
+        'y uno sin calavera lo deja en el suyo. <b>Menos por menos, más; más por menos, menos.</b>';
+  }
+  /* 5. restar como si fuera sumar: − (−3) se queda en −3 */
+  if(hay('baja') && conMal(j => j.tipo === 'baja') === dicho && dicho !== v){
+    const j = pasos.find(x => x.tipo === 'baja');
+    return 'La resta se ha quedado en suma. <b>− (' + conSigno(j.f) + ')</b> es que se va ' +
+      (j.f < 0 ? 'uno que tiraba hacia la <b>izquierda</b>: la bandera se va a la <b>derecha</b>'
+               : 'uno que tiraba hacia la <b>derecha</b>: la bandera se va a la <b>izquierda</b>') +
+      '. Por eso − (' + conSigno(j.f) + ') = + (' + conSigno(-j.f) + ').';
+  }
+  /* 6. juntar las fuerzas sin mirar el bando */
+  const abs = pasos.reduce((t, j) =>
+    j.tipo === 'alta' ? t + Math.abs(j.f)
+    : j.tipo === 'termino' ? t + Math.abs(j.f * j.k)
+    : j.tipo === 'baja' ? t - Math.abs(j.f) : t, 0);
+  if(pasos.every(j => ['alta','baja','termino'].indexOf(j.tipo) >= 0) &&
+     pasos.some(j => (j.f * (j.k || 1)) < 0) && abs === dicho && dicho !== v)
+    return 'Has juntado las fuerzas <b>sin mirar el bando</b>. Los de la izquierda tiran ' +
+      '<b>en contra</b> de los de la derecha: unos restan a los otros.';
+  /* 7. el número bien, el lado mal */
+  if(dicho === -v && v !== 0)
+    return 'La <b>distancia al cero</b> es la buena, pero el <b>lado</b> no: la bandera para ' +
+      (v < 0 ? 'a la <b>izquierda</b>, en los negativos.' : 'a la <b>derecha</b>, en los positivos.');
+  /* 8. el cero: empate */
+  if(v === 0)
+    return 'Mira bien: los dos bandos tiran <b>lo mismo</b>. Es un empate, y el empate es el ' +
+      '<b>0</b>, que no es de ningún bando.';
+  return '';
+}
 function compruebaOper(){
   if(!oper || oper.resp === '' || oper.fase === 'bien') return;
   if(!esEntero(oper.resp)){ $('opAviso').innerHTML = 'Escribe un número: con cifras, y el signo delante si lo lleva.'; return; }
@@ -3458,6 +3595,7 @@ function compruebaOper(){
     oper.seguidas++;
     oper.tropiezos = 0;
     $('opAviso').innerHTML = '<b>Correcto.</b> ' +
+      (oper.ej.valor === 0 ? 'Empate: el <b>0</b> no es de ningún bando. ' : '') +
       (oper.visto ? 'Ahora inténtala sin abrir el campo.' : '<b>Y sin abrir el campo.</b>');
     if(oper.aciertos % 5 === 0) confeti();
     apuntaLogro();
@@ -3471,9 +3609,11 @@ function compruebaOper(){
     oper.seguidas = 0;
     oper.tropiezos++;
     apuntaFallo();
-    $('opAviso').innerHTML = 'No es <b>' + oper.resp + '</b>. ' +
+    const porque = queHaPasado(oper.ej, dicho);
+    $('opAviso').innerHTML = 'No es <b>' + oper.resp + '</b>. ' + (porque ||
       (oper.visto ? 'Vuelve a mirar el campo con calma: la bandera para donde para.'
-                  : 'Ábrela con los tiradores y mira qué pasa.');
+                  : 'Ábrela con los tiradores y mira qué pasa.')) +
+      (porque && !oper.visto ? ' Si quieres, ábrela y míralo.' : '');
     if(!ruta && oper.tropiezos >= 2 && oper.nivel > 0){
       oper.nivel--; oper.tropiezos = 0;
       $('opAviso').innerHTML += ' Bajamos un nivel.';
@@ -3511,8 +3651,11 @@ function rondaCanon(){
     canon.ej = {tipo, f, valor: Math.abs(f),
       txt: '¿Con cuánta fuerza tira el de ' + numHtml(f) + '?'};
   }else{
-    let a = pick(FUERZAS), b = pick(FUERZAS);
-    while(b === a) b = pick(FUERZAS);
+    /* el 0 también se compara: queda a la izquierda de todos los positivos
+       y a la derecha de todos los negativos */
+    const CON_CERO = FUERZAS.concat([0, 0]);
+    let a = pick(CON_CERO), b = pick(CON_CERO);
+    while(b === a) b = pick(CON_CERO);
     canon.ej = {tipo, a, b, valor: Math.min(a, b),
       txt: 'De ' + numHtml(a) + ' y ' + numHtml(b) +
            ', ¿cuál es <b>menor</b>, o sea cuál queda más a la izquierda?'};
@@ -3631,8 +3774,17 @@ function rondaArgos(){
       const buenos = [];
   for(let i = 1; i <= pasos.length; i++) buenos.push(sumaSim(estadoDe(pasos, i)));
   const candidatos = [];
-  for(let k = pasos.length > 1 ? 1 : 0; k < pasos.length; k++)
+  /* ARGOS MÁS EXIGENTE. Antes: tres renglones y solo dos posibles
+     culpables (se acertaba la mitad al azar). Ahora: cuatro renglones o
+     más, con restas a quien no está y pociones, y cualquiera puede ser el
+     culpable, también el primero */
+  for(let k = 0; k < pasos.length; k++)
     if(sumaSim(estadoDe(pasos, k + 1, k)) !== buenos[k]) candidatos.push(k);
+  argos.intentos = (argos.intentos || 0) + 1;
+  if((pasos.length < 4 || candidatos.length < 3) && argos.intentos < 40){
+    argos.ej = null; return rondaArgos();
+  }
+  argos.intentos = 0;
   if(!candidatos.length){ argos.ej = null; return rondaArgos(); }   // ronda imposible: otra
   argos.malo = pick(candidatos);
   argos.dichos = [];
@@ -3657,7 +3809,10 @@ function textoPaso(j){
   if(j.tipo === 'purga') return 'se retiran <b>' + conSigno(j.fs[0]) + '</b> y <b>' +
     conSigno(j.fs[1]) + '</b> a la vez';
   if(j.tipo === 'alta') return 'entra un tirador de <b>' + conSigno(j.f) + '</b>';
-  if(j.tipo === 'baja') return 'se retira el tirador de <b>' + conSigno(j.f) + '</b>';
+  if(j.tipo === 'baja') return j.nulo
+    ? 'no hay nadie de <b>' + conSigno(j.f) + '</b>: entra una pareja nula y se retira el de <b>' +
+      conSigno(j.f) + '</b>'
+    : 'se retira el tirador de <b>' + conSigno(j.f) + '</b>';
   if(j.tipo === 'bebe') return 'el de ' + conSigno(j.f) + ' se bebe <b>' + j.nom +
     ' (' + j.e + ')</b>';
   return '<b>todos</b> se beben ' + j.nom + ' (' + j.e + ')';
@@ -3748,7 +3903,7 @@ function argosAlCampo(){
   asomaCampo();
 }
 function arrancaArgos(nivel){
-  argos = {nivel:2, aciertos:0, fallos:0, ej:null, malo:0, dichos:[],
+  argos = {nivel:6, aciertos:0, fallos:0, ej:null, malo:0, dichos:[],
            hecho:false, elegido:-1};
   diana = null; cron = null; oper = null; mudo = false;
   $('argos').hidden = false;
@@ -3922,9 +4077,21 @@ function correTokens(i){
     return;
   }
   const p = tiradores.find(q => q.f === tk.f && !retirandoIds.has(q.id));
-  if(!p){ cron.imposible = tk; juzgaCron(); return; }   // no se puede retirar a quien no está
-  retira(p.id);
-  { const yo = cron; trasRetirar(p.id, () => { if(cron && cron === yo) correTokens(i + 1); }); }
+  const yo = cron;
+  if(p){
+    retira(p.id);
+    trasRetirar(p.id, () => { if(cron && cron === yo) correTokens(i + 1); });
+    return;
+  }
+  /* no hay nadie de ese número: entra su pareja nula y se retira el que toca.
+     Antes esto era «ahí no se puede»; ahora restar vale para cualquiera */
+  const id = entraPareja(tk.f);
+  setTimeout(() => {
+    if(!(cron && cron === yo)) return;
+    if(!tiradores.some(q => q.id === id)){ correTokens(i + 1); return; }
+    retira(id);
+    trasRetirar(id, () => { if(cron && cron === yo) correTokens(i + 1); });
+  }, ms(2400));
 }
 function equivale(){
   if(cron.tokens.length !== 1 || cron.sucesos.length !== 1) return '';
@@ -4024,25 +4191,29 @@ const MISIONES = [
      'Al comprobar se juega lo que escribas.'},
   {t:'Dos operaciones', modo:'oper', n:2, meta:4,
    d:'Cadenas de dos, por orden, de izquierda a derecha.'},
+  {t:'Restar al que no está', modo:'oper', n:3, meta:4,
+   d:'¿Y si hay que restar un <b>−3</b> y no hay nadie de −3? Entra una <b>pareja nula</b> ' +
+     '—un +3 y un −3, que suman 0— y se retira el −3. Por eso <b>− (−3)</b> hace lo mismo ' +
+     'que <b>+ (+3)</b>.'},
   {t:'Dos jugadas seguidas', modo:'diana', n:2, meta:3,
    d:'Pasan las dos y <b>solo hay una estaca</b>: la cuenta va por dentro.'},
-  {t:'Las pociones', modo:'oper', n:4, meta:4,
+  {t:'Las pociones', modo:'oper', n:5, meta:4,
    d:'El frasco multiplica <b>a un tirador</b>, no al campo: por eso va antes que la suma.'},
   {t:'Cadena con pociones', modo:'diana', n:5, meta:3,
    d:'Tres jugadas con frascos por medio, traduciendo sobre la marcha.'},
   {t:'Escribe la cadena', modo:'cron', n:1, meta:3,
    d:'Dos cosas seguidas, y las escribes las dos, en orden.'},
-  {t:'Paréntesis: todos beben', modo:'oper', n:6, meta:3,
+  {t:'Paréntesis: todos beben', modo:'oper', n:7, meta:3,
    d:'<b>2 · (3 + 1)</b> no es una regla: <b>los dos se beben un Doblón</b>.'},
-  {t:'Menos delante del paréntesis', modo:'oper', n:7, meta:3,
+  {t:'Menos delante del paréntesis', modo:'oper', n:8, meta:3,
    d:'Se retiran <b>dos a la vez</b>: <b>− ( (+2) + (−3) )</b>. Ojo, que el menos ' +
      'alcanza a los dos — caen dos rayos.'},
-  {t:'Potencias: dónde está el paréntesis', modo:'oper', n:8, meta:3,
+  {t:'Potencias: dónde está el paréntesis', modo:'oper', n:9, meta:3,
    d:'<b>(−2)²</b> y <b>−2²</b> no son lo mismo. Ábrelo y mira <b>quién entra al ' +
      'campo</b>: ahí está toda la diferencia.'},
-  {t:'El ojo de Argos', modo:'argos', n:2, meta:3,
-   d:'Alguien ha resuelto la cadena y en un paso <b>se equivocó de signo</b>. ' +
-     'Señala el primero que está mal.'},
+  {t:'El ojo de Argos', modo:'argos', n:6, meta:3,
+   d:'Alguien ha resuelto una cadena larga, con restas y pociones, y en un paso ' +
+     '<b>se equivocó</b>. Señala el primero que está mal.'},
   {t:'El taller', modo:'taller', n:0, meta:0,
    d:'El campo entero para ti. Aquí no se puntúa nada.'}
 ];
@@ -4429,7 +4600,7 @@ const VISITA = [
    t:'Este botón abre <b>el campo</b>. No es hacer trampa: es la ayuda.',
    hacer: () => { if(oper && !oper.visto) abreCampo(); }},
   {sel:'.campo', siempre:true, c:'El tira y afloja',
-   t:'Los de la <b>derecha suman</b> y los de la <b>izquierda restan</b>. Donde para la bandera es el resultado, y abajo tienes la recta numérica.'},
+   t:'Los de la derecha tiran hacia los <b>positivos</b> y los de la izquierda hacia los <b>negativos</b>. Que alguien <b>entre</b> es sumar su número, con su signo; que se <b>retire</b> es restarlo. Donde para la bandera es el resultado, y abajo tienes la recta numérica.'},
   {sel:'#opPasos', siempre: () => !!oper, c:'Fotograma a fotograma',
    t:'Cada <b>▶</b> es un término de la operación, y se puede volver <b>◀</b> atrás. Arriba se enciende el término que está pasando.',
    hacer: () => { if(oper && oper.paso === 0) vePaso(1, true); }},
@@ -4439,7 +4610,7 @@ const VISITA = [
    t:'Un ánfora multiplica <b>a un tirador</b>, no al campo entero: por eso el producto va <b>antes</b> que la suma. Aparecen cuando la jugada las usa.',
    hacer: () => { $('cajonPociones').hidden = false; $('cajonPociones').open = true; }},
   {sel:'#ruta', c:'La ruta',
-   t:'Dieciséis misiones, cada una con lo suyo. En algunas es al revés: pasan las jugadas y <b>tú dices dónde parará</b> la bandera arrastrando el dedo.'},
+   t:'Las misiones, de una en una y cada una con lo suyo. En algunas es al revés: pasan las jugadas y <b>tú dices dónde parará</b> la bandera arrastrando el dedo.'},
   {sel:'.menus', c:'Y ya está',
    t:'Aquí arriba tienes el <b>glosario</b>, el <b>taller</b> para trastear libre y los <b>ajustes</b>. A jugar.'}
 ];
