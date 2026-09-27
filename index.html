@@ -1154,6 +1154,45 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 .banco-f .frasco{zoom:.55}
 .banco-f i{font-style:normal;font-family:'Space Mono',monospace;font-size:13px;font-weight:700}
 .banco-f.baja{transform:translateY(40px) scale(.6);opacity:0}
+
+/* ── LAS ENTREVISTAS ── */
+.ev-quien{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 8px}
+.ev-quien button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px 5px;min-height:0}
+.ev-quien button[aria-pressed="true"]{border-color:var(--ambar);color:var(--ambar);
+  box-shadow:inset 0 0 0 1px var(--ambar)}
+.ev-mini{width:46px;height:46px;display:block}
+.ev-mini svg{width:100%;height:100%}
+.ev-cartel{font-size:13px;color:var(--muted);margin:2px 0 8px;font-style:italic}
+.ev-escena{display:flex;gap:10px;align-items:flex-end;margin:0 0 10px}
+.ev-cara{flex:0 0 auto;width:132px;height:132px}
+.ev-cara svg{width:100%;height:100%;display:block}
+.ev-globo{flex:1;position:relative;min-height:112px;padding:10px 13px;border-radius:12px;
+  background:var(--habla-l);border:1.5px solid var(--habla-l-b);margin-bottom:18px}
+.ev-globo::before{content:'';position:absolute;left:-9px;bottom:16px;width:14px;height:14px;
+  background:inherit;border-left:1.5px solid var(--habla-l-b);border-bottom:1.5px solid var(--habla-l-b);
+  transform:rotate(45deg)}
+.ev-pregunta{margin:0 0 5px;font-size:12.5px;color:var(--muted);font-family:'Oswald',sans-serif;letter-spacing:.4px}
+.ev-respuesta{margin:0;font-size:15.5px;line-height:1.5;font-style:italic;color:var(--ink);min-height:1.5em}
+.ev-respuesta b{color:var(--ink)}
+#evPrueba{margin-top:8px}
+.ev-rotulo{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--muted);margin:0 0 6px}
+.ev-lista{display:flex;flex-direction:column;gap:6px}
+.ev-p{text-align:left;text-transform:none;letter-spacing:0;font-family:'Atkinson Hyperlegible',sans-serif;
+  font-size:14px;padding:9px 12px;min-height:0}
+.ev-p.hecha{opacity:.55}
+.ev-p.repregunta{border-style:dashed;border-color:var(--ambar)}
+.ev-re{font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ambar)}
+@media (max-width:420px){ .ev-cara{width:104px;height:104px} .ev-respuesta{font-size:14.5px} }
+/* en el aula, la entrevista ocupa el ancho: el campo no pinta nada aquí */
+@media (min-width:1100px){
+  body[data-aula="si"] .aulaRejilla:has(#entrevista:not([hidden])){grid-template-columns:minmax(0,1fr)}
+  body[data-aula="si"] .aulaRejilla:has(#entrevista:not([hidden])) .colDer{display:none}
+  body[data-aula="si"] #entrevista .ev-cara{width:220px;height:220px}
+  body[data-aula="si"] #entrevista .ev-respuesta{font-size:20px}
+  body[data-aula="si"] #entrevista .ev-globo{max-width:980px}
+  body[data-aula="si"] #entrevista .ev-lista{display:grid;grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
@@ -1255,7 +1294,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.3</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.4</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1306,6 +1345,22 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
     <button id="clSalir">Volver al taller</button>
   </div>
 </div>
+<div class="panel entrevista" id="entrevista" hidden>
+  <h2>Entrevistas en la palestra</h2>
+  <div class="ev-quien" id="evQuien" role="group" aria-label="A quién entrevistar"></div>
+  <p class="ev-cartel" id="evCartel"></p>
+  <div class="ev-escena">
+    <div class="ev-cara" id="evCara" aria-hidden="true"></div>
+    <div class="ev-globo">
+      <p class="ev-pregunta" id="evPregunta"></p>
+      <p class="ev-respuesta" id="evRespuesta" aria-live="polite"></p>
+      <button id="evPrueba" class="scan" hidden>Verlo en la tablilla</button>
+    </div>
+  </div>
+  <p class="ev-rotulo">Pregúntale:</p>
+  <div class="ev-lista" id="evLista"></div>
+  <div class="fila" style="margin-top:8px"><button id="evSalir">Volver al taller</button></div>
+</div>
 <div class="modos" id="modos" hidden>
   <button id="mOper" class="modo-b" aria-pressed="true">Operaciones</button>
   <button id="mDiana" class="modo-b" aria-pressed="false">La Diana</button>
@@ -1313,6 +1368,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
   <button id="mArgos" class="modo-b" aria-pressed="false">Argos</button>
   <button id="mCanon" class="modo-b" aria-pressed="false">El canon</button>
   <button id="mCalc" class="modo-b" aria-pressed="false">La tablilla</button>
+  <button id="mEntrevista" class="modo-b" aria-pressed="false">Entrevistas</button>
 </div>
 <div class="tour-capa" id="tour" hidden>
   <div class="tour-foco" id="tourFoco"></div>
@@ -1466,6 +1522,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
       <button id="otroReto">Otro encargo</button>
       <button id="vaciar">Vaciar el campo</button>
       <button id="aCalc">La tablilla de Listillón</button>
+      <button id="aEntrevista">Entrevistas</button>
     </div>
   </div>
   <div id="letraChica" hidden>
@@ -1616,6 +1673,7 @@ let tirado = false;
 let diana = null;
 let cron = null;
 let calc = null;
+let ev = null;
 let mudo = false;
 const suma = () => tiradores.reduce((t, p) => t + p.f, 0);
 const conSigno = n => n === 0 ? '0' : (n > 0 ? '+' : '−') + Math.abs(n);
@@ -4774,6 +4832,7 @@ function modoBotones(m){
   $('mTaller').setAttribute('aria-pressed', String(m === 'taller'));
   $('mDiana').setAttribute('aria-pressed', String(m === 'diana'));
   $('mCalc').setAttribute('aria-pressed', String(m === 'calc'));
+  $('mEntrevista').setAttribute('aria-pressed', String(m === 'entrevista'));
     if(m !== 'taller') vueltaTaller = null;
   pintaBotonTaller();
 }
@@ -4786,7 +4845,7 @@ function pintaBotonTaller(){
 }
 function modoSuelto(){
   const cuales = {mOper:'oper', mDiana:'diana', mCron:'cronista',
-                  mArgos:'argos', mCanon:'canon', mCalc:'calc'};
+                  mArgos:'argos', mCanon:'canon', mCalc:'calc', mEntrevista:'entrevista'};
   for(const id in cuales)
     if($(id).getAttribute('aria-pressed') === 'true') return cuales[id];
   return null;
@@ -4802,7 +4861,7 @@ function alTallerBoton(){
       guardaTurno(); pintaRuta();
     } else if(v && v.tipo === 'suelto'){
       const arranques = {oper:arrancaOper, diana:arrancaDiana,
-        cronista:arrancaCronista, argos:arrancaArgos, canon:arrancaCanon, calc:arrancaCalc};
+        cronista:arrancaCronista, argos:arrancaArgos, canon:arrancaCanon, calc:arrancaCalc, entrevista:arrancaEntrevista};
       alTaller(); modoBotones(v.modo); arranques[v.modo]();
     } else if(!retomaTurno()){      // sin memoria de vuelta: a la ruta
       arrancaMision(0);
@@ -4834,6 +4893,8 @@ function alTaller(){
   if(calc){ calc.teatro++; calc = null; pintaBanco([]); }
   $('clEscena').hidden = true; $('clEscena').textContent = '';
   $('calc').hidden = true;
+  if(ev){ ev.tok++; ev = null; }
+  $('entrevista').hidden = true;
   ruta = null; mudo = false;
   $('argos').hidden = true;
   $('canon').hidden = true;
@@ -5608,6 +5669,239 @@ async function igualCalc(){
 $('mCalc').addEventListener('click', () => { alTaller(); modoBotones('calc'); arrancaCalc(); });
 $('aCalc').addEventListener('click', () => { alTaller(); modoBotones('calc'); arrancaCalc(); });
 
+/* ── ZEUS ── a cara descubierta: en el campo solo se le ve a contraluz */
+const ZV = {piel:'#E7B58C', sombra:'#C98E66', barba:'#F4F1EA', barbaS:'#CFCBD8', toga:'#EEF0F6', togaS:'#C9CEDF',
+            oro:'#E9B84E', ojo:'#FFE27A', rayo:'#F5C542'};
+function rayoZ(x, y, esc, giro){
+  return '<g transform="translate(' + x + ' ' + y + ') rotate(' + giro + ') scale(' + esc + ')">' +
+    '<path d="M0 -22 L9 -22 L3 -6 L11 -6 L-5 22 L-1 2 L-8 2 Z" fill="' + ZV.rayo + '" stroke="' + TINTA +
+    '" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<path d="M2 -19 L6 -19 L1.5 -8" fill="none" stroke="#fff" stroke-width="1.2" opacity=".75"/></g>';
+}
+function manoZ(x, y){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="4.8" fill="' + ZV.piel + '" stroke="' + TINTA + '" stroke-width="1.3"/>';
+}
+function zeus(pose){
+  pose = pose || 'habla';
+  const P = {
+    habla:   {bI:[110,14,70,12], bD:[-50,15,-95,12], rayo:'mano', boca:.5, ceja:'serio', ojo:'abierto'},
+    enfada:  {bI:[110,14,70,12], bD:[-80,15,-100,14], rayo:'alto', boca:.7, ceja:'furia', ojo:'abierto'},
+    rie:     {bI:[140,10,40,14], bD:[40,12,150,12], rayo:'suelo', boca:1, ceja:'alegre', ojo:'cerrado'},
+    piensa:  {bI:[110,14,70,12], bD:[200,14,240,12], rayo:'suelo', boca:0, ceja:'piensa', ojo:'arriba'},
+    sorpresa:{bI:[-140,14,-110,12], bD:[-40,14,-70,12], rayo:'suelo', boca:.9, ceja:'alta', ojo:'grande'},
+    calla:   {bI:[110,14,70,12], bD:[110,14,70,12], rayo:'suelo', boca:0, ceja:'serio', ojo:'abierto'}
+  }[pose];
+  const brazoDe = (x, y, b) => brazo2(x, y, b[0], b[1], b[2], b[3], 7.4, ZV.piel, manoZ);
+  const fin = (x0, y0, b) => {
+    const r1 = b[0] * Math.PI / 180, r2 = b[2] * Math.PI / 180;
+    return [x0 + Math.cos(r1) * b[1] + Math.cos(r2) * b[3], y0 + Math.sin(r1) * b[1] + Math.sin(r2) * b[3]];
+  };
+  let s = '<svg viewBox="0 0 100 100" class="pj pj-zeus pose-' + pose + '" aria-hidden="true">';
+  if(P.rayo === 'suelo') s += rayoZ(88, 80, .8, 18);
+  /* brazo de atrás */
+  s += brazoDe(32, 64, P.bI);
+  /* túnica */
+  s += '<path d="M18 100 Q18 70 34 60 L66 60 Q82 70 82 100 Z" fill="' + ZV.toga + '" stroke="' + TINTA + '" stroke-width="1.6" stroke-linejoin="round"/>';
+  s += '<path d="M34 60 Q46 78 44 100 M58 62 Q54 80 60 100" fill="none" stroke="' + ZV.togaS + '" stroke-width="1.4"/>';
+  s += '<path d="M30 62 L70 96" stroke="' + TINTA + '" stroke-width="6.2"/><path d="M30 62 L70 96" stroke="' + ZV.oro + '" stroke-width="4.2"/>';
+  /* barba: nube por debajo de la cara */
+  const nube = (pts, fill) => pts.map(([x, y, r]) => '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + fill + '"/>').join('');
+  const barba = [[38,50,8],[46,56,9],[54,56,9],[62,50,8],[42,62,7],[50,66,8],[58,62,7],[50,72,6]];
+  s += '<g>' + nube(barba.map(([x,y,r]) => [x,y,r + 1.3]), TINTA) + nube(barba, ZV.barba) + '</g>';
+  /* pelo: nube por detrás de la cabeza */
+  const pelo = [[34,34,7],[35,24,7],[42,17,7],[50,15,7],[58,17,7],[65,24,7],[66,34,7]];
+  s += nube(pelo.map(([x,y,r]) => [x,y,r + 1.3]), TINTA) + nube(pelo, ZV.barba);
+  /* corona de puntas, como su silueta en el campo */
+  s += '<path d="M36 18 L38 6 L42 14 L46 2 L50 12 L54 2 L58 14 L62 6 L64 18 Z" fill="' + ZV.oro + '" stroke="' + TINTA + '" stroke-width="1.3" stroke-linejoin="round"/>';
+  /* cara */
+  s += '<ellipse cx="50" cy="36" rx="13" ry="14" fill="' + ZV.piel + '" stroke="' + TINTA + '" stroke-width="1.5"/>';
+  s += '<path d="M48 38 Q50 44 52 38" fill="' + ZV.sombra + '" stroke="' + TINTA + '" stroke-width="1"/>';
+  /* ojos: brillan como en el campo */
+  const ojo = (cx) => {
+    if(P.ojo === 'cerrado') return '<path d="M' + (cx - 3) + ' 33 q3 -3 6 0" fill="none" stroke="' + TINTA + '" stroke-width="1.8" stroke-linecap="round"/>';
+    const r = P.ojo === 'grande' ? 3.4 : 2.6, dy = P.ojo === 'arriba' ? -1.2 : 0;
+    return '<circle cx="' + cx + '" cy="' + (33 + dy) + '" r="' + (r + 1.6) + '" fill="' + ZV.ojo + '" opacity=".35"/>' +
+      '<circle cx="' + cx + '" cy="' + (33 + dy) + '" r="' + r + '" fill="' + ZV.ojo + '" stroke="' + TINTA + '" stroke-width="1"/>' +
+      '<circle cx="' + cx + '" cy="' + (33 + dy) + '" r="' + (r * .42) + '" fill="#140F1F"/>';
+  };
+  s += ojo(44.5) + ojo(55.5);
+  /* cejas pobladas */
+  const cj = {serio:[[39,28,48,29],[52,29,61,28]], furia:[[39,26,48,30.5],[52,30.5,61,26]],
+              alegre:[[39,28,48,26],[52,26,61,28]], piensa:[[39,27,48,29],[52,27,61,25]],
+              alta:[[39,24,48,23],[52,23,61,24]]}[P.ceja];
+  cj.forEach(c => { s += '<path d="M' + c[0] + ' ' + c[1] + ' L' + c[2] + ' ' + c[3] + '" stroke="' + TINTA + '" stroke-width="4.4" stroke-linecap="round"/>' +
+    '<path d="M' + c[0] + ' ' + c[1] + ' L' + c[2] + ' ' + c[3] + '" stroke="' + ZV.barba + '" stroke-width="2.6" stroke-linecap="round"/>'; });
+  /* bigote y boca */
+  const ab = P.boca * 5;
+  if(P.boca > .1) s += '<ellipse cx="50" cy="' + (48 + ab * .3) + '" rx="' + (3 + P.boca * 2) + '" ry="' + (1 + ab * .6) + '" fill="#7A2B2B" stroke="' + TINTA + '" stroke-width="1"/>';
+  s += '<path d="M40 46 Q45 42 50 45 Q55 42 60 46 Q55 48 50 46.4 Q45 48 40 46 Z" fill="' + ZV.barba + '" stroke="' + TINTA + '" stroke-width="1.1" stroke-linejoin="round"/>';
+  /* brazo de delante, con el rayo si lo lleva */
+  const [hx, hy] = fin(68, 64, P.bD);
+  if(P.rayo === 'alto') s += rayoZ(hx, hy - 12, 1.05, 12);
+  if(P.rayo === 'mano') s += rayoZ(hx + 4, hy - 8, .75, 20);
+  s += brazoDe(68, 64, P.bD);
+  s += '</svg>';
+  return s;
+}
+
+/* ── LAS ENTREVISTAS ──────────────────────────────────────────────────────
+   Se elige a quién entrevistar y qué preguntarle; contesta con su voz y su
+   postura. Son respuestas escritas a mano (nada de inteligencia artificial):
+   cómicas, pero cada una lleva dentro una idea de los enteros. Algunas
+   preguntas abren otra («repregunta»), y alguna respuesta invita a
+   comprobarlo en la tablilla de Listillón.                                  */
+DIBUJA.zeus = zeus;
+const HABLAN = {jef:'habla', lis:'habla', zeus:'habla'};
+const ENTREVISTAS = {
+  zeus: {nombre:'Zeus', cargo:'dios del rayo y árbitro de la palestra',
+    hola:['enfada', 'Primera entrevista a cara descubierta en tres mil años. Tiene cinco minutos: los rayos no se lanzan solos.'],
+    preguntas:[
+      {id:'z1', p:'¿Por qué fulmina a los que se retiran?', pose:'enfada',
+       r:'¡Porque abandonar un pulso a medias es de muy mala educación! Y además alguien tiene que llevar la cuenta: <b>cada rayo es una resta</b>. Sin rayo, nadie se enteraría de que el total ha cambiado.'},
+      {id:'z1b', tras:'z1', p:'¿Y a los que entran no los fulmina?', pose:'rie',
+       r:'¿A los que entran? ¡Si vienen a ayudar! <b>Entrar es sumar</b>, y sumar no necesita rayos. Necesita ganas.'},
+      {id:'z2', p:'¿Es verdad que restar un negativo es sumar?', pose:'habla',
+       r:'Mira: si retiro a uno que tiraba hacia la izquierda, la izquierda pierde fuerza y la bandera se va a la derecha. Eso es <b>− (−3) = +3</b>. No es magia. Bueno, un poco sí: la magia soy yo.'},
+      {id:'z3', p:'¿Y si le mandan retirar a alguien que no está en el campo?', pose:'piensa',
+       r:'No me voy a quedar con el rayo en la mano. Hago entrar una <b>pareja nula</b>, un +3 y un −3, que se anulan, y fulmino al −3. La bandera ni se inmuta… hasta que cae el rayo.'},
+      {id:'z4', p:'¿Cuál es su número favorito?', pose:'rie',
+       r:'El <b>cero</b>. Empate perfecto: nadie gana, nadie pierde, y yo me echo la siesta.'},
+      {id:'z5', p:'¿Le duele el brazo de tanto lanzar rayos?', pose:'sorpresa',
+       r:'Nadie me había preguntado eso en tres mil años… Un poco, sí. Sobre todo con el <b>menos delante de un paréntesis</b>: ¡hay rayo para todos los de dentro!'},
+      {id:'z6', p:'¿Qué opina de Jeferión?', pose:'enfada',
+       r:'Me paga en aceitunas. Y encima me pide que fulmine a los que tiran en su contra. ¡Yo soy <b>árbitro</b>, no su guardaespaldas! El rayo no mira de qué bando eres: mira a quién se retira.'},
+      {id:'z7', p:'¿Alguna vez ha fallado un rayo?', pose:'calla', r:'Siguiente pregunta.'},
+      {id:'z7b', tras:'z7', p:'Venga, en serio: ¿alguna vez?', pose:'piensa',
+       r:'…Una vez. Me mandaron retirar a un <b>+2</b> y fulminé a un <b>−2</b>. La bandera se fue justo al revés: cuatro casillas de golpe. Desde entonces miro el <b>signo</b> dos veces antes de lanzar.'}
+    ]},
+  jef: {nombre:'Jeferión', cargo:'jefe del almacén de carros y patrocinador del equipo de la derecha',
+    hola:['habla', 'Pregunte rápido, que tengo carros que cargar. Y hable bien de mí.'],
+    preguntas:[
+      {id:'j1', p:'¿Por qué lleva gafas, si es un cocodrilo?', pose:'habla',
+       r:'Para leer las tablillas de Listillón. Escribe muy pequeño y con <b>muchos paréntesis</b>.'},
+      {id:'j2', p:'¿Por qué siempre va con los de la derecha?', pose:'celebra',
+       r:'¡Porque los de la derecha tiran hacia los positivos! Aunque Listillón dice que un <b>−5 tira más fuerte que un +3</b>. Me sigue doliendo.'},
+      {id:'j2b', tras:'j2', p:'Entonces, ¿−5 es más que +3?', pose:'piensa',
+       r:'Más <b>fuerte</b>, sí; más <b>grande</b>, no. El −5 tira con fuerza 5, pero en la regla queda más a la izquierda, así que es <b>menor</b>. Me lo ha explicado cuatro veces. Cinco con esta.'},
+      {id:'j3', p:'¿Qué es lo que más le cuesta?', pose:'piensa',
+       r:'Restar negativos. Si me quitan una deuda, gano, eso lo entiendo. Pero cuando lo veo escrito, <b>− (−3)</b>, me mareo. Hasta que cae el rayo y lo veo claro.'},
+      {id:'j4', p:'¿Qué opina de las pociones de Traición?', pose:'celebra',
+       r:'¡Mi poción favorita! Le cambia el bando al rival: <b>es un menos que se bebe</b>. Aunque una vez me la bebí yo por error y me pasé la tarde tirando en mi contra.'},
+      {id:'j5', p:'¿Por qué Listillón tiene que escribirlo todo?', pose:'senala',
+       r:'Porque lo que pasa en el campo se lo lleva el viento. Lo que se escribe con signos <b>se puede comprobar</b>. Y así nadie me discute las cuentas. Bueno, Listillón sí.'},
+      {id:'j6', p:'¿Es usted buen jefe?', pose:'sorpresa',
+       r:'¿Cómo que si soy…? ¡Pues claro! Pregúntele a Listillón. …Mejor no le pregunte.'},
+      {id:'j7', p:'¿Qué haría con mil tiradores?', pose:'celebra',
+       r:'¡Ganar! Aunque en el campo solo caben <b>cinco por lado</b>. Listillón dice que es una restricción del problema. Yo digo que es una injusticia.'}
+    ]},
+  lis: {nombre:'Listillón', cargo:'escriba oficial de Jeferión y autor de las tablillas',
+    hola:['habla', 'Apunto las preguntas y contesto las respuestas. Por ese orden.'],
+    preguntas:[
+      {id:'l1', p:'¿Qué apunta en su tablilla?', pose:'habla',
+       r:'Todo lo que pasa en el campo, <b>con signos</b>. Si entra un −3, escribo <b>+ (−3)</b>. Si se retira, <b>− (−3)</b>. Así el jefe no puede decir que no pasó.'},
+      {id:'l2', p:'¿Por qué dice que el signo y la fuerza son dos preguntas?', pose:'senala',
+       r:'Porque lo son. La <b>fuerza</b> es cuánto tira: el número sin signo. El <b>signo</b> es hacia dónde. El jefe mezcla las dos cosas y luego se enfada con la regla.'},
+      {id:'l3', p:'¿Por qué en su tablilla el frasco espera en el banco?', pose:'senala',
+       r:'Porque en <b>3·(−2 + 1)</b> el 3 está escrito antes de que haya nadie a quien dárselo. Se escribe en un orden y se juega en otro: eso es la <b>jerarquía</b>. ¿Quiere verlo?',
+       prueba:[{t:'p',k:3},{t:'('},{t:'n',f:-2},{t:'+'},{t:'n',f:1},{t:')'}]},
+      {id:'l4', p:'¿Qué es lo más difícil de ser escriba de Jeferión?', pose:'piensa',
+       r:'Que lo quiere todo en positivo. Le digo que el total es −4 y me contesta: «Escríbelo más bonito». <b>El −4 ya es bonito</b>, jefe.'},
+      {id:'l5', p:'¿Se lleva bien con Zeus?', pose:'sorpresa',
+       r:'Nos respetamos. Él lanza los rayos y yo apunto las restas. Una vez se equivocó de tirador y… eso pregúnteselo a él.'},
+      {id:'l6', p:'¿Por qué lleva gorra?', pose:'celebra',
+       r:'Para que no me caigan encima los paréntesis. Hay días que llueven.'},
+      {id:'l7', p:'¿Qué le diría a quien odia los números negativos?', pose:'celebra',
+       r:'Que no son malos: son <b>del otro bando</b>. Sin ellos no habría pulso, solo gente tirando de una cuerda hacia el mismo lado. Qué aburrimiento.'},
+      {id:'l8', p:'¿Cómo sabe que una cuenta está bien?', pose:'senala',
+       r:'La juego en el campo. Si la bandera para donde dice la cuenta, está bien. Si no, alguien se ha equivocado de signo. <b>Casi siempre es el signo</b>.'}
+    ]}
+};
+function arrancaEntrevista(quien){
+  ev = {quien: quien || (ev && ev.quien) || 'zeus', hechas: new Set(), tok: 0};
+  diana = null; cron = null; oper = null; argos = null; canon = null; mudo = false;
+  ['panelOper','argos','canon','diana','cronista','zonaEncargo','opPasos','panelCampo'].forEach(id => { $(id).hidden = true; });
+  $('entrevista').hidden = false;
+  eligeEntrevistado(ev.quien);
+}
+function eligeEntrevistado(quien){
+  if(!ev) return;
+  ev.quien = quien; ev.hechas = new Set();
+  document.querySelectorAll('#evQuien button').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.q === quien)));
+  const E = ENTREVISTAS[quien];
+  $('evCartel').innerHTML = 'Hoy entrevistamos a <b>' + E.nombre + '</b>, ' + E.cargo + '.';
+  $('evPregunta').textContent = '';
+  contesta(E.hola[0], E.hola[1]);
+  pintaPreguntas();
+}
+function pintaPreguntas(){
+  const E = ENTREVISTAS[ev.quien], L = $('evLista');
+  L.innerHTML = '';
+  E.preguntas.filter(q => !q.tras || ev.hechas.has(q.tras)).forEach(q => {
+    const b = document.createElement('button');
+    b.className = 'ev-p' + (ev.hechas.has(q.id) ? ' hecha' : '') + (q.tras ? ' repregunta' : '');
+    b.innerHTML = (q.tras ? '<span class="ev-re">repregunta</span> ' : '') + q.p;
+    b.addEventListener('click', () => pregunta(q));
+    L.appendChild(b);
+  });
+}
+function pregunta(q){
+  ev.hechas.add(q.id);
+  $('evPregunta').innerHTML = '— ' + q.p;
+  const esc = document.querySelector('.ev-escena');     // en el móvil, que se vea quién contesta
+  if(esc && esc.getBoundingClientRect().top < 0) esc.scrollIntoView({behavior:'smooth', block:'start'});
+  contesta(q.pose, q.r, q.prueba);
+  pintaPreguntas();
+}
+/* la respuesta sale letra a letra, con la boca moviéndose; al acabar, la postura */
+function contesta(pose, html, prueba){
+  const tok = ++ev.tok;
+  const cara = $('evCara'), dibu = DIBUJA[ev.quien];
+  const txt = $('evRespuesta');
+  $('evPrueba').hidden = true;
+  const trozos = html.split(/(<[^>]+>)/).filter(Boolean);
+  const total = trozos.reduce((n, t) => n + (t[0] === '<' ? 0 : t.length), 0);
+  const cierre = () => {
+    if(ev && ev.tok !== tok) return;
+    txt.innerHTML = html;
+    cara.innerHTML = dibu(pose);
+    if(prueba){ $('evPrueba').hidden = false; $('evPrueba').onclick = () => {
+      alTaller(); modoBotones('calc'); arrancaCalc();
+      calc.tok = prueba.map(t => Object.assign({}, t, t.t === 'p' ? {pre: true} : {}));
+      pintaCalc(); igualCalc();
+    }; }
+  };
+  if(MOV_REDUCIDO){ cierre(); return; }
+  let n = 0;
+  const paso = () => {
+    if(!ev || ev.tok !== tok) return;
+    n = Math.min(total, n + 2);
+    let quedan = n, h = '';
+    for(const t of trozos){
+      if(t[0] === '<'){ h += t; continue; }
+      if(quedan <= 0) break;
+      h += t.slice(0, quedan); quedan -= t.length;
+    }
+    txt.innerHTML = h;
+    cara.innerHTML = dibu(Math.floor(n / 6) % 2 ? 'calla' : (pose === 'calla' ? 'calla' : HABLAN[ev.quien]));
+    if(n < total) setTimeout(paso, 28); else cierre();
+  };
+  paso();
+}
+(function(){
+  const q = $('evQuien');
+  [['zeus','Zeus'],['jef','Jeferión'],['lis','Listillón']].forEach(([id, nom]) => {
+    const b = document.createElement('button');
+    b.dataset.q = id; b.type = 'button';
+    b.innerHTML = '<span class="ev-mini">' + DIBUJA[id]('calla') + '</span>' + nom;
+    b.addEventListener('click', () => eligeEntrevistado(id));
+    q.appendChild(b);
+  });
+  $('evSalir').addEventListener('click', alTaller);
+})();
+$('mEntrevista').addEventListener('click', () => { alTaller(); modoBotones('entrevista'); arrancaEntrevista(); });
+$('aEntrevista').addEventListener('click', () => { alTaller(); modoBotones('entrevista'); arrancaEntrevista(); });
+
 /* ── EL TEMA ─────────────────────────────────────────────────────────── */
 (function(){
   const bs = document.querySelectorAll('#fTema .vel-b');
@@ -5634,7 +5928,7 @@ $('aCalc').addEventListener('click', () => { alTaller(); modoBotones('calc'); ar
 (function(){
   const LLAVE = 'aula.v1';
   const el = s => document.querySelector(s);
-  const IZQ = ["#ruta", "#panelOper", "#canon", "#calc", "#argos", "#diana", "#cronista", "#zonaEncargo"],
+  const IZQ = ["#ruta", "#panelOper", "#canon", "#calc", "#entrevista", "#argos", "#diana", "#cronista", "#zonaEncargo"],
         DER = ["#panelCampo"];
   if(IZQ.length && DER.length){
     const primero = el(IZQ[0]);
