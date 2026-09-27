@@ -1193,6 +1193,36 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
   body[data-aula="si"] #entrevista .ev-globo{max-width:980px}
   body[data-aula="si"] #entrevista .ev-lista{display:grid;grid-template-columns:1fr 1fr}
 }
+
+/* ── las teclas, de barro cocido: grano, cantos algo irregulares, relieve con
+   su canto de sombra y el texto grabado. Al pulsar, se hunden. */
+.calc #clTeclas button{position:relative;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42  0 0 0 0 .3  0 0 0 0 .14  0 0 0 .55 -.12'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>"), radial-gradient(ellipse at 30% 20%, #fbf3dc 0, #efdfbb 45%, #dcc493 100%);
+  background-size:140px 140px, 100% 100%;
+  border:2px solid #7a5a2e;border-radius:11px 13px 10px 12px / 12px 10px 13px 11px;
+  box-shadow:0 4px 0 #7a5a2e, 0 6px 7px rgba(40,25,5,.35),
+    inset 0 2px 0 rgba(255,250,235,.75), inset 0 -4px 6px rgba(110,78,30,.3), inset 2px 0 3px rgba(255,250,235,.3);
+  text-shadow:0 1px 0 rgba(255,250,235,.8), 0 -1px 0 rgba(90,60,20,.25);
+  transition:transform .07s ease, box-shadow .07s ease;margin-bottom:3px}
+.calc #clTeclas button:nth-child(3n+1){border-radius:13px 10px 12px 11px / 10px 13px 11px 12px}
+.calc #clTeclas button:nth-child(3n+2){border-radius:10px 12px 13px 10px / 13px 11px 10px 12px}
+.calc #clTeclas button:hover{filter:brightness(1.04)}
+.calc #clTeclas button:active{transform:translateY(3px);
+  box-shadow:0 1px 0 #7a5a2e, 0 2px 3px rgba(40,25,5,.3),
+    inset 0 2px 5px rgba(110,78,30,.35), inset 0 -1px 0 rgba(255,250,235,.4)}
+.calc #clTeclas .cl-t.izq{border-color:#8c3a28;box-shadow:0 4px 0 #8c3a28, 0 6px 7px rgba(40,25,5,.35),
+    inset 0 2px 0 rgba(255,250,235,.75), inset 0 -4px 6px rgba(140,58,40,.25)}
+.calc #clTeclas .cl-t.der{border-color:#2c6c82;box-shadow:0 4px 0 #2c6c82, 0 6px 7px rgba(40,25,5,.35),
+    inset 0 2px 0 rgba(255,250,235,.75), inset 0 -4px 6px rgba(44,108,130,.25)}
+.calc #clTeclas .cl-t.izq:active,.calc #clTeclas .cl-t.der:active{box-shadow:0 1px 0 #5a4020, inset 0 2px 5px rgba(110,78,30,.35)}
+.calc #clTeclas .cl-o{font-weight:700;font-size:24px;color:#3a2a14}
+.calc #clTeclas .cl-igual{background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42  0 0 0 0 .3  0 0 0 0 .14  0 0 0 .55 -.12'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>"), radial-gradient(ellipse at 30% 20%, #f7d98a 0, #dcaa45 55%, #b8862a 100%);
+  background-size:140px 140px, 100% 100%;border-color:#6e4e14;color:#2a1a04;
+  box-shadow:0 4px 0 #6e4e14, 0 6px 7px rgba(40,25,5,.35), inset 0 2px 0 rgba(255,245,210,.7), inset 0 -4px 6px rgba(110,70,10,.35)}
+.calc #clTeclas button:disabled{opacity:.6;transform:none}
+/* la tablilla donde se escribe, con el mismo grano */
+.cl-tabla{background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42  0 0 0 0 .3  0 0 0 0 .14  0 0 0 .55 -.12'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>"), linear-gradient(180deg,#e2d0a8,#eee0c0);background-size:140px 140px, 100% 100%;
+  border:2px solid #9a7a45;box-shadow:inset 0 3px 8px rgba(90,64,30,.35), inset 0 -1px 0 rgba(255,250,235,.6)}
 </style>
 </head>
 <body>
@@ -1294,7 +1324,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.4</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.5</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -2100,10 +2130,13 @@ function cambiaPandeo(d){
   aplicaPandeo();
 }
 let PASO = 14;
+/* hasta dónde llega la regla: ±8 siempre, salvo en la tablilla de Listillón,
+   que la alarga (hasta ±12) si la cuenta lo pide */
+let ALCANCE = 8;
 function pasoQueCabe(){
   const c = document.querySelector('.campo');
   const w = (c && c.clientWidth) || 320;
-  const p = Math.floor((w / 2 - 16) / 9.4);
+  const p = Math.floor((w / 2 - 16) / (ALCANCE + 1.4));
   return document.body.classList.contains('pizarra')
     ? Math.max(20, Math.min(34, Math.round(p * 1.45)))
     : Math.max(15, Math.min(24, p));
@@ -2117,7 +2150,7 @@ function pintaRegla(){
   const t = suma();
     const viva = !!(diana && diana.esperando);
   let h = '';
-  for(let v = -8; v <= 8; v++){
+  for(let v = -ALCANCE; v <= ALCANCE; v++){
     const clase = (v === 0 ? ' cero' : (tirado && v === t ? ' diana' : '')) +
       (prediccion !== null && v === prediccion ? ' elegida' : '') +
                   (viva && prediccion === v ? ' elegida' : '');
@@ -2136,7 +2169,7 @@ function pintaRegla(){
   $('regla').innerHTML = h;
     $('regla').style.setProperty('--paso', PASO + 'px');
   $('regla').classList.toggle('ancha', PASO >= 19);
-  $('regla').classList.toggle('estrecha', PASO < 18);
+  $('regla').classList.toggle('estrecha', PASO < 18 || ALCANCE > 8);
   $('regla').classList.toggle('viva', viva);
   document.querySelector('.campo').classList.toggle('eligiendo', viva);
   $('dial').hidden = !viva;
@@ -2294,9 +2327,9 @@ function pinta(){
       const anchoCampo = document.querySelector('.campo').clientWidth || 470;
   const tAhora = suma();
   const arr = tiradores.length
-    ? Math.max(-8 * PASO, Math.min(8 * PASO, tAhora * PASO)) : 0;
-    const bordeIzq = Math.min(-anchoLado(true) + arr, -9.4 * PASO);
-  const bordeDer = Math.max( anchoLado(false) + arr,  9.4 * PASO);
+    ? Math.max(-ALCANCE * PASO, Math.min(ALCANCE * PASO, tAhora * PASO)) : 0;
+    const bordeIzq = Math.min(-anchoLado(true) + arr, -(ALCANCE + 1.4) * PASO);
+  const bordeDer = Math.max( anchoLado(false) + arr,  (ALCANCE + 1.4) * PASO);
   const ancho = bordeDer - bordeIzq + 26;
   const crudo = Math.min(1, anchoCampo / ancho);
   ZOOM = Math.max(0.45, Math.floor(crudo * 20) / 20);
@@ -2444,7 +2477,7 @@ function pinta(){
     v.textContent = t === 0 ? 'Empate · las fuerzas se anulan'
       : 'Gana la ' + (t < 0 ? 'izquierda' : 'derecha') + ' por ' + Math.abs(t) +
         ' · el nudo queda en ' + conSigno(t) +
-        (Math.abs(t) > 8 ? ' — ¡se sale de la regla!' : '');
+        (Math.abs(t) > ALCANCE ? ' — ¡se sale de la regla!' : '');
   }
   $('tituloPociones').textContent = $('tituloPociones').dataset.glosario
     ? 'Glosario de pociones'
@@ -4891,6 +4924,7 @@ function glosarioSegunHaga(hace){
 function alTaller(){
     diana = null; cron = null; oper = null; argos = null; canon = null;
   if(calc){ calc.teatro++; calc = null; pintaBanco([]); }
+  if(ALCANCE !== 8){ ALCANCE = 8; ajustaPaso(); }
   $('clEscena').hidden = true; $('clEscena').textContent = '';
   $('calc').hidden = true;
   if(ev){ ev.tok++; ev = null; }
@@ -5263,7 +5297,7 @@ if(!retomaTurno()) arrancaMision(0);
    juega en otro: eso es la jerarquía de las operaciones.
    Primero se simula la cuenta entera (sin dibujar nada) para que Listillón
    avise de lo que no se puede jugar; luego se juega de verdad.            */
-const MAX_F = 8;                     // fuerza máxima de un tirador en la palestra
+const MAX_F = 12;                    // fuerza máxima de un tirador en la palestra (la tablilla alarga la regla)
 const esFactor = t => t && (t.t === 'n' || t.t === ')' || (t.t === 'p' && !t.pre));
 function frascoHtml(po){
   return '<span class="frasco">' +
@@ -5342,7 +5376,7 @@ function teclaCalc(tk){
   }else if(tk.t === 'borra'){
     T.pop();
   }
-  calc.ultimo = null;
+  calc.ultimo = null; calc.ultimoTxt = null;
   pintaCalc();
 }
 const preTxt = k => (k < 0 ? '(' + conSigno(k) + ')' : String(k)) + '·';
@@ -5363,7 +5397,8 @@ function pintaCalc(){
     else if(t.t === ')') h += '<span class="op">)</span>';
     else if(t.t === 'p'){ h += '<span class="poc">' + (t.pre ? preTxt(t.k) : etqDe(t.k)) + '</span>'; primero = false; }
   });
-  if(calc.ultimo !== null) h += '<span class="op"> = </span><b class="cl-res">' +
+  if(calc.ultimoTxt) h += '<span class="op"> = </span><b class="cl-res">' + calc.ultimoTxt + '</b>';
+  else if(calc.ultimo !== null) h += '<span class="op"> = </span><b class="cl-res">' +
     (calc.ultimo < 0 ? conSigno(calc.ultimo) : String(calc.ultimo)) + '</b>';
   $('clEscrito').innerHTML = h || '<span class="cl-vacia">escribe aquí…</span>';
   $('clIgual').disabled = calc.jugando;
@@ -5455,13 +5490,28 @@ async function juegaTermino(t, B){
       await B.saco(ids, 'La cuadrilla del paréntesis ya está en el campo' +
         (ids.length ? '' : ', aunque se ha quedado vacía: vale 0') + '.');
   }
+  /* si el frasco no se puede dar a cada uno de dentro (le tocaría medio
+     tirador, o una fuerza que no cabe) pero sí a la cuadrilla entera, la
+     cuadrilla se junta en uno solo: un paréntesis vale lo que su suma */
+  const juntaSiHaceFalta = async k => {
+    if(ids.length < 2) return;
+    const cabe = v => Number.isInteger(v) && Math.abs(v) <= MAX_F;
+    if(ids.every(id => cabe(B.f(id) * k))) return;
+    const s = ids.reduce((a, id) => a + B.f(id), 0);
+    if(!cabe(s * k)) return;
+    ids = await B.junta(ids, 'El frasco no se puede repartir a <b>cada uno</b> de dentro, pero la cuadrilla ' +
+      'entera vale <b>' + (s === 0 ? '0' : conSigno(s)) + '</b>: <b>se juntan en uno solo</b>. Un paréntesis ' +
+      'vale lo que su suma.');
+  };
   /* primero los que esperaban en el banco (el más cercano antes), luego los de detrás */
   for(const p of t.pre.slice().reverse()){
+    await juntaSiHaceFalta(p.k);
     const po = POCIONES.find(x => x.k === p.k);
     await B.bebe(ids, p.k, p.b, 'El <b>' + po.n + ' (' + preTxt(p.k) + ')</b> esperaba en el banco: ahora que ' +
       (ids.length > 1 ? 'están todos, baja y <b>se lo beben todos</b>.' : 'ya está en el campo, baja y se lo bebe.'));
   }
   for(const k of t.post){
+    await juntaSiHaceFalta(k);
     const po = POCIONES.find(x => Math.abs(x.k - k) < 1e-9);
     await B.bebe(ids, k, null, (ids.length > 1 ? 'Se beben todos ' : 'Se bebe ') + 'el <b>' + po.n +
       ' (' + po.e + ')</b>.');
@@ -5470,19 +5520,26 @@ async function juegaTermino(t, B){
 }
 /* la simulación: sin dibujar, para avisar antes de salir a escena */
 function simulador(){
-  const m = new Map(); let n = 1;
+  const m = new Map(); let n = 1, lejos = 0;
   const suma = () => [...m.values()].reduce((a, b) => a + b, 0);
   const mira = () => {
     const izq = [...m.values()].filter(f => f < 0).length, der = m.size - izq;
     if(izq > 5 || der > 5) throw new Error('No caben: en cada lado tiran <b>cinco</b> como mucho, y aquí serían ' +
-      Math.max(izq, der) + '. Prueba con menos gente.');
+      Math.max(izq, der) + '.');
     const s = suma();
-    if(Math.abs(s) > MAX_F) throw new Error('La bandera se saldría de la regla: llegaría a <b>' + conSigno(s) +
-      '</b>. Prueba con números más pequeños.');
+    lejos = Math.max(lejos, Math.abs(s));
+    if(Math.abs(s) > MAX_F) throw new Error('La bandera se saldría de la regla, que llega hasta ±' + MAX_F +
+      ': acabaría en <b>' + conSigno(s) + '</b>.');
   };
   return {
-    f: id => m.get(id), suma,
+    f: id => m.get(id), suma, lejos: () => lejos,
     entra: async f => { const id = n++; m.set(id, f); mira(); return id; },
+    junta: async ids => {
+      const s = ids.reduce((a, id) => a + m.get(id), 0);
+      ids.forEach(id => m.delete(id));
+      if(!s) return [];
+      const id = n++; m.set(id, s); mira(); return [id];
+    },
     retira: async id => { m.delete(id); mira(); },
     pareja: async f => { const a = n++, b = n++; m.set(a, f); m.set(b, -f); mira(); return [a, b]; },
     saco: async () => {},
@@ -5490,7 +5547,7 @@ function simulador(){
       ids.forEach(id => {
         const v = m.get(id) * k;
         if(!Number.isInteger(v)) throw new Error('El de <b>' + conSigno(m.get(id)) + '</b> no se puede repartir ' +
-          'así: le tocaría <b>' + (Math.round(v * 100) / 100) + '</b>, y aquí se tira con fuerzas enteras.' +
+          'así: le tocaría <b>' + String(Math.round(v * 100) / 100).replace('.', ',') + '</b>, y aquí se tira con fuerzas enteras.' +
           (ids.length > 1 ? ' En un paréntesis el frasco se lo bebe <b>cada uno</b> de dentro.' : ''));
         if(Math.abs(v) > MAX_F) throw new Error('Un tirador de fuerza <b>' + Math.abs(v) + '</b> no cabe en la ' +
           'palestra: como mucho ' + MAX_F + '.');
@@ -5522,6 +5579,20 @@ function teatro(tokT){
       await new Promise(ok => trasRetirar(id, ok)); if(!vivo()) throw new Error('corte');
     },
     pareja: async (f, txt) => { await quieto(); const id = entraPareja(f); dice(txt); await pausa(2500); return [id, id + 1]; },
+    junta: async (ids, txt) => {
+      await quieto(); dice(txt);
+      const s = ids.reduce((a, id) => a + ((tiradores.find(q => q.id === id) || {f:0}).f), 0);
+      sacoSobre(ids.map(id => document.querySelector('.tirador[data-id="' + id + '"]')), '= ' + (s ? conSigno(s) : '0'), 1700);
+      await pausa(1500);
+      cortaCinta('se juntan en uno: ' + (s ? conSigno(s) : '0'));
+      tiradores = tiradores.filter(q => ids.indexOf(q.id) < 0);
+      let nuevo = [];
+      if(s){ const id = sigId++; tiradores.push({id, f:s}); nuevo = [id]; }
+      base = suma(); previo = suma();
+      pinta();
+      await pausa(900);
+      return nuevo;
+    },
     saco: async (ids, txt) => {
       await quieto(); dice(txt);
       if(ids.length) sacoSobre(ids.map(id => document.querySelector('.tirador[data-id="' + id + '"]')), '( )', 1900);
@@ -5570,14 +5641,49 @@ function grupoQueBebe(e){
   }
   return null;
 }
+/* la cuenta hecha a mano, en fracciones exactas: para cuando no cabe en el
+   campo y hay que calcularla sin teatro */
+const mcdN = (a, b) => { a = Math.abs(a); b = Math.abs(b); while(b){ [a, b] = [b, a % b]; } return a || 1; };
+const frac = (n, d) => { if(d < 0){ n = -n; d = -d; } const g = mcdN(n, d); return [n / g, d / g]; };
+const fracDe = k => Number.isInteger(k) ? [k, 1] : frac(Math.sign(k), Math.round(1 / Math.abs(k)));
+function exacto(e){
+  let tot = [0, 1];
+  e.terms.forEach(t => {
+    let v = t.factor.t === 'n' ? [t.factor.f, 1] : exacto(t.factor.expr);
+    t.pre.map(p => p.k).concat(t.post).forEach(k => { const f = fracDe(k); v = frac(v[0] * f[0], v[1] * f[1]); });
+    if(t.sign === '-') v = [-v[0], v[1]];
+    tot = frac(tot[0] * v[1] + v[0] * tot[1], tot[1] * v[1]);
+  });
+  return tot;
+}
+const fracTxt = ([n, d]) => d === 1 ? (n < 0 ? conSigno(n) : String(n))
+  : (n < 0 ? '−' : '') + Math.abs(n) + '/' + d;
+function reglaNormal(){
+  if(ALCANCE === 8) return;
+  ALCANCE = 8; ajustaPaso(); pinta();
+}
 async function igualCalc(){
   if(!calc || calc.jugando) return;
   let p;
   try{ p = parseCalc(calc.tok); }
   catch(e){ $('clAviso').innerHTML = e.message; return; }
-  let valor;
-  try{ const S = simulador(); await juegaExpr(p.arbol, [], S); valor = S.suma(); }
-  catch(e){ $('clAviso').innerHTML = e.message; return; }
+  let valor, lejos = 8;
+  try{ const S = simulador(); await juegaExpr(p.arbol, [], S); valor = S.suma(); lejos = S.lejos(); }
+  catch(e){
+    /* no cabe en el campo: sin teatro, pero la cuenta se hace igual */
+    const v = exacto(p.arbol);
+    calc.teatro++; calc.jugando = false;
+    calc.ultimo = v[1] === 1 ? v[0] : null; calc.ultimoTxt = fracTxt(v);
+    pintaBanco([]); pintaCalc();
+    $('clAviso').innerHTML = e.message + ' Así que esta va <b>sin teatro</b>: te la calculo igual. ' +
+      '<b>' + escribeArbol(p.arbol, false, true) + ' = ' + fracTxt(v) + '</b>' +
+      (v[1] !== 1 ? ': no da un número entero, da una <b>fracción</b>, y en la palestra solo se tira con enteros.' : '.');
+    return;
+  }
+  calc.ultimoTxt = null;
+  /* la regla se alarga lo justo para que la bandera no se salga */
+  const alcance = Math.max(8, Math.min(MAX_F, Math.ceil(lejos)));
+  if(alcance !== ALCANCE){ ALCANCE = alcance; ajustaPaso(); }
   /* a escena */
   const tokT = calc.teatro = calc.teatro + 1;
   calc.jugando = true; calc.ultimo = null; calc.arbol = p.arbol;
@@ -5651,7 +5757,8 @@ async function igualCalc(){
   $('clOtra').addEventListener('click', () => { if(calc && !calc.jugando && calc.tok.length) igualCalc(); });
   $('clLimpia').addEventListener('click', () => {
     if(!calc) return;
-    calc.teatro++; calc.jugando = false; calc.tok = []; calc.ultimo = null;
+    calc.teatro++; calc.jugando = false; calc.tok = []; calc.ultimo = null; calc.ultimoTxt = null;
+    reglaNormal();
     tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
     bebiendoIds.clear(); retirandoIds.clear();
     pintaBanco([]); pinta(); pintaCalc();
