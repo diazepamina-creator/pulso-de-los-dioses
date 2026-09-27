@@ -61,6 +61,11 @@
     --ink:#F2EDE2; --muted:#A79DB5;
     --oro:#E9B84E; --ambar:#E9B84E; --cyan:#57B8D6;
     --green:#9BD164; --red:#FF4059; --izq:#E2725B; --der:#57B8D6;
+    /* EL ERROR YA NO ES ROJO. El rojo de fallo (#FF4059) era casi el
+       terracota del bando izquierdo, y equivocarse se leía como «negativo».
+       El fallo va en violeta, que no es de ningún bando ni de ninguna
+       poción, y además el campo tiembla: no depende solo del color. */
+    --fallo:#A98BFF; --fallo-rgb:169,139,255;
   }
   *{box-sizing:border-box}
     button{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;
@@ -230,6 +235,8 @@
   .hito.h0 b{background:var(--izq)}
   .hito.h1{background:linear-gradient(180deg,var(--der),#2C6C82)}
   .hito.h1 b{background:var(--der)}
+  .hito.hc{background:linear-gradient(180deg,var(--oro),#8a6a2a)}
+  .hito.hc b{background:var(--oro)}
   .estacaVal{position:absolute;bottom:146px;transform:translateX(-50%);
     transform-origin:50% 100%;
     z-index:14;pointer-events:none;
@@ -251,11 +258,16 @@
     78%{box-shadow:0 0 0 3px var(--green), 0 0 38px rgba(155,209,100,.5)}
     100%{box-shadow:0 0 0 0 rgba(155,209,100,0)}}
   @keyframes destelloNo{
-    0%{box-shadow:0 0 0 0 rgba(255,64,89,0)}
-    8%{box-shadow:0 0 0 3px var(--red), 0 0 34px rgba(255,64,89,.45)}
-    45%{box-shadow:0 0 0 2px rgba(255,64,89,.3), 0 0 16px rgba(255,64,89,.18)}
-    70%{box-shadow:0 0 0 3px var(--red), 0 0 30px rgba(255,64,89,.4)}
-    100%{box-shadow:0 0 0 0 rgba(255,64,89,0)}}
+    0%{box-shadow:0 0 0 0 rgba(var(--fallo-rgb),0);transform:translateX(0)}
+    6%{transform:translateX(-4px)}
+    8%{box-shadow:0 0 0 3px var(--fallo), 0 0 34px rgba(var(--fallo-rgb),.45)}
+    12%{transform:translateX(4px)}
+    18%{transform:translateX(-3px)}
+    24%{transform:translateX(2px)}
+    30%{transform:translateX(0)}
+    45%{box-shadow:0 0 0 2px rgba(var(--fallo-rgb),.3), 0 0 16px rgba(var(--fallo-rgb),.18)}
+    70%{box-shadow:0 0 0 3px var(--fallo), 0 0 30px rgba(var(--fallo-rgb),.4)}
+    100%{box-shadow:0 0 0 0 rgba(var(--fallo-rgb),0)}}
       .friso{position:absolute;left:0;right:0;top:0;height:18px;z-index:1;
     pointer-events:none;
     background:
@@ -414,8 +426,8 @@
   .tirador .rasgo{fill:rgba(16,11,26,.72)}
     .tirador .ceja{opacity:.9}
   .tirador .fuera{position:absolute;top:-8px;right:-8px;width:26px;height:26px;
-    border-radius:50%;border:1.5px solid var(--red);background:var(--panel);
-    color:var(--red);font-size:17px;font-weight:700;line-height:1;padding:0;display:none;
+    border-radius:50%;border:1.5px solid var(--muted);background:var(--panel);
+    color:var(--ink);font-size:17px;font-weight:700;line-height:1;padding:0;display:none;
     align-items:center;justify-content:center;min-height:0;cursor:pointer;z-index:9}
   .tirador[aria-pressed="true"] .fuera{display:flex}
   .tirador.saliendo{animation:seVa calc(.5s * var(--lento,1)) ease forwards}
@@ -841,8 +853,8 @@
   .ag-p .ag-t{flex:1;line-height:1.45}
   .ag-p .ag-r{font-family:'Space Mono',monospace;font-weight:700;font-size:14px}
   .ag-p.buena{border-color:rgba(155,209,100,.5)} .ag-p.buena .ag-r{color:var(--green)}
-  .ag-p.mala{border-color:rgba(255,64,89,.6);background:rgba(255,64,89,.09)}
-  .ag-p.mala .ag-r{color:var(--izq)}
+  .ag-p.mala{border-color:rgba(var(--fallo-rgb),.65);background:rgba(var(--fallo-rgb),.1)}
+  .ag-p.mala .ag-r{color:var(--fallo)}
   .ag-p.arrastre{opacity:.55}
     .op-linea{font-family:'Space Mono',monospace;font-size:19px;text-align:center;
     padding:16px 8px;border:1px solid var(--line);border-radius:10px;
@@ -874,7 +886,7 @@
   .ac-f{display:flex;align-items:baseline;gap:8px;font-size:12px;
     padding:6px 8px;border-radius:7px;border-left:2px solid var(--line);
     margin-bottom:4px;background:var(--panel-2)}
-  .ac-f.floja{border-left-color:var(--izq)}
+  .ac-f.floja{border-left-color:var(--fallo)}
   .ac-n{flex:1;color:var(--ink)}
   .ac-d{font-family:'Space Mono',monospace;color:var(--muted)}
   .ac-p{font-family:'Oswald',sans-serif;color:var(--ambar);min-width:38px;text-align:right}
@@ -988,7 +1000,7 @@ html[data-tema="tablilla"]{
   --bg:#d9c7a1; --panel:#efe4ca; --panel-2:#f7f0de; --line:#c4b08a;
   --ink:#241b36; --muted:#5f5040;
   --oro:#7f5a0e; --ambar:#7f5a0e; --cyan:#1f6a88;
-  --green:#2f6b28; --red:#a82e1c; --izq:#a8432d; --der:#1f6a88;
+  --green:#2f6b28; --red:#a82e1c; --fallo:#6a4bc4; --fallo-rgb:106,75,196; --izq:#a8432d; --der:#1f6a88;
   --marco:#8a6a3b; --marco-2:#b8a589; --sello-oro:#875b12; --sello-rojo:#9e412b;
   --sello-azul:#26789a;
   color-scheme:light;
@@ -1180,7 +1192,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.0</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.1</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1999,7 +2011,9 @@ function ponHitos(vals){
   const esc = $('escena');
   vals.forEach((v, i) => {
     const h = document.createElement('span');
-    h.className = 'hito h' + i;
+    /* el color lo da el signo, no el orden: antes el primero salía rojo
+       aunque fuera positivo */
+    h.className = 'hito ' + (v < 0 ? 'h0' : (v > 0 ? 'h1' : 'hc'));
     h.style.left = 'calc(50% + ' + (v * PASO) + 'px)';
     const b = document.createElement('b');
     b.textContent = conSigno(v);
