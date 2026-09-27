@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>try{if(localStorage.getItem('pulso.tema')==='tablilla')document.documentElement.dataset.tema='tablilla';}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <!--
@@ -970,6 +971,105 @@ body[data-aula="si"] .reto{font-size:16px}
 #bAula[aria-pressed="true"]{color:var(--oro, #E9B84E)}
 /* con la ventana ancha los cinco botones del menú se iban a los extremos */
 body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:auto}
+
+/* ── EL TEMA TABLILLA ─────────────────────────────────────────────────────
+   El mismo campo, pintado como las tablillas de barro que van en papel: arcilla
+   clara, marco marrón, terracota y azul, y los sellos Δοκιμή · Ἀγών · Νίκη.
+   Jeferión plantea la misión en su bocadillo rosa y Listillón explica en el
+   azul. Solo cambia la piel: el juego es el mismo. Los tonos de texto son
+   más oscuros que los de las fichas porque en pantalla tienen que leerse
+   sobre el beige (contraste 4,5:1 o más).                                   */
+html[data-tema="tablilla"]{
+  --bg:#d9c7a1; --panel:#efe4ca; --panel-2:#f7f0de; --line:#c4b08a;
+  --ink:#241b36; --muted:#5f5040;
+  --oro:#7f5a0e; --ambar:#7f5a0e; --cyan:#1f6a88;
+  --green:#2f6b28; --red:#a82e1c; --izq:#a8432d; --der:#1f6a88;
+  --marco:#8a6a3b; --marco-2:#b8a589; --sello-oro:#875b12; --sello-rojo:#9e412b;
+  --sello-azul:#26789a; --rosa:#faf1ef; --rosa-b:#d48b7a; --celeste:#eef5f8;
+  --celeste-b:#77b0c6;
+  color-scheme:light;
+}
+[data-tema="tablilla"] body{background:transparent}
+html[data-tema="tablilla"]{min-height:100%;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255,250,235,.55), transparent 55%),
+    radial-gradient(ellipse at 90% 100%, rgba(120,90,50,.18), transparent 60%),
+    var(--bg);
+  background-attachment:fixed}
+[data-tema="tablilla"] .panel{
+  border:3px solid var(--marco);border-radius:14px;
+  box-shadow:inset 0 0 0 2px var(--panel), inset 0 0 0 3px var(--marco-2),
+    0 2px 0 rgba(90,64,30,.25)}
+[data-tema="tablilla"] h1{color:var(--ink);text-shadow:none}
+[data-tema="tablilla"] .sub .gr{color:var(--sello-oro)}
+[data-tema="tablilla"] .sello{color:#fff8e6;background:var(--marco);box-shadow:none}
+[data-tema="tablilla"] button:where(:not(.tirador):not(.poc)){background:var(--panel-2);border-color:var(--line);color:var(--ink)}
+/* las pociones guardan su color, en tono de tinta para leerse sobre el barro */
+[data-tema="tablilla"] button.poc.mengua{color:#3d63b0}
+[data-tema="tablilla"] button.poc.bando{color:#a5308f}
+[data-tema="tablilla"] .panel{padding:11px}
+[data-tema="tablilla"] button.scan, [data-tema="tablilla"] #bTormenta{
+  background:#d7a646;border-color:#a67a1f;color:#241b36}
+[data-tema="tablilla"] .menus button{background:transparent;border-color:transparent}
+[data-tema="tablilla"] .menus button:hover,[data-tema="tablilla"] .menus button:focus-visible{border-bottom-color:var(--sello-rojo)}
+[data-tema="tablilla"] .menus button[aria-pressed="true"]{color:var(--sello-rojo);border-bottom-color:var(--sello-rojo)}
+[data-tema="tablilla"] .chip{border-color:var(--marco-2)}
+[data-tema="tablilla"] input, [data-tema="tablilla"] .op-resp{background:#fffaf0;color:var(--ink);border-color:var(--marco-2)}
+[data-tema="tablilla"] .op-linea, [data-tema="tablilla"] .anuncio{background:#fbf6ea;border-color:var(--line)}
+[data-tema="tablilla"] .op-linea .ahora{background:rgba(166,122,31,.16);box-shadow:0 0 0 1.5px rgba(166,122,31,.45)}
+/* el campo: la palestra a pleno día, como en las fichas */
+[data-tema="tablilla"] .campo{border:1px solid var(--marco-2);
+  background:linear-gradient(180deg,#fbf8f0 0%,#f5f0e4 60%,#ece3cf 100%)}
+[data-tema="tablilla"] .campo::after{background:radial-gradient(ellipse 115% 95% at 50% 46%,
+  transparent 62%, rgba(138,106,59,.16) 100%)}
+[data-tema="tablilla"] .friso{background:
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='18'><g fill='none' stroke='rgba(138,106,59,.3)' stroke-width='1'><path d='M0 3.5 H26'/><path d='M0 14.5 H26'/></g><path d='M13 14 V5 H5 V10 H9' fill='none' stroke='rgba(138,106,59,.55)' stroke-width='1.8'/></svg>") repeat-x center / 26px 18px,
+  linear-gradient(180deg,#efe6d2,#f6f1e5);border-bottom-color:rgba(138,106,59,.25)}
+[data-tema="tablilla"] .columnata{opacity:1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='92' height='158'><g fill='rgba(255,255,255,.75)'><rect x='29' y='4' width='34' height='6' rx='1'/><path d='M32 10 L60 10 L57 17 L35 17 Z'/><rect x='36' y='17' width='20' height='131'/><rect x='32' y='148' width='28' height='5' rx='1'/><rect x='29' y='153' width='34' height='5' rx='1'/></g><g fill='rgba(160,140,110,.14)'><rect x='40' y='18' width='1.6' height='129'/><rect x='45.5' y='18' width='1.6' height='129'/><rect x='51' y='18' width='1.6' height='129'/></g></svg>")}
+[data-tema="tablilla"] .marca{background:repeating-linear-gradient(180deg,
+  rgba(80,70,90,.45) 0 7px, transparent 7px 13px);box-shadow:none}
+[data-tema="tablilla"] .regla{background:linear-gradient(180deg,#efe4ca 0,#e9dcbf 100%);
+  border-top:1.5px solid #c9a24f;box-shadow:none}
+[data-tema="tablilla"] .regla::before{background:none}
+[data-tema="tablilla"] .marca-n{color:#3a3040}
+[data-tema="tablilla"] .marca-n i{background:rgba(120,100,80,.45)}
+[data-tema="tablilla"] .marca-n.cero{color:var(--ink)}
+[data-tema="tablilla"] .marca-n.cero i{background:#6b5f72}
+[data-tema="tablilla"] .regla.estrecha .marca-n.impar:not(.cero):not(.diana):not(.elegida){color:transparent}
+[data-tema="tablilla"] .nudo .cifra{color:var(--ink);text-shadow:0 0 4px rgba(255,250,238,.95)}
+[data-tema="tablilla"] .veredicto{background:#f7f0de;box-shadow:none}
+[data-tema="tablilla"] .veredicto.izq{border-color:rgba(168,67,45,.45)}
+[data-tema="tablilla"] .veredicto.der{border-color:rgba(31,106,136,.45)}
+[data-tema="tablilla"] #altas button.i{border-color:rgba(168,67,45,.45)}
+[data-tema="tablilla"] #altas button.d{border-color:rgba(31,106,136,.45)}
+/* Jeferión y Listillón: solo salen con la tablilla */
+.cara{display:none}
+[data-tema="tablilla"] .cara{display:block;flex:0 0 auto}
+.rt-habla{display:contents}
+[data-tema="tablilla"] .ruta .rt-habla{display:flex;gap:10px;align-items:center}
+[data-tema="tablilla"] .ruta .rt-txt{flex:1;background:var(--rosa);border:1.5px solid var(--rosa-b);
+  border-radius:10px;padding:8px 12px;margin:4px 0 6px;color:var(--ink);font-style:italic}
+[data-tema="tablilla"] .ruta .rt-txt b{color:var(--ink)}
+[data-tema="tablilla"] .cara.jef{width:58px}
+.habla{display:contents}
+[data-tema="tablilla"] .habla:has(> .aviso:not(:empty):not([hidden])){display:flex;gap:10px;align-items:center;
+  background:var(--celeste);border:1.5px solid var(--celeste-b);border-radius:10px;
+  padding:6px 8px 6px 12px;margin:8px 0 0}
+[data-tema="tablilla"] .habla > .aviso{flex:1;margin:0;color:var(--ink);font-style:italic;min-height:0}
+[data-tema="tablilla"] .habla:has(> .aviso:empty) .cara,
+[data-tema="tablilla"] .habla:has(> .aviso[hidden]) .cara{display:none}
+[data-tema="tablilla"] .habla .cara.lis{width:38px;order:2}
+[data-tema="tablilla"] .habla .aviso b{color:var(--ink)}
+/* los sellos: la misión empieza en Δοκιμή (probar), a mitad es Ἀγών (la
+   lucha) y al cumplirla se estampa Νίκη (la victoria) */
+.sellito{display:none}
+[data-tema="tablilla"] .sellito{display:inline-block;font-family:'Cardo',serif;font-size:13px;
+  letter-spacing:.5px;text-transform:none;padding:0 6px;border:1.5px solid currentColor;border-radius:5px;
+  transform:rotate(-4deg);margin-left:6px;line-height:1.35;background:rgba(255,255,255,.35)}
+.sellito.s0{color:var(--sello-oro)} .sellito.s1{color:var(--sello-rojo)} .sellito.s2{color:var(--sello-azul)}
+[data-tema="tablilla"] .sellito.s2{animation:estampa .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes estampa{from{transform:rotate(-14deg) scale(1.8);opacity:0}}
 </style>
 </head>
 <body>
@@ -1054,6 +1154,11 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
   <button class="vel-b" id="pdMas">+</button>
   <output class="pd-v" id="pdVal">2,5 px</output>
 </div>
+<div class="veloc" id="fTema">
+  <span>Tema</span>
+  <button class="vel-b" data-tema="noche" aria-pressed="true">Noche del Olimpo</button>
+  <button class="vel-b" data-tema="tablilla" aria-pressed="false">Tablilla</button>
+</div>
 <div class="veloc" id="veloc">
   <span>Velocidad</span>
   <button class="vel-b" data-v="1" aria-pressed="true">Normal</button>
@@ -1066,7 +1171,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v5.7</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v5.8</p>
 <div class="veloc">
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1100,7 +1205,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
     <h2 id="rtTitulo"></h2>
     <div class="rt-puntos" id="rtPuntos"></div>
   </div>
-  <p class="rt-txt" id="rtTxt"></p>
+  <div class="rt-habla"><span class="cara jef" aria-hidden="true"></span><p class="rt-txt" id="rtTxt"></p></div>
   <div class="fila" id="rtBotones">
     <button id="rtSigue" class="scan" hidden>Siguiente misión</button>
     <button id="rtSalta">Saltar esta misión</button>
@@ -1141,7 +1246,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
       <button id="opVale" class="scan">Comprobar</button>
     </div>
   </div>
-  <p class="aviso" id="opAviso" role="status"></p>
+  <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="opAviso" role="status"></p></div>
 </div>
 <div class="panel" id="panelCampo">
   <h2>Tira y afloja</h2>
@@ -1204,7 +1309,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
     <summary id="tituloPociones">Pociones · pulsa antes a un tirador</summary>
     <div class="fila" id="pociones"></div>
   </details>
-  <p class="aviso" id="aviso" role="status"></p>
+  <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="aviso" role="status"></p></div>
 </div>
       <div id="diana" hidden>
     <p class="dn-marca" id="dnMarca"></p>
@@ -1214,7 +1319,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
         <button id="dnClava" class="scan ancho" disabled>Comprobar</button>
       </div>
     </div>
-    <p class="aviso" id="dnAviso" role="status"></p>
+    <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="dnAviso" role="status"></p></div>
     <div class="fila" style="margin-top:8px">
       <button id="dnSalir">Volver al taller</button>
     </div>
@@ -1230,13 +1335,13 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
       <button id="cnVer">Verlo en el campo</button>
       <button id="cnVale" class="scan">Comprobar</button>
     </div>
-    <p class="aviso" id="cnAviso" role="status"></p>
+    <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="cnAviso" role="status"></p></div>
   </div>
     <div id="argos" hidden>
     <p class="dn-marca" id="agMarca"></p>
     <p class="cr-txt" id="agTxt"></p>
     <div id="agLista"></div>
-    <p class="aviso" id="agAviso" role="status"></p>
+    <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="agAviso" role="status"></p></div>
     <div class="fila" style="margin-top:8px">
       <button id="agVer">Verlo en el campo</button>
       <button id="agOtra" class="scan" hidden>Siguiente</button>
@@ -1252,7 +1357,7 @@ body[data-aula="si"] .menus .acciones{justify-content:flex-end;gap:26px;width:au
         <div id="crTeclas" hidden>
       <div class="cr-ops" id="crOpciones"></div>
     </div>
-        <p class="aviso" id="crAviso" role="status"></p>
+        <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="crAviso" role="status"></p></div>
     <div class="fila" style="margin-top:8px">
       <button id="crSalir">Volver al taller</button>
     </div>
@@ -4023,6 +4128,10 @@ function pintaRuta(){
   const m = MISIONES[ruta.i];
   $('ruta').hidden = false;
   $('rtCab').textContent = 'Misión ' + (ruta.i + 1) + ' de ' + MISIONES.length;
+  const fase = ruta.hecho || (m.meta && ruta.hechas >= m.meta) ? 2
+             : (m.meta && ruta.hechas * 2 >= m.meta ? 1 : 0);
+  $('rtCab').insertAdjacentHTML('beforeend', ' <span class="sellito s' + fase + '" title="' +
+    ['Prueba', 'Lucha', 'Victoria'][fase] + '">' + SELLOS[fase] + '</span>');
   $('rtTitulo').textContent = m.t;
     $('rtTxt').innerHTML = (ruta.hecho ? '<b>Misión cumplida.</b> ' : '') + m.d +
     (ruta.cameo || '');
@@ -4036,6 +4145,13 @@ function pintaRuta(){
   $('rtSalta').hidden = ruta.i >= MISIONES.length - 1;
 }
 const PAR_JL = '<svg viewBox="0 0 92 50" aria-hidden="true"> <rect x="1" y="41" width="90" height="4.4" rx="1.5" fill="rgba(244,240,230,.06)" stroke="rgba(233,184,78,.22)" stroke-width=".9"/> <g> <path d="M7 41 Q8 28 20 26 L32 26 Q44 29 45 41 Z" fill="#A9B347" stroke="#241C36" stroke-width="1.2"/> <path d="M45.4 39 L42.6 34.6 L41.2 38 L38.6 33.4 L37.4 36.6" fill="none" stroke="#7A882C" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/> <path d="M13 28.5 Q25 34 35 41" stroke="#7E5C86" stroke-width="4" fill="none"/> <path d="M13 28.5 Q25 34 35 41" stroke="rgba(233,184,78,.55)" stroke-width="1.1" fill="none"/> <path d="M36 30 L43 21 L41.5 14" stroke="#241C36" stroke-width="5.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/> <path d="M36 30 L43 21 L41.5 14" stroke="#A9B347" stroke-width="3.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/> <rect x="38.8" y="10.2" width="5.2" height="4.4" rx="1.8" fill="#A9B347" stroke="#241C36" stroke-width="1"/> <circle cx="24" cy="16" r="8.6" fill="#A9B347" stroke="#241C36" stroke-width="1.2"/> <path d="M20 16.2 L10.2 16.2 Q7 16.2 7 19.4 Q7 22.6 10.2 22.6 L20 22.6 Z" fill="#A9B347" stroke="#241C36" stroke-width="1.2" stroke-linejoin="round"/><rect x="16.5" y="16.6" width="4" height="5.6" fill="#A9B347"/><circle cx="9.6" cy="18.4" r=".75" fill="#241C36"/><path d="M8.8 21.4 H17" stroke="#241C36" stroke-width=".9" stroke-linecap="round"/> <circle cx="20.4" cy="15" r="3.5" fill="#f2f6fb" stroke="#241C36" stroke-width="1.2"/> <circle cx="27.8" cy="14.6" r="3.5" fill="#f2f6fb" stroke="#241C36" stroke-width="1.2"/> <path d="M23.9 14.9 H24.3" stroke="#241C36" stroke-width="1.2"/> <circle cx="20.7" cy="15.2" r="1.35" fill="#140F1F"/><circle cx="28.1" cy="14.8" r="1.35" fill="#140F1F"/> <rect x="25.6" y="9.5" width="5" height="1.6" rx=".8" fill="#241C36" transform="rotate(12 28.1 10.3)"/> <rect x="17.2" y="9.9" width="5" height="1.6" rx=".8" fill="#241C36" transform="rotate(-12 19.7 10.7)"/> <path d="M16.6 8 Q24 3.4 31.4 8" fill="none" stroke="#5E7A2A" stroke-width="1.4" stroke-linecap="round"/> <ellipse cx="18" cy="7.6" rx="2" ry=".9" fill="#7FA33C" stroke="rgba(16,11,26,.35)" stroke-width=".5" transform="rotate(-26 18 7.6)"/> <ellipse cx="30" cy="7.6" rx="2" ry=".9" fill="#7FA33C" stroke="rgba(16,11,26,.35)" stroke-width=".5" transform="rotate(26 30 7.6)"/> <ellipse cx="22.3" cy="5.3" rx="1.9" ry=".85" fill="#7FA33C" stroke="rgba(16,11,26,.35)" stroke-width=".5" transform="rotate(-10 22.3 5.3)"/> <ellipse cx="25.8" cy="5.2" rx="1.9" ry=".85" fill="#7FA33C" stroke="rgba(16,11,26,.35)" stroke-width=".5" transform="rotate(10 25.8 5.2)"/> </g> <g> <path d="M54 41 Q55 31 62 29 L71 29 Q78 32 79 41 Z" fill="#57B8D6" stroke="#241C36" stroke-width="1.2"/> <path d="M72 32 Q77 35 75.5 40" fill="none" stroke="#3F9CBC" stroke-width="2.4" stroke-linecap="round"/> <circle cx="67" cy="21.5" r="7.2" fill="#57B8D6" stroke="#241C36" stroke-width="1.2"/> <path d="M73.8 20.6 L79.6 23.2 L73.8 25.6 Z" fill="#E9B84E" stroke="#241C36" stroke-width="1"/> <path d="M61 16.6 Q67 7.6 73 16.6 Z" fill="#C0392B" stroke="#241C36" stroke-width="1.1" stroke-linejoin="round"/> <rect x="59.6" y="15.8" width="14.8" height="2.4" rx="1.2" fill="#C0392B" stroke="#241C36" stroke-width="1"/> <circle cx="69.4" cy="21.6" r="2.1" fill="#f2f6fb"/><circle cx="65" cy="21.6" r="1.85" fill="#f2f6fb"/> <circle cx="69.8" cy="21.8" r=".95" fill="#140F1F"/><circle cx="65.4" cy="21.8" r=".85" fill="#140F1F"/> <rect x="67.9" y="19" width="4" height="1.35" rx=".67" fill="#241C36" transform="rotate(-10 69.9 19.7)"/> <rect x="62.7" y="19.1" width="4" height="1.35" rx=".67" fill="#241C36" transform="rotate(10 64.7 19.8)"/> <rect x="50.5" y="31" width="13" height="9.4" rx="1.4" fill="#C8B48B" stroke="#241C36" stroke-width="1.1"/> <path d="M52.6 34 H61 M52.6 36.4 H58.8" stroke="#241C36" stroke-width=".8" opacity=".55"/> <path d="M64.6 33.4 Q61.8 33.2 60.6 34.6" fill="none" stroke="#241C36" stroke-width="3.6" stroke-linecap="round"/> <path d="M64.6 33.4 Q61.8 33.2 60.6 34.6" fill="none" stroke="#57B8D6" stroke-width="2.2" stroke-linecap="round"/> <path d="M63.4 33 L67.4 29.6" stroke="#241C36" stroke-width="1.4" stroke-linecap="round"/> </g> </svg>';
+/* los dos de la grada, sueltos, para los bocadillos del tema tablilla */
+const SELLOS = ['Δοκιμή', 'Ἀγών', 'Νίκη'];
+const [JEF_G, LIS_G] = PAR_JL.match(/<g>[\s\S]*?<\/g>/g);
+const JEF_SVG = '<svg viewBox="5 2 42 41" aria-hidden="true">' + JEF_G + '</svg>';
+const LIS_SVG = '<svg viewBox="49 7 32 36" aria-hidden="true">' + LIS_G + '</svg>';
+document.querySelectorAll('.cara.jef').forEach(c => { c.innerHTML = JEF_SVG; });
+document.querySelectorAll('.cara.lis').forEach(c => { c.innerHTML = LIS_SVG; });
 const CAMEOS = [
   'En la grada, <b>Jeferión</b> le grita a su escriba: «¡Listillón, ' +
     'apunta esos números!». Dice que le harán falta para cargar los carros.',
@@ -4550,6 +4666,24 @@ $('aviso').innerHTML = 'Pulsa un tirador para marcarlo: podrás darle una poció
   'retirarlo con la cruz. Retirar es <b>restar</b>. Los frascos <b>estrechos</b> ' +
   'reparten (dividen) y los de <b>calavera</b> cambian de bando.';
 if(!retomaTurno()) arrancaMision(0);
+
+/* ── EL TEMA ─────────────────────────────────────────────────────────── */
+(function(){
+  const bs = document.querySelectorAll('#fTema .vel-b');
+  const marca = () => {
+    const t = document.documentElement.dataset.tema === 'tablilla' ? 'tablilla' : 'noche';
+    bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tema === t)));
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if(meta) meta.content = t === 'tablilla' ? '#d9c7a1' : '#0F0C18';
+  };
+  bs.forEach(b => b.addEventListener('click', () => {
+    if(b.dataset.tema === 'tablilla') document.documentElement.dataset.tema = 'tablilla';
+    else delete document.documentElement.dataset.tema;
+    try{ localStorage.setItem('pulso.tema', b.dataset.tema); }catch(e){}
+    marca();
+  }));
+  marca();
+})();
 
 /* ── EL MODO AULA ───────────────────────────────────────────────────────
    Se guarda en su propia llave del almacén, aparte del turno, para no tocar
