@@ -1144,7 +1144,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 .calc .cl-o{font-size:22px;font-family:'Space Mono',monospace;min-height:46px;padding:4px 0}
 .calc .cl-igual{font-size:24px}
 /* el banco: los frascos escritos delante esperan aquí a que haya a quién dárselos */
-.banco{position:absolute;top:22px;left:8px;z-index:13;display:flex;gap:5px;align-items:center;
+.banco{position:absolute;top:76px;left:10px;z-index:13;display:flex;gap:5px;align-items:center;
   padding:3px 8px 3px 6px;border-radius:8px;background:rgba(20,14,30,.55);
   border:1px dashed rgba(233,184,78,.6);pointer-events:none}
 [data-tema="tablilla"] .banco{background:rgba(247,240,222,.9);border-color:#a67a1f}
@@ -1272,6 +1272,36 @@ body[data-modo="calc"] .cartela:not([hidden]){display:block;position:absolute;to
 body[data-modo="calc"] #zonaCuenta{display:none}
 /* y los números que flotan: la cartela ya lo dice */
 body[data-modo="calc"] .flota{display:none}
+
+/* ── el mazo, más vivo: se vacía a la derecha y se llena a la izquierda ── */
+body[data-modo="calc"] .mazo{box-shadow:none}
+.canto-i, .canto-d{position:absolute;top:0;bottom:0;display:block;
+  background:repeating-linear-gradient(90deg,#f3ead5 0 1px,#b39d72 1px 2px);
+  transition:width .25s steps(4, end)}
+.canto-d{right:0;width:calc(var(--hojasD,14) * 1.5px);border-radius:0 10px 10px 0;
+  box-shadow:-2px 0 4px rgba(0,0,0,.35)}
+.canto-i{left:0;width:calc(var(--hojasI,0) * 1.5px);border-radius:10px 0 0 10px;
+  box-shadow:2px 0 4px rgba(0,0,0,.35)}
+.mazo-esquina{width:34px;height:34px}
+.campo.hojeo .mazo-esquina{transform:rotate(calc(var(--hoja,0) * -12deg)) scale(1.45)}
+/* la hoja que cae: una sombra de papel que cruza desde el canto */
+.hoja-cae{position:absolute;top:0;bottom:0;right:0;width:45%;display:block;opacity:0;pointer-events:none;
+  background:linear-gradient(to left, rgba(40,25,10,.28), rgba(250,244,228,.16) 30%, rgba(250,244,228,0) 100%)}
+.hoja-cae.va{animation:hojaCae .1s steps(3, end)}
+@keyframes hojaCae{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-70%)}}
+/* cada imagen, un poco movida */
+.campo.hojeo .escena{translate:var(--jx,0) var(--jy,0);rotate:var(--jr,0deg)}
+/* ── la cartela karaoke ── */
+body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;width:max-content;padding:4px 12px}
+.ct-cuenta{display:block;font-size:17px;line-height:1.5}
+.ct-cuenta .op{color:#C9BFD6}
+.ct-on{background:#E9B84E;border-radius:4px;padding:0 2px;box-shadow:0 0 0 2px #E9B84E}
+.ct-on, .ct-on *{color:#1A1206 !important}
+.ct-hecho{opacity:.38}
+.ct-res{color:#F9D98A;font-size:19px}
+.ct-x{display:block;font-size:12.5px;color:#F9D98A;margin-top:1px;letter-spacing:.2px}
+[data-tema="tablilla"] .ct-cuenta .op{color:#5f5040}
+[data-tema="tablilla"] .ct-x, [data-tema="tablilla"] .ct-res{color:#7f5a0e}
 </style>
 </head>
 <body>
@@ -1373,7 +1403,7 @@ body[data-modo="calc"] .flota{display:none}
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.4</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.5</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1503,7 +1533,7 @@ body[data-modo="calc"] .flota{display:none}
       <span class="m-t">Derecha</span></div>
   </div>
   <div class="campo">
-    <div class="mazo" aria-hidden="true"><i class="mazo-esquina"></i></div>
+    <div class="mazo" aria-hidden="true"><i class="canto-i"></i><i class="canto-d"></i><i class="hoja-cae"></i><i class="mazo-esquina"></i></div>
     <div class="cartela" id="cartela" role="status" hidden></div>
         <div class="dial" id="dial" hidden></div>
         <div class="escena" id="escena">
@@ -5377,20 +5407,28 @@ const numCuaderno = (f, primero) => primero ? (f < 0 ? conSigno(f) : String(f))
   : (f < 0 ? '(' + conSigno(f) + ')' : String(f));
 const numCalc = (f, primero) => '<span class="' + (f < 0 ? 'izq' : 'der') + '">' +
   numCuaderno(f, primero) + '</span>';
+/* la cuenta escrita, trozo a trozo; «clase» marca los que se iluminan */
+function htmlCuenta(tok, clase){
+  let h = '', primero = true;
+  tok.forEach((t, i) => {
+    const sig = tok[i + 1];
+    let x = '';
+    /* un negativo elevado va siempre entre paréntesis: (−2)² no es −2² */
+    if(t.t === 'n'){ x = numCalc(t.f, primero && !(sig && sig.t === 'e' && t.f < 0)); primero = false; }
+    else if(t.t === 'e') x = '<sup class="cl-exp">' + t.n + '</sup>';
+    else if(t.t === '+'){ x = '<span class="op"> + </span>'; primero = false; }
+    else if(t.t === '-'){ x = '<span class="op">' + (primero ? '−' : ' − ') + '</span>'; primero = false; }
+    else if(t.t === '('){ x = '<span class="op">(</span>'; primero = true; }
+    else if(t.t === ')') x = '<span class="op">)</span>';
+    else if(t.t === 'p'){ x = '<span class="poc">' + (t.pre ? preTxt(t.k) : etqDe(t.k)) + '</span>'; primero = false; }
+    const c = clase ? clase(i) : '';
+    h += c ? '<span class="' + c + '">' + x + '</span>' : x;
+  });
+  return h;
+}
 function pintaCalc(){
   if(!calc) return;
-  let h = '', primero = true;
-  calc.tok.forEach((t, i) => {
-    const sig = calc.tok[i + 1];
-    /* un negativo elevado va siempre entre paréntesis: (−2)² no es −2² */
-    if(t.t === 'n'){ h += numCalc(t.f, primero && !(sig && sig.t === 'e' && t.f < 0)); primero = false; }
-    else if(t.t === 'e') h += '<sup class="cl-exp">' + t.n + '</sup>';
-    else if(t.t === '+'){ h += '<span class="op"> + </span>'; primero = false; }
-    else if(t.t === '-'){ h += '<span class="op">' + (primero ? '−' : ' − ') + '</span>'; primero = false; }
-    else if(t.t === '('){ h += '<span class="op">(</span>'; primero = true; }
-    else if(t.t === ')') h += '<span class="op">)</span>';
-    else if(t.t === 'p'){ h += '<span class="poc">' + (t.pre ? preTxt(t.k) : etqDe(t.k)) + '</span>'; primero = false; }
-  });
+  let h = htmlCuenta(calc.tok);
   if(calc.ultimoTxt) h += '<span class="op"> = </span><b class="cl-res">' + calc.ultimoTxt + '</b>';
   else if(calc.ultimo !== null) h += '<span class="op"> = </span><b class="cl-res">' +
     (calc.ultimo < 0 ? conSigno(calc.ultimo) : String(calc.ultimo)) + '</b>';
@@ -5403,32 +5441,34 @@ function parseCalc(T){
   const err = m => { throw new Error(m); };
   function expr(){
     const terms = [];
-    let sign = '+';
-    if(T[i] && T[i].t === '-'){ sign = '-'; i++; }
+    let sign = '+', si = null;
+    if(T[i] && T[i].t === '-'){ sign = '-'; si = i; i++; }
     for(;;){
-      terms.push(Object.assign({sign}, term()));
-      if(T[i] && (T[i].t === '+' || T[i].t === '-')){ sign = T[i].t; i++; continue; }
+      terms.push(Object.assign({sign, si}, term()));
+      if(T[i] && (T[i].t === '+' || T[i].t === '-')){ sign = T[i].t; si = i; i++; continue; }
       break;
     }
     return {terms};
   }
   function term(){
     const pre = [], post = [];
-    while(T[i] && T[i].t === 'p' && T[i].pre){ pre.push({k:T[i].k, b:banco++}); i++; }
+    while(T[i] && T[i].t === 'p' && T[i].pre){ pre.push({k:T[i].k, b:banco++, ti:i}); i++; }
     let factor;
     if(!T[i]) err('La cuenta se ha quedado a medias: falta a quién darle el frasco o el número de detrás.');
-    if(T[i].t === 'n'){ factor = {t:'n', f:T[i].f}; i++; }
+    if(T[i].t === 'n'){ factor = {t:'n', f:T[i].f, a:i, z:i}; i++; }
     else if(T[i].t === '('){
+      const a = i;
       i++;
       const dentro = expr();
       if(!T[i] || T[i].t !== ')') err('Falta cerrar un paréntesis.');
+      factor = {t:'g', expr:dentro, a, z:i};
       i++;
-      factor = {t:'g', expr:dentro};
     }else err('Ahí falta un tirador o un paréntesis.');
-    let exp = 1;
-    if(T[i] && T[i].t === 'e'){ exp = T[i].n; i++; }
-    while(T[i] && T[i].t === 'p' && !T[i].pre){ post.push(T[i].k); i++; }
-    return {pre, factor, exp, post};
+    let exp = 1, ei = null;
+    if(T[i] && T[i].t === 'e'){ exp = T[i].n; ei = i; i++; }
+    const postI = [];
+    while(T[i] && T[i].t === 'p' && !T[i].pre){ post.push(T[i].k); postI.push(i); i++; }
+    return {pre, factor, exp, ei, post, postI};
   }
   if(!T.length) err('Todavía no has escrito nada.');
   const e = expr();
@@ -5452,6 +5492,15 @@ function escribeArbol(e, jugado, primero){
   return h;
 }
 /* ── el intérprete: el mismo guion para la simulación y para el teatro ── */
+/* LA CARTELA KARAOKE: cada paso dice qué trozo de lo escrito se está
+   jugando (m, las posiciones en la tablilla) y, si hace falta, la cuenta
+   pequeña de lo que le pasa a quien bebe (x) */
+const rango = (a, z) => { const r = []; for(let q = a; q <= z; q++) r.push(q); return r; };
+const conSi = (t, r) => t.si === null || t.si === undefined ? r : [t.si].concat(r);
+const trozoFactor = t => rango(t.factor.a, t.factor.z).concat(t.ei !== null && t.ei !== undefined ? [t.ei] : []);
+const opTxt = k => Number.isInteger(k) ? '·' + (k < 0 ? '(' + conSigno(k) + ')' : k) : etqDe(k);
+const cuentaBebe = (B, ids, k) => ids.slice(0, 3).map(id => '(' + conSigno(B.f(id)) + ')' + opTxt(k) + ' = ' +
+  conSigno(B.f(id) * k)).join(' &nbsp; ') + (ids.length > 3 ? ' …' : '');
 async function juegaExpr(e, ambito, B){
   for(const t of e.terms){
     const suelto = t.factor.t === 'n' && !t.pre.length && !t.post.length && !(t.exp > 1);
@@ -5460,16 +5509,19 @@ async function juegaExpr(e, ambito, B){
       const id = ambito.find(q => B.f(q) === f);
       if(id !== undefined){
         ambito.splice(ambito.indexOf(id), 1);
-        await B.retira(id, '− (' + conSigno(f) + ')');
+        await B.retira(id, {m: conSi(t, [t.factor.a]), x: 'se va el ' + conSigno(f)});
       }else{
-        const [idF, idN] = await B.pareja(f, conSigno(f) + ' ' + conSigno(-f) + ' = 0');
+        const [idF, idN] = await B.pareja(f, {m: conSi(t, [t.factor.a]),
+          x: 'no hay ' + conSigno(f) + ': entran ' + conSigno(f) + ' y ' + conSigno(-f) + ' (suman 0)'});
         ambito.push(idN);
-        await B.retira(idF, '− (' + conSigno(f) + ')');
+        await B.retira(idF, {m: conSi(t, [t.factor.a]), x: 'se va el ' + conSigno(f)});
       }
     }else{
       const ids = await juegaTermino(t, B);
       if(t.sign === '-')
-        await B.bebe(ids, -1, null, '−( )');
+        await B.bebe(ids, -1, null, {m: conSi(t, rango(t.pre.length ? t.pre[0].ti : t.factor.a,
+          t.postI.length ? t.postI[t.postI.length - 1] : (t.ei !== null ? t.ei : t.factor.z))),
+          x: ids.length > 1 ? 'el menos: todos cambian de bando' : 'el menos: cambia de bando', flip: true});
       ambito.push(...ids);
     }
   }
@@ -5478,24 +5530,24 @@ async function juegaExpr(e, ambito, B){
 async function juegaTermino(t, B){
   let ids;
   if(t.factor.t === 'n'){
-    ids = [await B.entra(t.factor.f, '+ (' + conSigno(t.factor.f) + ')')];
+    ids = [await B.entra(t.factor.f, {m: t.pre.length || t.sign === '-' ? [t.factor.a] : conSi(t, [t.factor.a]), x: ''})];
   }else{
     ids = await juegaExpr(t.factor.expr, [], B);
     if(t.pre.length || t.post.length)
-      await B.saco(ids, ids.length ? '( )' : '( ) = 0');
+      await B.saco(ids, {m: rango(t.factor.a, t.factor.z), x: ids.length ? 'la cuadrilla, lista' : 'vacía: vale 0'});
   }
   /* LA POTENCIA: elevar es multiplicar por sí mismo, así que el tirador se
      bebe su propio frasco (el −2, la Traición doble) una vez menos que el
      exponente. Un paréntesis, antes, se junta en uno */
   if(t.exp > 1){
-    if(ids.length > 1) ids = await B.junta(ids, '( ) → uno');
+    if(ids.length > 1) ids = await B.junta(ids, {m: rango(t.factor.a, t.factor.z), x: 'se juntan en uno'});
     if(ids.length){
       const v = B.f(ids[0]);
       const po = POCIONES.find(x => x.k === v);
       if(v !== 1){
         if(!po) throw new Error('Para elevar, el tirador se bebe <b>su propio frasco</b>, y no hay frasco de ·' + v + '.');
         for(let r = 1; r < t.exp; r++)
-          await B.bebe(ids, v, null, '·(' + conSigno(v) + ')');
+          await B.bebe(ids, v, null, {m: trozoFactor(t), x: cuentaBebe(B, ids, v)});
       }
     }
   }
@@ -5508,18 +5560,17 @@ async function juegaTermino(t, B){
     if(ids.every(id => cabe(B.f(id) * k))) return;
     const s = ids.reduce((a, id) => a + B.f(id), 0);
     if(!cabe(s * k)) return;
-    ids = await B.junta(ids, '( ) = ' + (s === 0 ? '0' : conSigno(s)));
+    ids = await B.junta(ids, {m: rango(t.factor.a, t.factor.z), x: 'se juntan: ' + (s === 0 ? '0' : conSigno(s))});
   };
   /* primero los que esperaban en el banco (el más cercano antes), luego los de detrás */
   for(const p of t.pre.slice().reverse()){
     await juntaSiHaceFalta(p.k);
     const po = POCIONES.find(x => x.k === p.k);
-    await B.bebe(ids, p.k, p.b, preTxt(p.k) + (ids.length > 1 ? '( )' : ''));
+    await B.bebe(ids, p.k, p.b, {m: [p.ti].concat(trozoFactor(t)), x: cuentaBebe(B, ids, p.k)});
   }
-  for(const k of t.post){
+  for(const [n, k] of t.post.entries()){
     await juntaSiHaceFalta(k);
-    const po = POCIONES.find(x => Math.abs(x.k - k) < 1e-9);
-    await B.bebe(ids, k, null, (ids.length > 1 ? '( )' : '') + po.e);
+    await B.bebe(ids, k, null, {m: trozoFactor(t).concat([t.postI[n]]), x: cuentaBebe(B, ids, k)});
   }
   return ids;
 }
@@ -5611,7 +5662,7 @@ function teatro(tokT){
         await pausa(650);
       }
       const po = POCIONES.find(x => Math.abs(x.k - k) < 1e-9) || {n:'el menos', e:'·(−1)'};
-      const nom = banco === null && k === -1 && /menos de delante/.test(txt) ? 'el menos de delante' : po.n;
+      const nom = txt && txt.flip ? 'el menos de delante' : po.n;
       ids.forEach((id, i) => setTimeout(() => {
         if(!vivo() || !tiradores.some(q => q.id === id)) return;
         sel = id; pocion(k, nom, po.e); sel = null;
@@ -5718,10 +5769,20 @@ function hojeo(si){
   clearInterval(hojeoT); hojeoT = 0;
   if(!c) return;
   c.classList.toggle('hojeo', !!si);
-  if(!si){ c.classList.remove('h1'); return; }
+  if(!si){ c.classList.remove('h1'); ['--jx','--jy','--jr'].forEach(v => c.style.removeProperty(v)); return; }
   if(MOV_REDUCIDO) return;
   let n = 0;
-  hojeoT = setInterval(() => { n++; c.classList.toggle('h1', n % 2 === 1); c.style.setProperty('--hoja', n % 6); }, 110);
+  const cae = c.querySelector('.hoja-cae');
+  hojeoT = setInterval(() => {
+    n++;
+    c.classList.toggle('h1', n % 2 === 1);
+    c.style.setProperty('--hoja', n % 6);
+    /* cada imagen cae un poco movida, como el papel de un mazo de verdad */
+    c.style.setProperty('--jx', (Math.random() * 3 - 1.5).toFixed(1) + 'px');
+    c.style.setProperty('--jy', (Math.random() * 2 - 1).toFixed(1) + 'px');
+    c.style.setProperty('--jr', (Math.random() * .6 - .3).toFixed(2) + 'deg');
+    if(cae){ cae.classList.remove('va'); void cae.offsetWidth; cae.classList.add('va'); }
+  }, 110);
 }
 /* recompone el campo hasta el fotograma k; si «anima», el último se juega */
 async function vaFotograma(k, anima){
@@ -5731,6 +5792,8 @@ async function vaFotograma(k, anima){
   const tokT = calc.teatro = calc.teatro + 1;
   calc.jugando = !!anima && k > 0;
   P.k = k;
+  P.jugados = new Set();
+  P.textos.slice(0, Math.max(0, k - 1)).forEach(o => (o.m || []).forEach(q => P.jugados.add(q)));
   quitaHitos();
   tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
   bebiendoIds.clear(); retirandoIds.clear();
@@ -5768,6 +5831,8 @@ async function vaFotograma(k, anima){
     }
   };
   pintaPasosCalc();
+  { const campo = document.querySelector('.campo'), H = 14, pasadas = P.n ? Math.round(H * k / P.n) : 0;
+    campo.style.setProperty('--hojasI', pasadas); campo.style.setProperty('--hojasD', H - pasadas); }
   if(anima && k > 0) hojeo(true);
   try{ await juegaExpr(P.arbol, [], B); }
   catch(e){ if(e !== PARA){ if(e.message === 'corte'){ hojeo(false); return; } throw e; } }
@@ -5777,7 +5842,7 @@ async function vaFotograma(k, anima){
   base = suma(); previo = suma();
   pinta();
   pintaBanco(P.bancos.filter(b => !gastados.has(b.b)));
-  if(k === 0) cartela(P.bancos.length ? P.bancos.map(b => preTxt(b.k)).join(' ') + ' espera' : '▶');
+  if(k === 0) cartela({m: P.bancos.map(b => b.ti), x: P.bancos.length ? 'espera en el banco' : 'pulsa ▶'});
   else if(k < P.n) cartela(P.textos[k - 1]);
   else finFuncion(P, P.textos[k - 1]);
   pintaPasosCalc();
@@ -5794,7 +5859,8 @@ function finFuncion(P, paso){
   calc.ultimo = suma();
   pintaBanco([]);
   pintaCalc();
-  cartela((paso ? paso + ' &nbsp; ' : '') + '= ' + totalHtml(calc.ultimo));
+  P.jugados = new Set();
+  cartela({m: [], x: paso && paso.x ? paso.x : ''}, totalHtml(calc.ultimo));
   let h = '';
   if(calc.ultimo !== P.valor) h += 'Algo se ha torcido en escena: debía dar ' + totalHtml(P.valor) + '. ';
   if(P.bancos.length)
@@ -5810,11 +5876,20 @@ function finFuncion(P, paso){
   }
   $('clAviso').innerHTML = h;
 }
-/* la cartela de cine mudo, arriba del teatro */
-function cartela(h){
+/* la cartela de cine mudo, arriba del teatro: la cuenta escrita, con el
+   trozo que se está jugando iluminado (como en un karaoke), lo ya jugado
+   atenuado y, debajo, la cuenta pequeña de quien bebe */
+function cartela(o, fin){
   const c = $('cartela');
   if(!c) return;
-  c.innerHTML = h || '';
+  let h = '';
+  if(o && typeof o === 'object'){
+    const on = new Set(o.m || []), hechos = (calc && calc.pel && calc.pel.jugados) || new Set();
+    h = '<span class="ct-cuenta">' + htmlCuenta(calc.tok, i => on.has(i) ? 'ct-on' : (hechos.has(i) ? 'ct-hecho' : '')) +
+      (fin !== undefined ? ' <span class="op">=</span> <b class="ct-res">' + fin + '</b>' : '') + '</span>' +
+      (o.x ? '<small class="ct-x">' + o.x + '</small>' : '');
+  }else h = o || '';
+  c.innerHTML = h;
   c.hidden = !h;
   c.classList.remove('nueva'); void c.offsetWidth; c.classList.add('nueva');
 }
