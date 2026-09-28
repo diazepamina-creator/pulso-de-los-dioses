@@ -1223,6 +1223,10 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 /* la tablilla donde se escribe, con el mismo grano */
 .cl-tabla{background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42  0 0 0 0 .3  0 0 0 0 .14  0 0 0 .55 -.12'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>"), linear-gradient(180deg,#e2d0a8,#eee0c0);background-size:140px 140px, 100% 100%;
   border:2px solid #9a7a45;box-shadow:inset 0 3px 8px rgba(90,64,30,.35), inset 0 -1px 0 rgba(255,250,235,.6)}
+
+/* LA PODA: en los ejercicios, la bandera sobre la regla y la cuenta escrita
+   bastan; el marcador y el veredicto repetían lo mismo. Quedan en el taller */
+body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:none}
 </style>
 </head>
 <body>
@@ -1242,7 +1246,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
     <span class="chip" id="chipMision"></span>
     <span class="acciones">
       <button id="bComo">Guía</button>
-      <button id="bGloss">Glosario</button>
+      <button id="bTablilla">Tablilla</button>
       <button id="mTaller">Taller</button>
       <button id="bAjustes">Ajustes</button>
       <button id="bActa">Acta</button>
@@ -1300,7 +1304,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 </details>
 <div class="panel ajustes" id="panelAjustes" hidden>
 <p class="rt-cab">Ajustes</p>
-<div class="veloc" id="fPandeo">
+<div class="veloc" id="fPandeo" data-solo-debug>
   <span>Pandeo</span>
   <button class="vel-b" id="pdMenos">−</button>
   <input type="range" id="pdRango" min="0" max="8" step="0.5" value="4">
@@ -1324,8 +1328,8 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v6.5</p>
-<div class="veloc">
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.0</p>
+<div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
   <button class="vel-b" data-par="todos" aria-pressed="false">Todos</button>
@@ -1333,6 +1337,7 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 </div>
 <div class="veloc">
   <span>Notas</span>
+  <button class="vel-b" id="bGloss" aria-pressed="false">Glosario de pociones</button>
   <button class="vel-b" id="aLetra" aria-pressed="false">Ver la letra pequeña</button>
   <button class="vel-b" id="aBorrar" aria-pressed="false">Empezar de cero</button>
 </div>
@@ -1551,7 +1556,6 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
     <div class="fila">
       <button id="otroReto">Otro encargo</button>
       <button id="vaciar">Vaciar el campo</button>
-      <button id="aCalc">La tablilla de Listillón</button>
       <button id="aEntrevista">Entrevistas</button>
     </div>
   </div>
@@ -1624,6 +1628,9 @@ let VEL = 1;
 let AJ = {subida:0, vuelco:70, hombro:0, codo:0, pausa:0};
 const DEBUG = /[?&]debug=1/.test(location.search);
 if(!DEBUG) $('ajuste').remove();
+/* LA PODA (v7): lo que era para afinar el dibujo o la notación no es cosa
+   del alumno. Sigue ahí con ?debug=1 */
+if(!DEBUG) document.querySelectorAll('[data-solo-debug]').forEach(e => { e.style.display = 'none'; });
 if(DEBUG){
 function aplicaAjuste(){
   const r = document.documentElement.style;
@@ -3245,7 +3252,6 @@ function juzga(dicho, real){
     destella(true);
         $('dnAviso').innerHTML = diana.racha % 5 === 0
       ? '<b>Racha de ' + diana.racha + '.</b>' : '';
-    if(diana.racha % 5 === 0) confeti();
   }else{
     diana.bien = false;
     diana.racha = 0;
@@ -3780,7 +3786,6 @@ function compruebaOper(){
     $('opAviso').innerHTML = '<b>Correcto.</b> ' +
       (oper.ej.valor === 0 ? 'Empate: el <b>0</b> no es de ningún bando. ' : '') +
       (oper.visto ? 'Ahora inténtala sin abrir el campo.' : '<b>Y sin abrir el campo.</b>');
-    if(oper.aciertos % 5 === 0) confeti();
     apuntaLogro();
     if(!ruta && oper.seguidas >= 3 && oper.nivel < NIVELES_OP.length - 1){
       oper.nivel++; oper.seguidas = 0;
@@ -3907,7 +3912,6 @@ function compruebaCanon(){
         'que es el menor: ' + conSigno(Math.min(e.a, e.b)) + ' &lt; ' +
         conSigno(Math.max(e.a, e.b)) + '.';
     destella(true);
-    confeti();
     apuntaLogro();
     { const yo = canon; setTimeout(() => { if(canon && canon === yo) rondaCanon(); }, ms(2200)); }
   }else{
@@ -4317,7 +4321,6 @@ function juzgaCron(){
   if(bien){
     cron.aciertos++; cron.racha++; cron.seguidas++; cron.tropiezos = 0;
     if(cron.racha > cron.mejor) cron.mejor = cron.racha;
-    if(cron.racha % 5 === 0) confeti();
     apuntaLogro();
     if(!ruta && cron.seguidas >= 2 && cron.grado < CGRADOS.length - 1){
       cron.grado++; cron.seguidas = 0;
@@ -4785,9 +4788,6 @@ function apuntaLogro(){
     confeti();
     ruta.hecho = true;
     setTimeout(() => asomo('jef'), ms(900));
-    if(ruta.i % 3 === 2 && cameosVistos < CAMEOS.length)
-      ruta.cameo = '<span class="cameo"><span class="cameo-par">' + jeferion('senala') + listillon('habla') + '</span><span>' +
-        CAMEOS[cameosVistos++] + '</span></span>';
   }
   pintaRuta();
 }
@@ -4858,6 +4858,8 @@ $('aVolverRuta').addEventListener('click', () => {
   else if(!retomaTurno()) arrancaMision(0);   // vuelve a la misión y los aciertos que llevaba
 });
 function modoBotones(m){
+  document.body.dataset.fase = m === 'taller' ? 'taller' : 'juego';
+  $('bTablilla').setAttribute('aria-pressed', String(m === 'calc'));
   $('mOper').setAttribute('aria-pressed', String(m === 'oper'));
   $('mCron').setAttribute('aria-pressed', String(m === 'cronista'));
   $('mArgos').setAttribute('aria-pressed', String(m === 'argos'));
@@ -5774,7 +5776,10 @@ async function igualCalc(){
   });
 })();
 $('mCalc').addEventListener('click', () => { alTaller(); modoBotones('calc'); arrancaCalc(); });
-$('aCalc').addEventListener('click', () => { alTaller(); modoBotones('calc'); arrancaCalc(); });
+$('bTablilla').addEventListener('click', () => {
+  if(calc) return;                       // ya estamos en ella
+  alTaller(); modoBotones('calc'); arrancaCalc();
+});
 
 /* ── ZEUS ── a cara descubierta: en el campo solo se le ve a contraluz */
 const ZV = {piel:'#E7B58C', sombra:'#C98E66', barba:'#F4F1EA', barbaS:'#CFCBD8', toga:'#EEF0F6', togaS:'#C9CEDF',
