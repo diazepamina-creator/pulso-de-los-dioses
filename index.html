@@ -1291,6 +1291,44 @@ body[data-modo="calc"] .mazo{box-shadow:none}
 @keyframes hojaCae{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-70%)}}
 /* cada imagen, un poco movida */
 .campo.hojeo .escena{translate:var(--jx,0) var(--jy,0);rotate:var(--jr,0deg)}
+/* ── EL LIBRITO: cosido por la izquierda y sujeto por la manaza de Jeferión ── */
+body[data-modo="calc"] .mazo{perspective:900px}
+.lomo{position:absolute;left:0;top:0;bottom:0;width:10px;display:block;z-index:2;
+  background:linear-gradient(90deg,#2a1d0c,#6b4e28 55%,#3a2a14);box-shadow:2px 0 5px rgba(0,0,0,.5);
+  border-radius:10px 0 0 10px}
+.lomo::after{content:"";position:absolute;left:4px;top:8px;bottom:8px;width:1.5px;
+  background:repeating-linear-gradient(180deg,#e8d9b0 0 6px,transparent 6px 12px)}
+.canto-i{left:10px;border-radius:0}
+.mazo-esquina.e2{width:24px;height:24px;opacity:.9}
+.campo.hojeo .mazo-esquina.e2{transform:rotate(calc((5 - var(--hoja,0)) * -10deg)) scale(1.3)}
+/* la hoja que se vuelve sobre el lomo a cada ▶ (y al revés con ◀) */
+.hoja-vuelta{position:absolute;left:10px;right:0;top:0;bottom:0;display:block;opacity:0;z-index:3;
+  transform-origin:0 50%;border-radius:0 8px 8px 0;backface-visibility:visible;
+  background:linear-gradient(315deg,#a8926a,#e9dcbc 6%,#f7f0de 30%,#efe4c8 70%,#cdbb90);
+}
+[data-tema="tablilla"] .hoja-vuelta{background:linear-gradient(315deg,#7a5a2e,#cdb584 6%,#efe0bb 30%,#dcc89a 70%,#a88c5c)}
+/* primero se dobla la esquina, luego la doblez cruza en diagonal y la hoja se va */
+.hoja-vuelta.va{animation:hojaVuelta .56s steps(9, end)}
+.hoja-vuelta.vuelve{animation:hojaVuelta .56s steps(9, end) reverse}
+@keyframes hojaVuelta{
+  0%{opacity:.96;transform:rotateY(0);clip-path:polygon(100% 100%,100% 100%,100% 100%,100% 100%)}
+  25%{opacity:.96;transform:rotateY(-6deg);clip-path:polygon(100% 62%,100% 100%,62% 100%,62% 100%)}
+  50%{opacity:.96;transform:rotateY(-22deg);clip-path:polygon(100% 0,100% 100%,0 100%,0 100%)}
+  75%{opacity:.96;transform:rotateY(-50deg);clip-path:polygon(100% 0,100% 100%,0 100%,0 0)}
+  100%{opacity:.5;transform:rotateY(-86deg);clip-path:polygon(100% 0,100% 100%,0 100%,0 0)}}
+/* la manaza: los dedos por detrás del mazo, el pulgar encima de la esquina */
+.manaza{display:none}
+body[data-modo="calc"] .manaza{display:block;position:relative;height:0;z-index:15;pointer-events:none}
+.manaza svg{position:absolute;right:-11px;bottom:-26px;width:84px;height:64px;overflow:visible;
+  filter:drop-shadow(-2px 2px 2px rgba(0,0,0,.35))}
+.manaza .pulgar{transform-origin:50px 52px;transition:transform .12s steps(2, end)}
+.campo.hojeo.h1 ~ .manaza .pulgar{transform:rotate(9deg) translate(1px,-1px)}
+.manaza.pasa .pulgar{animation:pulgarPasa .5s steps(6, end)}
+.manaza.pasa .mano{animation:manoPasa .5s steps(6, end)}
+@keyframes pulgarPasa{35%{transform:rotate(-16deg) translate(-3px,2px)}70%{transform:rotate(12deg)}}
+@keyframes manoPasa{35%{transform:translate(-2px,1px)}70%{transform:translate(1px,-2px)}}
+body[data-modo="calc"] #opPasoTxt{padding-right:52px;white-space:nowrap}
+@media (prefers-reduced-motion: reduce){ .hoja-vuelta.va, .hoja-vuelta.vuelve, .manaza.pasa *{animation:none} }
 /* ── la cartela karaoke ── */
 body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;width:max-content;padding:4px 12px}
 .ct-cuenta{display:block;font-size:17px;line-height:1.5}
@@ -1403,7 +1441,7 @@ body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;w
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.5</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.6</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1533,7 +1571,7 @@ body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;w
       <span class="m-t">Derecha</span></div>
   </div>
   <div class="campo">
-    <div class="mazo" aria-hidden="true"><i class="canto-i"></i><i class="canto-d"></i><i class="hoja-cae"></i><i class="mazo-esquina"></i></div>
+    <div class="mazo" aria-hidden="true"><i class="lomo"></i><i class="canto-i"></i><i class="canto-d"></i><i class="hoja-cae"></i><i class="hoja-vuelta"></i><i class="mazo-esquina"></i><i class="mazo-esquina e2"></i></div>
     <div class="cartela" id="cartela" role="status" hidden></div>
         <div class="dial" id="dial" hidden></div>
         <div class="escena" id="escena">
@@ -1554,6 +1592,7 @@ body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;w
     </div>
     </div>
   </div>
+  <div class="manaza" id="manaza" aria-hidden="true"></div>
     <div class="fila pasos-m" id="opPasos" hidden>
     <button id="opAtras" aria-label="Atrás">◀</button>
     <button id="opSig" class="scan" aria-label="Adelante">▶</button>
@@ -5784,11 +5823,42 @@ function hojeo(si){
     if(cae){ cae.classList.remove('va'); void cae.offsetWidth; cae.classList.add('va'); }
   }, 110);
 }
+/* la manaza de Jeferión: sujeta el librito por la esquina y pasa las hojas */
+(() => {
+  const m = $('manaza'); if(!m) return;
+  const P = JV.piel, S = JV.sombra, T = TINTA;
+  /* los nudillos del puño, apretando el mazo por debajo */
+  const nudillo = (x, y) => '<circle cx="' + x + '" cy="' + y + '" r="6.5" fill="' + P + '" stroke="' + T + '" stroke-width="1.6"/>';
+  m.innerHTML = '<svg viewBox="0 0 84 64">' +
+    '<g class="mano">' +
+    /* el antebrazo, que entra desde abajo a la derecha */
+    '<path d="M64 60 L86 54 L86 76 L58 76 Z" fill="' + P + '" stroke="' + T + '" stroke-width="1.8" stroke-linejoin="round"/>' +
+    '<path d="M68 70 q4 -3 8 0 M76 64 q4 -3 8 0" fill="none" stroke="' + S + '" stroke-width="1.5" stroke-linecap="round"/>' +
+    nudillo(58, 40) + nudillo(69, 41) + nudillo(79, 44) +
+    /* el puño */
+    '<path d="M44 52 Q42 42 54 42 L78 44 Q88 48 86 58 Q84 68 70 68 L52 68 Q44 64 44 52 Z" fill="' + P + '" stroke="' + T + '" stroke-width="1.8" stroke-linejoin="round"/>' +
+    '<path d="M58 44 q1 4 -1 7 M69 45 q1 4 -1 7 M79 48 q0 4 -2 6" fill="none" stroke="' + T + '" stroke-width="1.2" stroke-linecap="round"/>' +
+    '<path d="M60 60 q4 -3 8 0 M70 62 q4 -3 8 0" fill="none" stroke="' + S + '" stroke-width="1.5" stroke-linecap="round"/>' +
+    /* el pulgar, gordo, aplastando la esquina de las hojas */
+    '<g class="pulgar">' +
+    '<path d="M54 50 Q50 38 42 30 Q36 24 30 27 Q24 31 28 38 Q34 46 40 56 Z" fill="' + P + '" stroke="' + T + '" stroke-width="1.8" stroke-linejoin="round"/>' +
+    '<path d="M31.5 27.5 Q27 29.5 28.5 35 Q33.5 34.5 35.5 29.5 Q34 27 31.5 27.5 Z" fill="#F3EAD0" stroke="' + T + '" stroke-width="1"/>' +
+    '<path d="M40 38 q3 1 3 5 M45 44 q3 1 3 5" fill="none" stroke="' + S + '" stroke-width="1.3" stroke-linecap="round"/>' +
+    '</g></g></svg>';
+})();
+/* una hoja entera que se vuelve sobre el lomo: hacia delante (1) o atrás (-1) */
+function pasaHoja(dir){
+  if(MOV_REDUCIDO) return;
+  const h = document.querySelector('.hoja-vuelta'), m = $('manaza');
+  if(h){ h.classList.remove('va', 'vuelve'); void h.offsetWidth; h.classList.add(dir < 0 ? 'vuelve' : 'va'); }
+  if(m){ m.classList.remove('pasa'); void m.offsetWidth; m.classList.add('pasa'); }
+}
 /* recompone el campo hasta el fotograma k; si «anima», el último se juega */
 async function vaFotograma(k, anima){
   if(!calc || !calc.pel) return;
   const P = calc.pel;
   k = Math.max(0, Math.min(P.n, k));
+  if(k !== P.k) pasaHoja(k > P.k ? 1 : -1);
   const tokT = calc.teatro = calc.teatro + 1;
   calc.jugando = !!anima && k > 0;
   P.k = k;
@@ -5833,7 +5903,11 @@ async function vaFotograma(k, anima){
   pintaPasosCalc();
   { const campo = document.querySelector('.campo'), H = 14, pasadas = P.n ? Math.round(H * k / P.n) : 0;
     campo.style.setProperty('--hojasI', pasadas); campo.style.setProperty('--hojasD', H - pasadas); }
-  if(anima && k > 0) hojeo(true);
+  if(anima && k > 0){
+    hojeo(true);
+    /* la acción arranca cuando la hoja ya ha pasado medio lomo */
+    if(!MOV_REDUCIDO){ await new Promise(ok => setTimeout(ok, 300)); if(!calc || calc.teatro !== tokT) return; }
+  }
   try{ await juegaExpr(P.arbol, [], B); }
   catch(e){ if(e !== PARA){ if(e.message === 'corte'){ hojeo(false); return; } throw e; } }
   hojeo(false);
