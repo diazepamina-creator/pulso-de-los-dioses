@@ -1084,6 +1084,9 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 .habla:has(> .aviso:empty) .cara,
 .habla:has(> .aviso[hidden]) .cara{display:none}
 .habla .cara.lis{width:48px;order:2}
+/* los dibujos miran a la derecha (Listillón) o a la izquierda (Jeferión): en
+   el bocadillo se voltean para mirar hacia lo que dicen */
+.habla .cara.lis svg, .ruta .rt-habla .cara.jef svg{transform:scaleX(-1)}
 .habla .aviso b{color:var(--ink)}
 @media (max-width:420px){ .cara.jef{width:52px} .habla .cara.lis{width:40px} }
 /* los asomos: salen desde detrás de la regla */
@@ -1241,8 +1244,8 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
 .calc:has(#clEj:not([hidden])) .cl-cursor{display:none}
 
 /* ── EL FOLIOSCOPIO ── */
-.mazo, .cartela{display:none}
-body[data-modo="calc"] .mazo{display:block;position:absolute;inset:0;z-index:13;pointer-events:none;
+.cartela{display:none}
+.mazo{display:block;position:absolute;inset:0;z-index:13;pointer-events:none;
   /* los cantos de las hojas, apilados abajo y a la derecha */
   box-shadow:inset -2px -2px 0 #efe6cf, inset -3px -3px 0 #b9a47a, inset -5px -5px 0 #f2e9d4,
     inset -6px -6px 0 #b9a47a, inset -8px -8px 0 #efe6cf, inset -9px -9px 0 #a8926a;
@@ -1276,7 +1279,7 @@ body[data-modo="calc"] #zonaCuenta{display:none}
 body[data-modo="calc"] .flota{display:none}
 
 /* ── el mazo, más vivo: se vacía a la derecha y se llena a la izquierda ── */
-body[data-modo="calc"] .mazo{box-shadow:none}
+.mazo{box-shadow:none}
 .canto-i, .canto-d{position:absolute;top:0;bottom:0;display:block;
   background:repeating-linear-gradient(90deg,#f3ead5 0 1px,#b39d72 1px 2px);
   transition:width .25s steps(4, end)}
@@ -1294,7 +1297,7 @@ body[data-modo="calc"] .mazo{box-shadow:none}
 /* cada imagen, un poco movida */
 .campo.hojeo .escena{translate:var(--jx,0) var(--jy,0);rotate:var(--jr,0deg)}
 /* ── EL LIBRITO: cosido por la izquierda y sujeto por la manaza de Jeferión ── */
-body[data-modo="calc"] .mazo{perspective:900px}
+.mazo{perspective:900px}
 .lomo{position:absolute;left:0;top:0;bottom:0;width:10px;display:block;z-index:2;
   background:linear-gradient(90deg,#2a1d0c,#6b4e28 55%,#3a2a14);box-shadow:2px 0 5px rgba(0,0,0,.5);
   border-radius:10px 0 0 10px}
@@ -1321,15 +1324,16 @@ body[data-modo="calc"] .mazo{perspective:900px}
   75%{opacity:.96;transform:rotateY(-50deg);clip-path:polygon(100% 0,100% 100%,0 100%,0 0)}
   100%{opacity:.5;transform:rotateY(-86deg);clip-path:polygon(100% 0,100% 100%,0 100%,0 0)}}
 /* la manaza: los dedos por detrás del mazo, el pulgar encima de la esquina */
-.manaza{display:none}
-body[data-modo="calc"] .manaza{display:block;position:relative;height:0;z-index:15;pointer-events:none}
+.manaza{display:block;position:relative;height:0;z-index:15;pointer-events:none}
+/* fuera de la tablilla, lo de debajo del campo deja sitio a la pezuña */
+body:not([data-modo="calc"]) .manaza{margin-bottom:26px}
 .manaza svg{position:absolute;right:-8px;bottom:-26px;width:84px;height:64px;overflow:visible;
   filter:drop-shadow(-2px 2px 2px rgba(0,0,0,.35))}
 .manaza .mano{transform-origin:76px 66px;transition:transform .12s steps(2, end)}
 .campo.hojeo.h1 ~ .manaza .mano{transform:rotate(4deg)}
 .manaza.pasa .mano{animation:manoPasa .5s steps(6, end)}
 @keyframes manoPasa{35%{transform:rotate(-7deg) translate(-2px,1px)}70%{transform:rotate(5deg)}}
-body[data-modo="calc"] #opPasoTxt{padding-right:52px;white-space:nowrap}
+#opPasoTxt{padding-right:52px;white-space:nowrap}
 body:not([data-modo="calc"]) #opTodo{display:none}
 .pasos-m .op-todo{font-size:13px;letter-spacing:-2px}
 /* el pronóstico del alumno, marcado en la regla mientras se juega el paso */
@@ -1452,7 +1456,7 @@ body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;w
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.9</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.0</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -2962,6 +2966,7 @@ function alta(f){
   }
   const enEseLado = tiradores.filter(q => (q.f < 0) === (f < 0)).length;
   if(enEseLado >= 5){ $('aviso').textContent = 'En ese lado ya hay cinco.'; return; }
+  fotograma(900);
   vuelveAMontar();
   if(!cinta.length) base = suma();
   tiradores.push({id: sigId++, f});
@@ -2978,6 +2983,7 @@ function retira(id){
   if(retirandoIds.has(id)) return;
   const p = tiradores.find(q => q.id === id);
   if(!p) return;
+  fotograma(2300);
   vuelveAMontar();
   if(!cinta.length) base = suma();
   const nodo = document.querySelector('.tirador[data-id="' + id + '"]');
@@ -3030,6 +3036,7 @@ function cortaCinta(nota){
   base = suma();
 }
 function pocion(k, nombre, etq){
+  fotograma(2500);
   etq = etq || etqDe(k);
     if(cuadrilla.size){
     const ids = [...cuadrilla].filter(id => tiradores.some(p => p.id === id));
@@ -3163,6 +3170,7 @@ function hacePocion(p, antes, nuevo, nombre, cambiaBando, tono, color, etq){
    mueve —suman 0— y a partir de ahí se puede retirar a cualquiera de los
    dos. Devuelve el id del de fuerza f */
 function entraPareja(f){
+  fotograma(2400);
   const n = sigId;
   alta(f); alta(-f);
   const ids = [n, n + 1].filter(id => tiradores.some(q => q.id === id));
@@ -5841,7 +5849,7 @@ const PARA = new Error('para');
 /* EL FOLIOSCOPIO. Mientras se juega una acción, todo el movimiento del
    campo va a saltos —como cartulinas que pasan— y el canto del mazo se
    hojea: una esquina se levanta a cada imagen */
-let hojeoT = 0;
+var hojeoT = 0;
 function hojeo(si){
   const c = document.querySelector('.campo');
   clearInterval(hojeoT); hojeoT = 0;
@@ -5899,6 +5907,26 @@ function pasaHoja(dir){
   const h = document.querySelector('.hoja-vuelta'), m = $('manaza');
   if(h){ h.classList.remove('va', 'vuelve'); void h.offsetWidth; h.classList.add(dir < 0 ? 'vuelve' : 'va'); }
   if(m){ m.classList.remove('pasa'); void m.offsetWidth; m.classList.add('pasa'); }
+}
+/* EL FOLIOSCOPIO EN TODOS LOS CAMPOS. Fuera de la tablilla (que lleva sus
+   fotogramas a mano), cada acción del campo es una hoja: pasa la hoja, el
+   movimiento va a saltos mientras dura y el mazo cambia una hoja de lado.
+   Si llegan varias seguidas (una purga), se hojea sin volver a pasar hoja */
+var finHojeoT = 0, ultimaHoja = 0, hojasPasadas = 0;   // var: alta() se usa antes de llegar aquí
+function fotograma(dura){
+  if(document.body.dataset.modo === 'calc' || MOV_REDUCIDO) return;
+  const campo = document.querySelector('.campo');
+  if(!campo) return;
+  const ahora = Date.now();
+  if(ahora - ultimaHoja > 700){
+    pasaHoja(1);
+    hojasPasadas = (hojasPasadas + 1) % 13;
+    campo.style.setProperty('--hojasI', hojasPasadas); campo.style.setProperty('--hojasD', 14 - hojasPasadas);
+  }
+  ultimaHoja = ahora;
+  if(!campo.classList.contains('hojeo')) hojeo(true);
+  clearTimeout(finHojeoT);
+  finHojeoT = setTimeout(() => { if(document.body.dataset.modo !== 'calc') hojeo(false); }, ms(dura));
 }
 /* recompone el campo hasta el fotograma k; si «anima», el último se juega */
 async function vaFotograma(k, anima){
