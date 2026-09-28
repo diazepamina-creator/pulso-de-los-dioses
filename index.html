@@ -1130,7 +1130,8 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 .cl-fila{display:grid;gap:6px}
 .cl-tir{grid-template-columns:repeat(5,1fr)}
 .cl-poc{grid-template-columns:repeat(4,1fr)}
-.cl-ops{grid-template-columns:repeat(6,1fr)}
+.cl-ops{grid-template-columns:repeat(4,1fr)}
+.cl-exp{font-size:.62em;vertical-align:.9em;margin-left:1px}
 .calc .cl-t{display:flex;align-items:center;justify-content:center;gap:2px;padding:4px 2px;min-height:44px;
   font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:0}
 .calc .cl-t svg{width:24px;height:24px;flex:0 0 auto}
@@ -1227,6 +1228,15 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 /* LA PODA: en los ejercicios, la bandera sobre la regla y la cuenta escrita
    bastan; el marcador y el veredicto repetían lo mismo. Quedan en el taller */
 body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:none}
+
+/* el ejercicio de la ruta, dentro de la tablilla */
+.cl-ej{margin:0 0 8px}
+.cl-marca{margin:0 0 8px}
+.cl-resp{display:flex;gap:8px;align-items:stretch;margin:0 0 8px}
+.cl-resp .op-resp{flex:1;min-width:0;margin:0}
+.cl-resp .scan{flex:0 0 auto;padding:0 16px}
+.cl-ver{width:100%}
+.calc:has(#clEj:not([hidden])) .cl-cursor{display:none}
 </style>
 </head>
 <body>
@@ -1328,7 +1338,7 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.0</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.1</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1372,9 +1382,18 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
 <div class="panel calc" id="calc" hidden>
   <h2>La tablilla de Listillón</h2>
   <div class="cl-tabla" aria-live="polite"><span id="clEscrito"></span><span class="cl-cursor" aria-hidden="true"></span></div>
+  <div class="cl-ej" id="clEj" hidden>
+    <p class="dn-marca cl-marca" id="clMarca"></p>
+    <div class="cl-resp">
+      <input id="clResp" class="op-resp" type="text" inputmode="text" autocomplete="off" autocorrect="off"
+        spellcheck="false" placeholder="¿Dónde acaba la bandera?" aria-label="Tu respuesta">
+      <button id="clComprueba" class="scan">Comprobar</button>
+    </div>
+    <button id="clVer" class="cl-ver">▶ Verlo en el campo</button>
+  </div>
   <div id="clTeclas"></div>
   <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="clAviso" role="status"></p></div>
-  <div class="fila" style="margin-top:8px">
+  <div class="fila" id="clPie" style="margin-top:8px">
     <button id="clOtra">▶ Otra vez la función</button>
     <button id="clLimpia">Tablilla limpia</button>
     <button id="clSalir">Volver al taller</button>
@@ -1397,7 +1416,7 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
   <div class="fila" style="margin-top:8px"><button id="evSalir">Volver al taller</button></div>
 </div>
 <div class="modos" id="modos" hidden>
-  <button id="mOper" class="modo-b" aria-pressed="true">Operaciones</button>
+  <button id="mOper" class="modo-b" aria-pressed="true" hidden>Operaciones</button>
   <button id="mDiana" class="modo-b" aria-pressed="false">La Diana</button>
   <button id="mCron" class="modo-b" aria-pressed="false">El Cronista</button>
   <button id="mArgos" class="modo-b" aria-pressed="false">Argos</button>
@@ -4360,48 +4379,30 @@ function arrancaCronista(grado){
   if(grado !== undefined) cron.grado = grado;
   rondaCron();
 }
+/* LA RUTA ESENCIAL (v7): diez misiones en cuatro actos, con la tablilla en
+   el centro. Leer el campo · Sumar y restar · Las pociones · La jerarquía,
+   y Argos para acabar. La de antes (17) queda en la rama de respaldo. */
 const MISIONES = [
-  {t:'¿Cuánto tira cada uno?', modo:'canon', n:0, meta:4,
-   d:'La fuerza es el número <b>sin signo</b>: el signo dice para qué lado.'},
-  {t:'¿Cuál queda más a la izquierda?', modo:'canon', n:1, meta:4,
-   d:'El menor es el que queda más a la izquierda en la regla. Con los negativos, ' +
-     'cuanto más fuerte tiran, más pequeños son.'},
-  {t:'Entra gente', modo:'oper', n:0, meta:4,
-   d:'El que entra <b>suma</b> su fuerza con su signo.'},
-  {t:'¿Dónde va a parar?', modo:'diana', n:0, meta:3,
-   d:'Al revés: pasa una jugada y tú dices dónde para la bandera. Arrastra el dedo.'},
-  {t:'Alguien se retira', modo:'oper', n:2, meta:4,
-   d:'Retirar es <b>restar</b>. Si se va uno que tiraba hacia la izquierda, la bandera se va <b>hacia la derecha</b>.'},
-  {t:'Escríbelo con signos', modo:'cron', n:0, meta:3,
-   d:'Mira lo que pasa y <b>escríbelo como una operación</b>: + (−3), − (+2)… ' +
-     'Al comprobar se juega lo que escribas.'},
-  {t:'Dos operaciones', modo:'oper', n:2, meta:4,
-   d:'Cadenas de dos, por orden, de izquierda a derecha.'},
-  {t:'Restar al que no está', modo:'oper', n:3, meta:4,
-   d:'¿Y si hay que restar un <b>−3</b> y no hay nadie de −3? Entra una <b>pareja nula</b> ' +
-     '—un +3 y un −3, que suman 0— y se retira el −3. Por eso <b>− (−3)</b> hace lo mismo ' +
-     'que <b>+ (+3)</b>.'},
-  {t:'Dos jugadas seguidas', modo:'diana', n:2, meta:3,
-   d:'Pasan las dos y <b>solo hay una estaca</b>: la cuenta va por dentro.'},
-  {t:'Las pociones', modo:'oper', n:5, meta:4,
-   d:'El frasco multiplica <b>a un tirador</b>, no al campo: por eso va antes que la suma.'},
-  {t:'Cadena con pociones', modo:'diana', n:5, meta:3,
-   d:'Tres jugadas con frascos por medio, traduciendo sobre la marcha.'},
-  {t:'Escribe la cadena', modo:'cron', n:1, meta:3,
-   d:'Dos cosas seguidas, y las escribes las dos, en orden.'},
-  {t:'Paréntesis: todos beben', modo:'oper', n:7, meta:3,
-   d:'<b>2 · (3 + 1)</b> no es una regla: <b>los dos se beben un Doblón</b>.'},
-  {t:'Menos delante del paréntesis', modo:'oper', n:8, meta:3,
-   d:'Se retiran <b>dos a la vez</b>: <b>− ( (+2) + (−3) )</b>. Ojo, que el menos ' +
-     'alcanza a los dos — caen dos rayos.'},
-  {t:'Potencias: dónde está el paréntesis', modo:'oper', n:9, meta:3,
-   d:'<b>(−2)²</b> y <b>−2²</b> no son lo mismo. Ábrelo y mira <b>quién entra al ' +
-     'campo</b>: ahí está toda la diferencia.'},
+  {t:'Fuerza y bando', modo:'canon', n:2, meta:4,
+   d:'La fuerza es el número <b>sin signo</b>; el signo dice el bando. Y cuanto más a la izquierda, <b>menor</b>.'},
+  {t:'¿Dónde para?', modo:'diana', n:0, meta:3,
+   d:'Entra alguien: arrastra el dedo hasta donde parará la bandera.'},
+  {t:'Entra gente', modo:'tabla', niveles:[0, 0, 1, 1], meta:4,
+   d:'Sumar es que <b>entre</b> alguien, con su signo.'},
+  {t:'Alguien se retira', modo:'tabla', niveles:[2, 2, 3, 3], meta:4,
+   d:'Restar es <b>retirar</b>. Si no hay nadie a quien retirar, entra una <b>pareja nula</b>.'},
+  {t:'Escríbelo', modo:'cron', n:0, meta:3,
+   d:'Mira lo que pasa en el campo y <b>escríbelo con signos</b>.'},
+  {t:'Cambiar de bando', modo:'tabla', niveles:[5], meta:4,
+   d:'Un frasco multiplica al que lo bebe. Con calavera, <b>cambia de bando</b>.'},
+  {t:'Cadena con pociones', modo:'diana', n:4, meta:3,
+   d:'Pasan dos jugadas con frascos y <b>solo hay una estaca</b>: la cuenta va por dentro.'},
+  {t:'El banco', modo:'tabla', niveles:[7, 8, 7, 8], forma:'banco', meta:4,
+   d:'El frasco escrito <b>delante</b> del paréntesis espera en el banco a que llegue toda la cuadrilla.'},
+  {t:'Potencias', modo:'tabla', niveles:[9], meta:3,
+   d:'<b>(−2)²</b> y <b>−2²</b> no son lo mismo: mira <b>quién entra</b> al campo.'},
   {t:'El ojo de Argos', modo:'argos', n:6, meta:3,
-   d:'Alguien ha resuelto una cadena larga, con restas y pociones, y en un paso ' +
-     '<b>se equivocó</b>. Señala el primero que está mal.'},
-  {t:'El taller', modo:'taller', n:0, meta:0,
-   d:'El campo entero para ti. Aquí no se puntúa nada.'}
+   d:'Alguien resolvió una cadena y en un paso <b>se equivocó</b>. Señala el primero que está mal.'}
 ];
 let ruta = null;
 let sesion = {t0: Date.now(), bien:0, mal:0, mision:{}};
@@ -4789,6 +4790,7 @@ function apuntaLogro(){
     ruta.hecho = true;
     setTimeout(() => asomo('jef'), ms(900));
   }
+  guardaTurno();          // antes se guardaba antes de sumar el acierto: se perdía el último
   pintaRuta();
 }
 const GUARDADO = 'pulso.turno.v1';
@@ -4799,7 +4801,7 @@ function guardaTurno(){
   if(!turnoDesde) turnoDesde = Date.now();
   try{
     localStorage.setItem(GUARDADO, JSON.stringify({
-      v:1, ts:Date.now(), t0:turnoDesde, i:ruta.i, hechas:ruta.hechas, sesion:sesion,
+      v:2, ts:Date.now(), t0:turnoDesde, i:ruta.i, hechas:ruta.hechas, sesion:sesion,
       cameos:cameosVistos
     }));
   }catch(e){  }
@@ -4807,7 +4809,7 @@ function guardaTurno(){
 function leeTurno(){
   try{
     const d = JSON.parse(localStorage.getItem(GUARDADO) || 'null');
-    if(!d || d.v !== 1 || typeof d.i !== 'number') return null;
+    if(!d || d.v !== 2 || typeof d.i !== 'number') return null;
     if(Date.now() - (d.t0 || d.ts) > CADUCA){ borraTurno(); return null; }
     return d;
   }catch(e){ return null; }
@@ -4838,6 +4840,7 @@ function arrancaMision(i){
   else if(m.modo === 'cron'){ modoBotones('cronista'); arrancaCronista(m.n); }
   else if(m.modo === 'argos'){ modoBotones('argos'); arrancaArgos(m.n); }
   else if(m.modo === 'canon'){ modoBotones('canon'); arrancaCanon(m.n); }
+  else if(m.modo === 'tabla'){ modoBotones('calc'); arrancaTabla(m); }
   else modoBotones('taller');
   pintaRuta();
 }
@@ -5029,7 +5032,14 @@ $('aLetra').addEventListener('click', () => {
    pantalla y no decía una palabra del panel que el alumno tenía delante.
    Ahora cada modo tiene su parada, y solo se enseñan las que están a la
    vista: las que no, ni se cuentan (el «3 de 9» ya no miente). */
+/* LA GUÍA (v7): cinco paradas comunes y, si se ven, la del modo que toca */
 const VISITA = [
+  {sel:'#ruta', c:'La ruta',
+   t:'Diez misiones, de una en una. Aquí ves la que toca y cuántas llevas.'},
+  {sel:'.cl-tabla', c:'La tablilla',
+   t:'La cuenta, escrita como en el cuaderno. Es la herramienta de toda la app: con ella se aprende y con ella se comprueba.'},
+  {sel:'#clResp', c:'Tu respuesta',
+   t:'Escribe <b>dónde acabará la bandera</b>. Si dudas, <b>▶</b> juega la cuenta en el campo.'},
   {sel:'#cnLinea', c:'La pregunta',
    t:'Aquí no hay nada que calcular: se pregunta por la <b>fuerza</b> de un tirador —el número sin el signo— o por <b>cuál de dos queda más a la izquierda</b>. Es la vara con la que se mide todo lo demás.'},
   {sel:'#dnJugada', c:'Lo que va a pasar',
@@ -5038,27 +5048,10 @@ const VISITA = [
    t:'Pasa algo en el campo y tú lo <b>escribes como una operación</b>. Si tu escritura deja la bandera en el mismo sitio, vale: dos cuentas que acaban en el mismo punto son la misma cuenta.'},
   {sel:'#agLista', c:'El ojo de Argos',
    t:'Alguien ha resuelto la cadena y en un renglón se equivocó de signo. Desde ahí todo sale torcido, pero <b>culpable solo hay uno</b>: señala el primero.'},
-  {sel:'#opLinea', c:'Lo que hay que resolver',
-   t:'Aquí sale la <b>operación</b>. Cada paréntesis es alguien que entra, que se va o que se bebe un ánfora.'},
-  {sel:'#opResp', c:'Tu respuesta',
-   t:'Escribes el <b>resultado</b> con el teclado del móvil. Vale el guion normal para el menos, e <b>Intro</b> comprueba.'},
-  {sel:'#opVer', c:'Si no lo ves',
-   t:'Este botón abre <b>el campo</b>. No es hacer trampa: es la ayuda.',
-   hacer: () => { if(oper && !oper.visto) abreCampo(); }},
-  {sel:'.campo', siempre:true, c:'El tira y afloja',
-   t:'Los de la derecha tiran hacia los <b>positivos</b> y los de la izquierda hacia los <b>negativos</b>. Que alguien <b>entre</b> es sumar su número, con su signo; que se <b>retire</b> es restarlo. Donde para la bandera es el resultado, y abajo tienes la recta numérica.'},
-  {sel:'#opPasos', siempre: () => !!oper, c:'Fotograma a fotograma',
-   t:'Cada <b>▶</b> es un término de la operación, y se puede volver <b>◀</b> atrás. Arriba se enciende el término que está pasando.',
-   hacer: () => { if(oper && oper.paso === 0) vePaso(1, true); }},
-    {sel:'.campo', siempre:true, c:'Retirar a varios de golpe',
-   t:'Deja el dedo <b>medio segundo</b> sobre un tirador y se abre la <b>cuadrilla</b>: tocando a los demás los vas sumando. Luego, o les cae <b>el rayo</b> a todos —restarlos de una vez— o se beben <b>el mismo frasco</b>, que eso es un paréntesis.'},
-  {sel:'#pociones', siempre:true, c:'Las ánforas',
-   t:'Un ánfora multiplica <b>a un tirador</b>, no al campo entero: por eso el producto va <b>antes</b> que la suma. Aparecen cuando la jugada las usa.',
-   hacer: () => { $('cajonPociones').hidden = false; $('cajonPociones').open = true; }},
-  {sel:'#ruta', c:'La ruta',
-   t:'Las misiones, de una en una y cada una con lo suyo. En algunas es al revés: pasan las jugadas y <b>tú dices dónde parará</b> la bandera arrastrando el dedo.'},
-  {sel:'.menus', c:'Y ya está',
-   t:'Aquí arriba tienes el <b>glosario</b>, el <b>taller</b> para trastear libre y los <b>ajustes</b>. A jugar.'}
+  {sel:'.campo', siempre:true, c:'El campo',
+   t:'Los de la derecha tiran hacia los <b>positivos</b> y los de la izquierda hacia los <b>negativos</b>. Entrar es sumar; retirarse, restar. Donde para la bandera, el resultado.'},
+  {sel:'.menus', siempre:true, c:'Y ya está',
+   t:'Arriba: la <b>tablilla</b> libre, el <b>taller</b> para trastear y los ajustes. A jugar.'}
 ];
 let visita = -1, paradas = [], tourRetoque = 0;
 function seVe(el){
@@ -5286,7 +5279,8 @@ if(typeof window !== 'undefined' && window.addEventListener)
 $('aviso').innerHTML = 'Pulsa un tirador para marcarlo: podrás darle una poción o ' +
   'retirarlo con la cruz. Retirar es <b>restar</b>. Los frascos <b>estrechos</b> ' +
   'reparten (dividen) y los de <b>calavera</b> cambian de bando.';
-if(!retomaTurno()) arrancaMision(0);
+/* el arranque (retomar el turno o la misión 1) va al final del todo: la
+   tablilla y las entrevistas tienen que estar montadas antes */
 
 /* ── LA TABLILLA DE LISTILLÓN ─────────────────────────────────────────────
    Una calculadora cuyas teclas son tiradores y frascos. Se escribe como en
@@ -5300,7 +5294,8 @@ if(!retomaTurno()) arrancaMision(0);
    Primero se simula la cuenta entera (sin dibujar nada) para que Listillón
    avise de lo que no se puede jugar; luego se juega de verdad.            */
 const MAX_F = 12;                    // fuerza máxima de un tirador en la palestra (la tablilla alarga la regla)
-const esFactor = t => t && (t.t === 'n' || t.t === ')' || (t.t === 'p' && !t.pre));
+const esFactor = t => t && (t.t === 'n' || t.t === ')' || t.t === 'e' || (t.t === 'p' && !t.pre));
+const SUP = {2:'²', 3:'³'};
 function frascoHtml(po){
   return '<span class="frasco">' +
       '<span class="corcho"></span><span class="cuello"></span>' +
@@ -5322,6 +5317,7 @@ function miniTirador(f){
 }
 function arrancaCalc(){
   calc = {tok:[], jugando:false, teatro:0, ultimo:null};
+  $('clEj').hidden = true; $('clTeclas').hidden = false; $('clPie').hidden = false;
   diana = null; cron = null; oper = null; argos = null; canon = null; mudo = false;
   $('calc').hidden = false;
   $('panelOper').hidden = true;
@@ -5343,7 +5339,7 @@ function arrancaCalc(){
 }
 /* ── la escritura ── */
 function teclaCalc(tk){
-  if(!calc) return;
+  if(!calc || calc.ej) return;
   if(calc.jugando){ $('clAviso').innerHTML = 'Espera a que acabe la función, que están actuando.'; return; }
   const T = calc.tok, ult = T[T.length - 1];
   const abiertos = T.filter(t => t.t === '(').length - T.filter(t => t.t === ')').length;
@@ -5375,6 +5371,14 @@ function teclaCalc(tk){
         'mismo que <b>(…) : 2</b>. Escribe primero a quién se reparte y luego el frasco.';
       return;
     }
+  }else if(tk.t === 'e'){
+    /* el cuadrado va pegado a un tirador o a un paréntesis */
+    if(!ult || (ult.t !== 'n' && ult.t !== ')')){
+      $('clAviso').innerHTML = 'El <b>' + SUP[tk.n] + '</b> va pegado a un tirador o a un paréntesis: ' +
+        '<b>(−2)²</b> o <b>(1 − 3)²</b>.';
+      return;
+    }
+    T.push({t:'e', n:tk.n});
   }else if(tk.t === 'borra'){
     T.pop();
   }
@@ -5391,8 +5395,11 @@ const numCalc = (f, primero) => '<span class="' + (f < 0 ? 'izq' : 'der') + '">'
 function pintaCalc(){
   if(!calc) return;
   let h = '', primero = true;
-  calc.tok.forEach(t => {
-    if(t.t === 'n'){ h += numCalc(t.f, primero); primero = false; }
+  calc.tok.forEach((t, i) => {
+    const sig = calc.tok[i + 1];
+    /* un negativo elevado va siempre entre paréntesis: (−2)² no es −2² */
+    if(t.t === 'n'){ h += numCalc(t.f, primero && !(sig && sig.t === 'e' && t.f < 0)); primero = false; }
+    else if(t.t === 'e') h += '<sup class="cl-exp">' + t.n + '</sup>';
     else if(t.t === '+'){ h += '<span class="op"> + </span>'; primero = false; }
     else if(t.t === '-'){ h += '<span class="op">' + (primero ? '−' : ' − ') + '</span>'; primero = false; }
     else if(t.t === '('){ h += '<span class="op">(</span>'; primero = true; }
@@ -5433,8 +5440,10 @@ function parseCalc(T){
       i++;
       factor = {t:'g', expr:dentro};
     }else err('Ahí falta un tirador o un paréntesis.');
+    let exp = 1;
+    if(T[i] && T[i].t === 'e'){ exp = T[i].n; i++; }
     while(T[i] && T[i].t === 'p' && !T[i].pre){ post.push(T[i].k); i++; }
-    return {pre, factor, post};
+    return {pre, factor, exp, post};
   }
   if(!T.length) err('Todavía no has escrito nada.');
   const e = expr();
@@ -5449,8 +5458,9 @@ function escribeArbol(e, jugado, primero){
     else if(n > 0) h += ' + ';
     const ini = primero && n === 0 && t.sign === '+';
     if(!jugado) t.pre.forEach(p => { h += preTxt(p.k); });
-    h += t.factor.t === 'n' ? numCuaderno(t.factor.f, ini && (jugado || !t.pre.length))
+    h += t.factor.t === 'n' ? numCuaderno(t.factor.f, ini && (jugado || !t.pre.length) && !(t.exp > 1 && t.factor.f < 0))
                             : '(' + escribeArbol(t.factor.expr, jugado, true) + ')';
+    if(t.exp > 1) h += SUP[t.exp];
     t.post.forEach(k => { h += etqDe(k); });
     if(jugado) t.pre.slice().reverse().forEach(p => { h += etqDe(p.k); });
   });
@@ -5459,7 +5469,7 @@ function escribeArbol(e, jugado, primero){
 /* ── el intérprete: el mismo guion para la simulación y para el teatro ── */
 async function juegaExpr(e, ambito, B){
   for(const t of e.terms){
-    const suelto = t.factor.t === 'n' && !t.pre.length && !t.post.length;
+    const suelto = t.factor.t === 'n' && !t.pre.length && !t.post.length && !(t.exp > 1);
     if(t.sign === '-' && suelto){
       const f = t.factor.f;
       const id = ambito.find(q => B.f(q) === f);
@@ -5491,6 +5501,23 @@ async function juegaTermino(t, B){
     if(t.pre.length || t.post.length)
       await B.saco(ids, 'La cuadrilla del paréntesis ya está en el campo' +
         (ids.length ? '' : ', aunque se ha quedado vacía: vale 0') + '.');
+  }
+  /* LA POTENCIA: elevar es multiplicar por sí mismo, así que el tirador se
+     bebe su propio frasco (el −2, la Traición doble) una vez menos que el
+     exponente. Un paréntesis, antes, se junta en uno */
+  if(t.exp > 1){
+    if(ids.length > 1) ids = await B.junta(ids, 'Para elevar el paréntesis, la cuadrilla se <b>junta en uno</b>: ' +
+      'un paréntesis vale lo que su suma.');
+    if(ids.length){
+      const v = B.f(ids[0]);
+      const po = POCIONES.find(x => x.k === v);
+      if(v !== 1){
+        if(!po) throw new Error('Para elevar, el tirador se bebe <b>su propio frasco</b>, y no hay frasco de ·' + v + '.');
+        for(let r = 1; r < t.exp; r++)
+          await B.bebe(ids, v, null, 'Elevar es multiplicar por sí mismo: el <b>' + conSigno(v) + '</b> se bebe ' +
+            '<b>su propio frasco</b> (' + po.n + ', ' + po.e + ')' + (t.exp > 2 ? ', ' + (t.exp - 1) + ' veces' : '') + '.');
+      }
+    }
   }
   /* si el frasco no se puede dar a cada uno de dentro (le tocaría medio
      tirador, o una fuerza que no cabe) pero sí a la cuadrilla entera, la
@@ -5652,6 +5679,7 @@ function exacto(e){
   let tot = [0, 1];
   e.terms.forEach(t => {
     let v = t.factor.t === 'n' ? [t.factor.f, 1] : exacto(t.factor.expr);
+    if(t.exp > 1) v = [Math.pow(v[0], t.exp), Math.pow(v[1], t.exp)];
     t.pre.map(p => p.k).concat(t.post).forEach(k => { const f = fracDe(k); v = frac(v[0] * f[0], v[1] * f[1]); });
     if(t.sign === '-') v = [-v[0], v[1]];
     tot = frac(tot[0] * v[1] + v[0] * tot[1], tot[1] * v[1]);
@@ -5729,6 +5757,120 @@ async function igualCalc(){
   $('clAviso').innerHTML = h;
   $('clEscena').innerHTML = h;
 }
+/* ── LOS EJERCICIOS DE LA RUTA, EN LA TABLILLA ──────────────────────────
+   Lo que antes era el panel de Operaciones: la cuenta aparece escrita en la
+   tablilla, el alumno pone dónde acaba la bandera y, si duda, ▶ la juega
+   en el campo. Una sola herramienta para aprender y para comprobar.       */
+function pasosATok(ej, prefijo){
+  const T = [], ps = ej.pasos;
+  const num = (f, op, dentro) => { if(dentro.algo) T.push({t:op}); else if(op === '-') T.push({t:'-'}); T.push({t:'n', f}); dentro.algo = true; };
+  const todos = ps.find(j => j.tipo === 'todos'), purga = ps.find(j => j.tipo === 'purga');
+  if(todos){
+    const k = todos.k, delante = prefijo && Number.isInteger(k);
+    if(delante) T.push({t:'p', k, pre:true});
+    T.push({t:'('});
+    const g = {algo:false};
+    ps.filter(j => j.tipo === 'alta').forEach(j => num(j.f, '+', g));
+    T.push({t:')'});
+    if(!delante) T.push({t:'p', k, pre:false});
+    return T;
+  }
+  const g = {algo:false};
+  ps.forEach(j => {
+    if(j.tipo === 'alta') num(j.f, '+', g);
+    else if(j.tipo === 'baja') num(j.f, '-', g);
+    else if(j.tipo === 'termino'){ num(j.f, '+', g); T.push({t:'p', k:j.k, pre:false}); }
+    else if(j.tipo === 'potencia'){
+      if(j.menos){ T.push({t:'-'}); T.push({t:'n', f:j.f}); }
+      else{ if(g.algo) T.push({t:'+'}); T.push({t:'n', f:j.f}); }
+      T.push({t:'e', n:j.n}); g.algo = true;
+    }else if(j.tipo === 'purga'){
+      T.push({t:'-'}); T.push({t:'('});
+      const d = {algo:false};
+      j.fs.forEach(f => num(f, '+', d));
+      T.push({t:')'});
+    }
+  });
+  return T;
+}
+function nivelTabla(){
+  const m = calc && calc.ej && calc.ej.m;
+  if(!m) return 0;
+  const hechas = ruta ? ruta.hechas : 0;
+  return m.niveles ? m.niveles[Math.min(hechas, m.niveles.length - 1)] : m.n;
+}
+function arrancaTabla(m){
+  arrancaCalc();
+  calc.ej = {m, aciertos:0, solas:0, actual:null};
+  $('clEj').hidden = false; $('clTeclas').hidden = true; $('clPie').hidden = true;
+  rondaTabla();
+}
+async function rondaTabla(){
+  if(!calc || !calc.ej) return;
+  const yo = calc;
+  calc.teatro++; calc.jugando = false; calc.ultimo = null; calc.ultimoTxt = null;
+  reglaNormal();
+  let ej, tok;
+  /* la escritura tiene que valer lo mismo que el ejercicio, y la cuenta
+     tiene que poder jugarse en el campo (cinco por lado, fuerzas enteras) */
+  for(let k = 0; k < 40; k++){
+    ej = generaOperacion(nivelTabla());
+    tok = pasosATok(ej, calc.ej.m.forma === 'banco');
+    try{
+      const arbol = parseCalc(tok).arbol, v = exacto(arbol);
+      if(v[1] !== 1 || v[0] !== ej.valor) continue;
+      const S = simulador(); await juegaExpr(arbol, [], S);
+      if(S.suma() === ej.valor) break;
+    }catch(e){}
+  }
+  if(calc !== yo || !calc.ej) return;
+  calc.tok = tok;
+  calc.ej.actual = {ej, visto:false, fase:'pensando'};
+  tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
+  bebiendoIds.clear(); retirandoIds.clear();
+  pintaBanco([]); pinta();
+  $('clResp').value = '';
+  $('clEscena').hidden = true;
+  $('clAviso').innerHTML = '¿Dónde acaba la bandera? Si dudas, pulsa <b>▶</b> y mírala en el campo.';
+  pintaTabla();
+}
+function pintaTabla(){
+  if(!calc || !calc.ej) return;
+  $('clMarca').innerHTML = '<span class="fi">resueltas <b>' + calc.ej.aciertos + '</b></span>' +
+    '<span class="fi ambar">sin mirar <b>' + calc.ej.solas + '</b></span>';
+  pintaCalc();
+}
+function compruebaTabla(){
+  if(!calc || !calc.ej || !calc.ej.actual) return;
+  const A = calc.ej.actual, resp = String($('clResp').value).trim();
+  if(A.fase === 'bien' || !resp) return;
+  if(!esEntero(resp)){ $('clAviso').innerHTML = 'Escribe un número: con cifras, y el signo delante si lo lleva.'; return; }
+  const dicho = parseInt(resp.replace(/[−–]/g, '-'), 10), v = A.ej.valor;
+  if(dicho === v){
+    A.fase = 'bien';
+    calc.ej.aciertos++;
+    if(!A.visto) calc.ej.solas++;
+    $('clAviso').innerHTML = '<b>Correcto.</b> ' + (v === 0 ? 'Empate: el <b>0</b> no es de ningún bando. ' : '') +
+      (A.visto ? 'La próxima, intenta sin mirar el campo.' : '<b>Y sin mirar el campo.</b>');
+    apuntaLogro();
+    pintaTabla();
+    const yo = calc;
+    setTimeout(() => { if(calc === yo && calc.ej && calc.ej.actual === A) rondaTabla(); }, ms(2000));
+  }else{
+    apuntaFallo();
+    const porque = queHaPasado(A.ej, dicho);
+    $('clAviso').innerHTML = 'No es <b>' + resp.replace('-', '−') + '</b>. ' +
+      (porque || 'Pulsa <b>▶</b> y mira dónde para la bandera.');
+    $('clResp').value = '';
+  }
+}
+$('clComprueba').addEventListener('click', compruebaTabla);
+$('clResp').addEventListener('keydown', ev => { if(ev.key === 'Enter'){ ev.preventDefault(); compruebaTabla(); } });
+$('clVer').addEventListener('click', () => {
+  if(!calc || !calc.ej || calc.jugando) return;
+  if(calc.ej.actual && calc.ej.actual.fase !== 'bien') calc.ej.actual.visto = true;
+  igualCalc();
+});
 (function montaCalc(){
   const el = $('clTeclas');
   const fila = cls => { const d = document.createElement('div'); d.className = 'cl-fila ' + cls; el.appendChild(d); return d; };
@@ -5754,6 +5896,8 @@ async function igualCalc(){
   tecla(fo, '−', 'cl-o', 'Menos: que se retire', () => teclaCalc({t:'-'}));
   tecla(fo, '(', 'cl-o', 'Abre paréntesis', () => teclaCalc({t:'('}));
   tecla(fo, ')', 'cl-o', 'Cierra paréntesis', () => teclaCalc({t:')'}));
+  tecla(fo, '²', 'cl-o', 'Al cuadrado', () => teclaCalc({t:'e', n:2}));
+  tecla(fo, '³', 'cl-o', 'Al cubo', () => teclaCalc({t:'e', n:3}));
   tecla(fo, '⌫', 'cl-o', 'Borra lo último', () => teclaCalc({t:'borra'}));
   tecla(fo, '=', 'cl-o cl-igual scan', 'Igual: que empiece el teatro', igualCalc).id = 'clIgual';
   $('clOtra').addEventListener('click', () => { if(calc && !calc.jugando && calc.tok.length) igualCalc(); });
@@ -5777,7 +5921,7 @@ async function igualCalc(){
 })();
 $('mCalc').addEventListener('click', () => { alTaller(); modoBotones('calc'); arrancaCalc(); });
 $('bTablilla').addEventListener('click', () => {
-  if(calc) return;                       // ya estamos en ella
+  if(calc && !calc.ej) return;           // ya estamos en la tablilla libre
   alTaller(); modoBotones('calc'); arrancaCalc();
 });
 
@@ -6075,6 +6219,8 @@ $('aEntrevista').addEventListener('click', () => { alTaller(); modoBotones('entr
   try{ document.documentElement.dataset.aula = localStorage.getItem(LLAVE) === 'si' ? 'si' : 'no'; }catch(e){}
   pintaAula();
 })();
+/* ── EL ARRANQUE ── con todo ya montado */
+if(!retomaTurno()) arrancaMision(0);
 </script>
 </body>
 </html>
