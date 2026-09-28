@@ -1256,15 +1256,16 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
 /* a saltos: unas nueve imágenes por movimiento, como cartulinas */
 .campo.hojeo *, .campo.hojeo *::before, .campo.hojeo *::after{
   animation-timing-function:steps(9, end) !important; transition-timing-function:steps(9, end) !important}
-/* la cartela de cine mudo, con la matemática en corto */
-body[data-modo="calc"] .cartela:not([hidden]){display:block;position:absolute;top:24px;left:50%;
-  transform:translateX(-50%);z-index:14;pointer-events:none;max-width:86%;
+/* la cartela de cine mudo, con la matemática en corto. Va justo encima del
+   campo, no dentro: dentro tapaba a Zeus y lo de arriba de la escena */
+body[data-modo="calc"] .cartela:not([hidden]){display:block;position:relative;
+  margin:0 auto 8px;pointer-events:none;max-width:100%;box-sizing:border-box;
   padding:3px 12px;border-radius:5px;text-align:center;white-space:nowrap;
   font-family:'Space Mono',monospace;font-size:16px;line-height:1.35;color:#F2EDE2;
   background:rgba(12,8,20,.86);border:2px solid #E9B84E;box-shadow:0 0 0 3px rgba(12,8,20,.86)}
 .cartela b{color:#F9D98A}
 .cartela.nueva{animation:cartelaEntra .25s steps(3, end)}
-@keyframes cartelaEntra{from{opacity:0;transform:translate(-50%,-6px)}}
+@keyframes cartelaEntra{from{opacity:0;transform:translateY(-6px)}}
 [data-tema="tablilla"] body[data-modo="calc"] .cartela:not([hidden]),
 [data-tema="tablilla"] .cartela{color:#241b36;background:#f7f0de;border-color:#8a6a3b;box-shadow:0 0 0 3px #f7f0de}
 /* en la tablilla, la cuenta de encima del campo repetía lo que ya está escrito */
@@ -1329,7 +1330,10 @@ body[data-modo="calc"] .regla.viva{animation:reglaLlama 1.2s ease-in-out infinit
 @keyframes reglaLlama{to{border-top-color:#F9D98A;box-shadow:inset 0 1px 0 rgba(255,236,196,.3), 0 -8px 18px rgba(233,184,78,.25)}}
 @media (prefers-reduced-motion: reduce){ .hoja-vuelta.va, .hoja-vuelta.vuelve, .manaza.pasa *{animation:none} }
 /* ── la cartela karaoke ── */
-body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;width:max-content;padding:4px 12px}
+body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:100%;width:max-content;padding:4px 12px}
+/* altura fija para tres renglones: si no, el campo subía y bajaba a cada fotograma */
+body[data-modo="calc"] .cartela:not([hidden]){display:flex;flex-direction:column;justify-content:center;min-height:76px}
+[data-tema="tablilla"] .cartela b{color:#7f5a0e}
 .ct-cuenta{display:block;font-size:17px;line-height:1.5}
 .ct-cuenta .op{color:#C9BFD6}
 .ct-on{background:#E9B84E;border-radius:4px;padding:2px 3px;margin:0 1px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
@@ -1440,7 +1444,7 @@ body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;w
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.1</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.2</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1569,9 +1573,9 @@ body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;w
     <div class="m-lado d"><b class="m-n" id="mDer">0</b>
       <span class="m-t">Derecha</span></div>
   </div>
+  <div class="cartela" id="cartela" role="status" hidden></div>
   <div class="campo">
     <div class="mazo" aria-hidden="true"><i class="lomo"></i><i class="canto-i"></i><i class="canto-d"></i><i class="hoja-vuelta"></i><i class="mazo-esquina"></i></div>
-    <div class="cartela" id="cartela" role="status" hidden></div>
         <div class="dial" id="dial" hidden></div>
         <div class="escena" id="escena">
         <div class="friso" aria-hidden="true"></div>
@@ -5972,7 +5976,8 @@ function veredicto(P, k, o){
   const dicho = P.dichos[k - 1], real = P.sumas[k - 1];
   const v = dicho === real ? '<b>¡clavado!</b>'
     : 'dijiste ' + conSigno(dicho) + ', acaba en <b>' + conSigno(real) + '</b>';
-  return (o && o.x ? o.x + ' · ' : '') + v;
+  /* en otra línea: un «·» de separador se leía como un por */
+  return (o && o.x ? o.x + '<br>' : '') + v;
 }
 /* ▶▶ repasa la función entera de un tirón, sin preguntas. Se para en
    cuanto se toca otro botón */
