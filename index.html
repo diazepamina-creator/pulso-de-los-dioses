@@ -1237,6 +1237,41 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
 .cl-resp .scan{flex:0 0 auto;padding:0 16px}
 .cl-ver{width:100%}
 .calc:has(#clEj:not([hidden])) .cl-cursor{display:none}
+
+/* ── EL FOLIOSCOPIO ── */
+.mazo, .cartela{display:none}
+body[data-modo="calc"] .mazo{display:block;position:absolute;inset:0;z-index:13;pointer-events:none;
+  /* los cantos de las hojas, apilados abajo y a la derecha */
+  box-shadow:inset -2px -2px 0 #efe6cf, inset -3px -3px 0 #b9a47a, inset -5px -5px 0 #f2e9d4,
+    inset -6px -6px 0 #b9a47a, inset -8px -8px 0 #efe6cf, inset -9px -9px 0 #a8926a;
+  border-radius:10px}
+.mazo-esquina{position:absolute;right:0;bottom:0;width:26px;height:26px;
+  background:linear-gradient(135deg,transparent 50%,#f6eedb 50%,#d9c8a0 100%);
+  border-top-left-radius:6px;transform-origin:100% 100%;filter:drop-shadow(-2px -2px 2px rgba(0,0,0,.25))}
+.campo.hojeo .mazo{box-shadow:inset -3px -2px 0 #efe6cf, inset -4px -4px 0 #b9a47a, inset -6px -5px 0 #f2e9d4,
+    inset -7px -7px 0 #b9a47a, inset -9px -8px 0 #efe6cf, inset -10px -10px 0 #a8926a}
+.campo.hojeo.h1 .mazo{box-shadow:inset -2px -3px 0 #efe6cf, inset -3px -4px 0 #b9a47a, inset -5px -6px 0 #f2e9d4,
+    inset -6px -7px 0 #b9a47a, inset -8px -9px 0 #efe6cf, inset -9px -10px 0 #a8926a}
+.campo.hojeo .mazo-esquina{transform:rotate(calc(var(--hoja,0) * -9deg)) scale(1.25)}
+.campo.hojeo.h1 .escena{filter:brightness(1.05)}
+/* a saltos: unas nueve imágenes por movimiento, como cartulinas */
+.campo.hojeo *, .campo.hojeo *::before, .campo.hojeo *::after{
+  animation-timing-function:steps(9, end) !important; transition-timing-function:steps(9, end) !important}
+/* la cartela de cine mudo, con la matemática en corto */
+body[data-modo="calc"] .cartela:not([hidden]){display:block;position:absolute;top:24px;left:50%;
+  transform:translateX(-50%);z-index:14;pointer-events:none;max-width:86%;
+  padding:3px 12px;border-radius:5px;text-align:center;white-space:nowrap;
+  font-family:'Space Mono',monospace;font-size:16px;line-height:1.35;color:#F2EDE2;
+  background:rgba(12,8,20,.86);border:2px solid #E9B84E;box-shadow:0 0 0 3px rgba(12,8,20,.86)}
+.cartela b{color:#F9D98A}
+.cartela.nueva{animation:cartelaEntra .25s steps(3, end)}
+@keyframes cartelaEntra{from{opacity:0;transform:translate(-50%,-6px)}}
+[data-tema="tablilla"] body[data-modo="calc"] .cartela:not([hidden]),
+[data-tema="tablilla"] .cartela{color:#241b36;background:#f7f0de;border-color:#8a6a3b;box-shadow:0 0 0 3px #f7f0de}
+/* en la tablilla, la cuenta de encima del campo repetía lo que ya está escrito */
+body[data-modo="calc"] #zonaCuenta{display:none}
+/* y los números que flotan: la cartela ya lo dice */
+body[data-modo="calc"] .flota{display:none}
 </style>
 </head>
 <body>
@@ -1338,7 +1373,7 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.2</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.3</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1468,6 +1503,8 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
       <span class="m-t">Derecha</span></div>
   </div>
   <div class="campo">
+    <div class="mazo" aria-hidden="true"><i class="mazo-esquina"></i></div>
+    <div class="cartela" id="cartela" role="status" hidden></div>
         <div class="dial" id="dial" hidden></div>
         <div class="escena" id="escena">
         <div class="friso" aria-hidden="true"></div>
@@ -3728,18 +3765,15 @@ function queHaPasado(ej, dicho){
   const hay = t => pasos.some(j => j.tipo === t);
   /* 1. el menos de delante del paréntesis, solo al primero */
   if(hay('purga') && conMal(j => j.tipo === 'purga') === dicho && dicho !== v)
-    return 'Has quitado solo al primero de dentro del paréntesis. El menos de delante ' +
-      'alcanza a <b>todos</b>: caen <b>dos rayos</b>.';
+    return 'El menos alcanza a <b>todos</b> los de dentro.';
   /* 2. potencias: −2² leído como (−2)², o al revés */
   if(hay('potencia')){
     const j = pasos.find(x => x.tipo === 'potencia');
     if(conMal(x => x.tipo === 'potencia') === dicho && dicho !== v)
       return j.menos
-        ? 'En <b>−' + j.f + '<sup>' + j.n + '</sup></b> no hay paréntesis: se eleva el <b>' + j.f +
-          '</b> y el menos va <b>al final</b>. No es lo mismo que (−' + j.f + ')<sup>' + j.n + '</sup>.'
-        : 'En <b>(' + conSigno(j.f) + ')<sup>' + j.n + '</sup></b> el paréntesis mete el menos ' +
-          '<b>dentro</b>: se multiplica ' + j.n + ' veces el ' + conSigno(j.f) + ', con su signo. ' +
-          (j.n % 2 === 0 ? 'Menos por menos, más.' : 'Con un número impar de menos, queda menos.');
+        ? '<b>−' + j.f + '<sup>' + j.n + '</sup></b>: se eleva el ' + j.f + '; el menos, al final.'
+        : '<b>(' + conSigno(j.f) + ')<sup>' + j.n + '</sup></b>: el menos va dentro. ' +
+          (j.n % 2 === 0 ? 'Menos por menos, más.' : 'Impar: queda menos.');
   }
   /* 3. paréntesis: el frasco solo para el último */
   if(hay('todos')){
@@ -3747,8 +3781,7 @@ function queHaPasado(ej, dicho){
     const dentro = pasos.filter(x => x.tipo === 'alta').map(x => x.f);
     const soloUltimo = sumaSim(dentro.slice(0, -1)) + dentro[dentro.length - 1] * j.k;
     if(soloUltimo === dicho && dicho !== v)
-      return 'El frasco <b>' + j.e + '</b> es para <b>todos</b> los de dentro del paréntesis, ' +
-        'no solo para el último: todos beben.';
+      return 'El frasco es para <b>todos</b> los de dentro.';
   }
   /* 4. la jerarquía: el frasco se lo bebe el campo entero en vez del que entra */
   if(hay('termino')){
@@ -3759,19 +3792,15 @@ function queHaPasado(ej, dicho){
       else if(j.tipo === 'termino') r = (r + j.f) * j.k;
     });
     if(Number.isInteger(r) && r === dicho && dicho !== v)
-      return 'Has sumado antes de multiplicar. El frasco se lo bebe <b>solo el tirador que ' +
-        'entra</b>, no todo el campo: primero el producto y luego la suma.';
+      return 'Primero el frasco, <b>luego</b> la suma.';
     if(conMal(j => j.tipo === 'termino') === dicho && dicho !== v)
-      return 'Mira el signo del producto: un frasco con calavera cambia de bando al que bebe, ' +
-        'y uno sin calavera lo deja en el suyo. <b>Menos por menos, más; más por menos, menos.</b>';
+      return 'Ojo al signo: <b>menos por menos, más</b>.';
   }
   /* 5. restar como si fuera sumar: − (−3) se queda en −3 */
   if(hay('baja') && conMal(j => j.tipo === 'baja') === dicho && dicho !== v){
     const j = pasos.find(x => x.tipo === 'baja');
-    return 'La resta se ha quedado en suma. <b>− (' + conSigno(j.f) + ')</b> es que se va ' +
-      (j.f < 0 ? 'uno que tiraba hacia la <b>izquierda</b>: la bandera se va a la <b>derecha</b>'
-               : 'uno que tiraba hacia la <b>derecha</b>: la bandera se va a la <b>izquierda</b>') +
-      '. Por eso − (' + conSigno(j.f) + ') = + (' + conSigno(-j.f) + ').';
+    return '<b>− (' + conSigno(j.f) + ') = + (' + conSigno(-j.f) + ')</b>: se va uno de la ' +
+      (j.f < 0 ? 'izquierda.' : 'derecha.');
   }
   /* 6. juntar las fuerzas sin mirar el bando */
   const abs = pasos.reduce((t, j) =>
@@ -3780,16 +3809,13 @@ function queHaPasado(ej, dicho){
     : j.tipo === 'baja' ? t - Math.abs(j.f) : t, 0);
   if(pasos.every(j => ['alta','baja','termino'].indexOf(j.tipo) >= 0) &&
      pasos.some(j => (j.f * (j.k || 1)) < 0) && abs === dicho && dicho !== v)
-    return 'Has juntado las fuerzas <b>sin mirar el bando</b>. Los de la izquierda tiran ' +
-      '<b>en contra</b> de los de la derecha: unos restan a los otros.';
+    return 'Cada bando tira <b>en contra</b> del otro.';
   /* 7. el número bien, el lado mal */
   if(dicho === -v && v !== 0)
-    return 'La <b>distancia al cero</b> es la buena, pero el <b>lado</b> no: la bandera para ' +
-      (v < 0 ? 'a la <b>izquierda</b>, en los negativos.' : 'a la <b>derecha</b>, en los positivos.');
+    return 'Buena distancia, <b>mal lado</b>.';
   /* 8. el cero: empate */
   if(v === 0)
-    return 'Mira bien: los dos bandos tiran <b>lo mismo</b>. Es un empate, y el empate es el ' +
-      '<b>0</b>, que no es de ningún bando.';
+    return 'Tiran lo mismo: <b>empate, 0</b>.';
   return '';
 }
 function compruebaOper(){
@@ -4384,25 +4410,25 @@ function arrancaCronista(grado){
    y Argos para acabar. La de antes (17) queda en la rama de respaldo. */
 const MISIONES = [
   {t:'Fuerza y bando', modo:'canon', n:2, meta:4,
-   d:'La fuerza es el número <b>sin signo</b>; el signo dice el bando. Y cuanto más a la izquierda, <b>menor</b>.'},
+   d:'Fuerza: el número sin signo. Más a la izquierda, <b>menor</b>.'},
   {t:'¿Dónde para?', modo:'diana', n:0, meta:3,
-   d:'Entra alguien: arrastra el dedo hasta donde parará la bandera.'},
+   d:'Arrastra hasta donde parará la bandera.'},
   {t:'Entra gente', modo:'tabla', niveles:[0, 0, 1, 1], meta:4,
-   d:'Sumar es que <b>entre</b> alguien, con su signo.'},
+   d:'Entrar es <b>sumar</b>, con su signo.'},
   {t:'Alguien se retira', modo:'tabla', niveles:[2, 2, 3, 3], meta:4,
-   d:'Restar es <b>retirar</b>. Si no hay nadie a quien retirar, entra una <b>pareja nula</b>.'},
+   d:'Retirarse es <b>restar</b>.'},
   {t:'Escríbelo', modo:'cron', n:0, meta:3,
-   d:'Mira lo que pasa en el campo y <b>escríbelo con signos</b>.'},
+   d:'Lo que pasa, <b>con signos</b>.'},
   {t:'Cambiar de bando', modo:'tabla', niveles:[5], meta:4,
-   d:'Un frasco multiplica al que lo bebe. Con calavera, <b>cambia de bando</b>.'},
+   d:'Con calavera, <b>cambia de bando</b>.'},
   {t:'Cadena con pociones', modo:'diana', n:4, meta:3,
-   d:'Pasan dos jugadas con frascos y <b>solo hay una estaca</b>: la cuenta va por dentro.'},
+   d:'Dos jugadas, <b>una estaca</b>.'},
   {t:'El banco', modo:'tabla', niveles:[7, 8, 7, 8], forma:'banco', meta:4,
-   d:'El frasco escrito <b>delante</b> del paréntesis espera en el banco a que llegue toda la cuadrilla.'},
+   d:'El frasco de delante <b>espera</b>.'},
   {t:'Potencias', modo:'tabla', niveles:[9], meta:3,
-   d:'<b>(−2)²</b> y <b>−2²</b> no son lo mismo: mira <b>quién entra</b> al campo.'},
+   d:'<b>(−2)²</b> no es <b>−2²</b>.'},
   {t:'El ojo de Argos', modo:'argos', n:6, meta:3,
-   d:'Alguien resolvió una cadena y en un paso <b>se equivocó</b>. Señala el primero que está mal.'}
+   d:'¿Dónde está el <b>primer fallo</b>?'}
 ];
 let ruta = null;
 let sesion = {t0: Date.now(), bien:0, mal:0, mision:{}};
@@ -4751,6 +4777,7 @@ const FRASES = {
 };
 let asomoTok = 0;
 function asomo(quien, texto){
+  if(calc && calc.pel) return;           // durante la función, la cartela manda
   const campo = document.querySelector('.campo');
   if(!campo || $('panelCampo').hidden) return;
   const viejo = campo.querySelector('.asomo'); if(viejo) viejo.remove();
@@ -4862,6 +4889,7 @@ $('aVolverRuta').addEventListener('click', () => {
 });
 function modoBotones(m){
   document.body.dataset.fase = m === 'taller' ? 'taller' : 'juego';
+  document.body.dataset.modo = m;
   $('bTablilla').setAttribute('aria-pressed', String(m === 'calc'));
   $('mOper').setAttribute('aria-pressed', String(m === 'oper'));
   $('mCron').setAttribute('aria-pressed', String(m === 'cronista'));
@@ -5336,8 +5364,7 @@ function arrancaCalc(){
   tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
   pintaBanco([]);
   pinta();
-  $('clAviso').innerHTML = 'Escribe una cuenta con las teclas, como en el cuaderno, y pulsa ' +
-    '<b>=</b>: la jugamos en el campo. Prueba con <b>−2 + 3·(−2 + 1)</b>.';
+  $('clAviso').innerHTML = 'Escribe una cuenta y pulsa <b>=</b>.';
   pintaCalc();
 }
 /* ── la escritura ── */
@@ -5394,6 +5421,8 @@ function sinFotogramas(){
   if(!calc) return;
   if(calc.pel){ calc.pel = null; calc.teatro++; calc.jugando = false; }
   $('opPasos').hidden = true;
+  cartela('');
+  hojeo(false);
 }
 const preTxt = k => (k < 0 ? '(' + conSigno(k) + ')' : String(k)) + '·';
 /* en la tablilla se escribe como en el cuaderno: el primero sin paréntesis,
@@ -5485,18 +5514,16 @@ async function juegaExpr(e, ambito, B){
       const id = ambito.find(q => B.f(q) === f);
       if(id !== undefined){
         ambito.splice(ambito.indexOf(id), 1);
-        await B.retira(id, 'Se retira el <b>' + conSigno(f) + '</b>: <b>− (' + conSigno(f) + ')</b>.');
+        await B.retira(id, '− (' + conSigno(f) + ')');
       }else{
-        const [idF, idN] = await B.pareja(f, 'No hay nadie de <b>' + conSigno(f) + '</b> a quien retirar: ' +
-          'entra una <b>pareja nula</b> (' + conSigno(f) + ' y ' + conSigno(-f) + ') y se va el de ' + conSigno(f) + '.');
+        const [idF, idN] = await B.pareja(f, conSigno(f) + ' ' + conSigno(-f) + ' = 0');
         ambito.push(idN);
-        await B.retira(idF, 'Se retira el <b>' + conSigno(f) + '</b> de la pareja.');
+        await B.retira(idF, '− (' + conSigno(f) + ')');
       }
     }else{
       const ids = await juegaTermino(t, B);
       if(t.sign === '-')
-        await B.bebe(ids, -1, null, 'El <b>menos de delante</b> alcanza a toda la cuadrilla: <b>todos cambian de bando</b>, ' +
-          'como con una Traición. Restar un grupo es darle la vuelta.');
+        await B.bebe(ids, -1, null, '−( )');
       ambito.push(...ids);
     }
   }
@@ -5505,27 +5532,24 @@ async function juegaExpr(e, ambito, B){
 async function juegaTermino(t, B){
   let ids;
   if(t.factor.t === 'n'){
-    ids = [await B.entra(t.factor.f, 'Entra el <b>' + conSigno(t.factor.f) + '</b>.')];
+    ids = [await B.entra(t.factor.f, '+ (' + conSigno(t.factor.f) + ')')];
   }else{
     ids = await juegaExpr(t.factor.expr, [], B);
     if(t.pre.length || t.post.length)
-      await B.saco(ids, 'La cuadrilla del paréntesis ya está en el campo' +
-        (ids.length ? '' : ', aunque se ha quedado vacía: vale 0') + '.');
+      await B.saco(ids, ids.length ? '( )' : '( ) = 0');
   }
   /* LA POTENCIA: elevar es multiplicar por sí mismo, así que el tirador se
      bebe su propio frasco (el −2, la Traición doble) una vez menos que el
      exponente. Un paréntesis, antes, se junta en uno */
   if(t.exp > 1){
-    if(ids.length > 1) ids = await B.junta(ids, 'Para elevar el paréntesis, la cuadrilla se <b>junta en uno</b>: ' +
-      'un paréntesis vale lo que su suma.');
+    if(ids.length > 1) ids = await B.junta(ids, '( ) → uno');
     if(ids.length){
       const v = B.f(ids[0]);
       const po = POCIONES.find(x => x.k === v);
       if(v !== 1){
         if(!po) throw new Error('Para elevar, el tirador se bebe <b>su propio frasco</b>, y no hay frasco de ·' + v + '.');
         for(let r = 1; r < t.exp; r++)
-          await B.bebe(ids, v, null, 'Elevar es multiplicar por sí mismo: el <b>' + conSigno(v) + '</b> se bebe ' +
-            '<b>su propio frasco</b> (' + po.n + ', ' + po.e + ')' + (t.exp > 2 ? ', ' + (t.exp - 1) + ' veces' : '') + '.');
+          await B.bebe(ids, v, null, '·(' + conSigno(v) + ')');
       }
     }
   }
@@ -5538,22 +5562,18 @@ async function juegaTermino(t, B){
     if(ids.every(id => cabe(B.f(id) * k))) return;
     const s = ids.reduce((a, id) => a + B.f(id), 0);
     if(!cabe(s * k)) return;
-    ids = await B.junta(ids, 'El frasco no se puede repartir a <b>cada uno</b> de dentro, pero la cuadrilla ' +
-      'entera vale <b>' + (s === 0 ? '0' : conSigno(s)) + '</b>: <b>se juntan en uno solo</b>. Un paréntesis ' +
-      'vale lo que su suma.');
+    ids = await B.junta(ids, '( ) = ' + (s === 0 ? '0' : conSigno(s)));
   };
   /* primero los que esperaban en el banco (el más cercano antes), luego los de detrás */
   for(const p of t.pre.slice().reverse()){
     await juntaSiHaceFalta(p.k);
     const po = POCIONES.find(x => x.k === p.k);
-    await B.bebe(ids, p.k, p.b, 'La poción <b>' + po.n + ' (' + preTxt(p.k) + ')</b> esperaba en el banco: ahora que ' +
-      (ids.length > 1 ? 'están todos, baja y <b>se lo beben todos</b>.' : 'ya está en el campo, baja y se lo bebe.'));
+    await B.bebe(ids, p.k, p.b, preTxt(p.k) + (ids.length > 1 ? '( )' : ''));
   }
   for(const k of t.post){
     await juntaSiHaceFalta(k);
     const po = POCIONES.find(x => Math.abs(x.k - k) < 1e-9);
-    await B.bebe(ids, k, null, (ids.length > 1 ? 'Se beben todos ' : 'Se bebe ') + 'la poción <b>' + po.n +
-      ' (' + po.e + ')</b>.');
+    await B.bebe(ids, k, null, (ids.length > 1 ? '( )' : '') + po.e);
   }
   return ids;
 }
@@ -5609,7 +5629,7 @@ function teatro(tokT){
     };
     mira();
   });
-  const dice = h => { $('clAviso').innerHTML = h; $('clEscena').innerHTML = h; };
+  const dice = h => cartela(h);
   return {
     f: id => { const p = tiradores.find(q => q.id === id); return p ? p.f : undefined; },
     entra: async (f, txt) => { await quieto(); dice(txt); const id = sigId; alta(f); await pausa(1100); return id; },
@@ -5736,13 +5756,27 @@ async function igualCalc(){
   await juegaExpr(p.arbol, [], C);
   calc.pel = {arbol: p.arbol, valor, textos, n: textos.length, k: 0, bancos: prefijos(p.arbol, [])};
   calc.ultimo = null; calc.arbol = p.arbol;
-  $('clEscena').hidden = false;
+  $('clAviso').innerHTML = '';
   $('opPasos').hidden = false;
   pintaCalc();
   asomaCampo();
   await vaFotograma(0, false);
 }
 const PARA = new Error('para');
+/* EL FOLIOSCOPIO. Mientras se juega una acción, todo el movimiento del
+   campo va a saltos —como cartulinas que pasan— y el canto del mazo se
+   hojea: una esquina se levanta a cada imagen */
+let hojeoT = 0;
+function hojeo(si){
+  const c = document.querySelector('.campo');
+  clearInterval(hojeoT); hojeoT = 0;
+  if(!c) return;
+  c.classList.toggle('hojeo', !!si);
+  if(!si){ c.classList.remove('h1'); return; }
+  if(MOV_REDUCIDO) return;
+  let n = 0;
+  hojeoT = setInterval(() => { n++; c.classList.toggle('h1', n % 2 === 1); c.style.setProperty('--hoja', n % 6); }, 110);
+}
 /* recompone el campo hasta el fotograma k; si «anima», el último se juega */
 async function vaFotograma(k, anima){
   if(!calc || !calc.pel) return;
@@ -5788,18 +5822,17 @@ async function vaFotograma(k, anima){
     }
   };
   pintaPasosCalc();
+  if(anima && k > 0) hojeo(true);
   try{ await juegaExpr(P.arbol, [], B); }
-  catch(e){ if(e !== PARA){ if(e.message === 'corte') return; throw e; } }
+  catch(e){ if(e !== PARA){ if(e.message === 'corte'){ hojeo(false); return; } throw e; } }
+  hojeo(false);
   if(!calc || calc.teatro !== tokT) return;
   calc.jugando = false;
   base = suma(); previo = suma();
   pinta();
   pintaBanco(P.bancos.filter(b => !gastados.has(b.b)));
-  const dice = h => { $('clAviso').innerHTML = h; $('clEscena').innerHTML = h; };
-  if(k === 0){
-    dice((P.bancos.length ? 'Los frascos escritos <b>delante</b> no tienen todavía a quién dárselos: esperan en el <b>banco</b>. '
-                          : 'El campo, vacío. ') + 'Pulsa <b>▶</b> para pasar al primer fotograma.');
-  }else if(k < P.n) dice(P.textos[k - 1]);
+  if(k === 0) cartela(P.bancos.length ? P.bancos.map(b => preTxt(b.k)).join(' ') + ' espera' : '▶');
+  else if(k < P.n) cartela(P.textos[k - 1]);
   else finFuncion(P, P.textos[k - 1]);
   pintaPasosCalc();
 }
@@ -5815,23 +5848,29 @@ function finFuncion(P, paso){
   calc.ultimo = suma();
   pintaBanco([]);
   pintaCalc();
-  let h = (paso ? paso + ' ' : '') + 'La bandera acaba en <b>' + totalHtml(calc.ultimo) + '</b>.';
-  if(calc.ultimo !== P.valor) h += ' (Y debería haber acabado en ' + totalHtml(P.valor) + ': algo se ha torcido en escena.)';
+  cartela((paso ? paso + ' &nbsp; ' : '') + '= ' + totalHtml(calc.ultimo));
+  let h = '';
+  if(calc.ultimo !== P.valor) h += 'Algo se ha torcido en escena: debía dar ' + totalHtml(P.valor) + '. ';
   if(P.bancos.length)
-    h += ' Lo escribiste <b>' + escribeArbol(P.arbol, false, true) + '</b> y se jugó <b>' +
-      escribeArbol(P.arbol, true, true) + '</b>: el frasco tuvo que esperar a que estuviera ' +
-      'a quién dárselo. Es la misma cuenta, porque para multiplicar da igual el orden.';
+    h += '<b>' + escribeArbol(P.arbol, false, true) + '</b> ⟶ <b>' + escribeArbol(P.arbol, true, true) + '</b>';
   const g = grupoQueBebe(P.arbol);
   if(g){
     const k = (g.pre[0] && g.pre[0].k) || g.post[0];
     const partes = g.factor.expr.terms.filter(t => t.factor.t === 'n');
     if(partes.length === g.factor.expr.terms.length && Number.isInteger(k))
-      h += ' Y como <b>cada uno</b> de dentro bebió su frasco: <b>' +
+      h += '<br><b>' + (k < 0 ? '(' + conSigno(k) + ')' : k) + '·(' + escribeArbol(g.factor.expr, false, true) + ') = ' +
         partes.map((t, n) => (t.sign === '-' ? (n ? ' − ' : '−') : (n ? ' + ' : '')) +
-          (k < 0 ? '(' + conSigno(k) + ')' : k) + '·' + numCuaderno(t.factor.f, false)).join('') + '</b>.';
+          (k < 0 ? '(' + conSigno(k) + ')' : k) + '·' + numCuaderno(t.factor.f, false)).join('') + '</b>';
   }
   $('clAviso').innerHTML = h;
-  $('clEscena').innerHTML = h;
+}
+/* la cartela de cine mudo, arriba del teatro */
+function cartela(h){
+  const c = $('cartela');
+  if(!c) return;
+  c.innerHTML = h || '';
+  c.hidden = !h;
+  c.classList.remove('nueva'); void c.offsetWidth; c.classList.add('nueva');
 }
 /* ── LOS EJERCICIOS DE LA RUTA, EN LA TABLILLA ──────────────────────────
    Lo que antes era el panel de Operaciones: la cuenta aparece escrita en la
@@ -5908,7 +5947,7 @@ async function rondaTabla(){
   pintaBanco([]); pinta();
   $('clResp').value = '';
   $('clEscena').hidden = true;
-  $('clAviso').innerHTML = '¿Dónde acaba la bandera? Si dudas, pulsa <b>▶</b> y mírala en el campo.';
+  $('clAviso').innerHTML = '';
   pintaTabla();
 }
 function pintaTabla(){
@@ -5927,8 +5966,7 @@ function compruebaTabla(){
     A.fase = 'bien';
     calc.ej.aciertos++;
     if(!A.visto) calc.ej.solas++;
-    $('clAviso').innerHTML = '<b>Correcto.</b> ' + (v === 0 ? 'Empate: el <b>0</b> no es de ningún bando. ' : '') +
-      (A.visto ? 'La próxima, intenta sin mirar el campo.' : '<b>Y sin mirar el campo.</b>');
+    $('clAviso').innerHTML = '<b>¡Correcto!</b>' + (A.visto ? '' : ' Y sin mirar.');
     apuntaLogro();
     pintaTabla();
     const yo = calc;
@@ -5936,8 +5974,7 @@ function compruebaTabla(){
   }else{
     apuntaFallo();
     const porque = queHaPasado(A.ej, dicho);
-    $('clAviso').innerHTML = 'No es <b>' + resp.replace('-', '−') + '</b>. ' +
-      (porque || 'Pulsa <b>▶</b> y mira dónde para la bandera.');
+    $('clAviso').innerHTML = 'No es <b>' + resp.replace('-', '−') + '</b>. ' + (porque || 'Pulsa <b>▶</b>.');
     $('clResp').value = '';
   }
 }
