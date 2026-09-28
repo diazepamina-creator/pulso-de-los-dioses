@@ -1319,6 +1319,21 @@ body:not([data-modo="calc"]) .manaza{margin-bottom:26px}
 .manaza.pasa .mano{animation:manoPasa .5s steps(6, end)}
 @keyframes manoPasa{35%{transform:rotate(-7deg) translate(-2px,1px)}70%{transform:rotate(5deg)}}
 #opPasoTxt{padding-right:52px;white-space:nowrap}
+/* ── DOS ASPECTOS DEL CAMPO ──
+   FOLIOSCOPIO (el librito con la pezuña): cuando el alumno pasa los
+   fotogramas a mano. CARRETE de película: en lo demás, con el movimiento
+   suave. Lo decide aspectoCampo() */
+.perfo{display:none}
+#panelCampo.carrete .perfo{display:block;height:15px;background-color:#0e0a14;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='15'%3E%3Crect x='5' y='4.5' width='8' height='6' rx='1.6' fill='%23e3d9bf'/%3E%3C/svg%3E");
+  background-repeat:repeat-x;background-position:4px 0}
+#panelCampo.carrete .perfo.arriba{border-radius:10px 10px 0 0}
+#panelCampo.carrete .perfo.abajo{border-radius:0 0 10px 10px;margin-bottom:0}
+#panelCampo.carrete .campo{border-radius:0;border-top:0;border-bottom:0;
+  border-left:5px solid #0e0a14;border-right:5px solid #0e0a14}
+#panelCampo.carrete .mazo, #panelCampo.carrete .manaza{display:none}
+[data-tema="tablilla"] #panelCampo.carrete .perfo{background-color:#2b2118}
+[data-tema="tablilla"] #panelCampo.carrete .campo{border-left-color:#2b2118;border-right-color:#2b2118}
 body:not([data-modo="calc"]) #opTodo{display:none}
 .pasos-m .op-todo{font-size:13px;letter-spacing:-2px}
 /* el pronóstico del alumno, marcado en la regla mientras se juega el paso */
@@ -1444,7 +1459,7 @@ body[data-modo="calc"] .cartela:not([hidden]){display:flex;flex-direction:column
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.2</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.4</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1574,6 +1589,7 @@ body[data-modo="calc"] .cartela:not([hidden]){display:flex;flex-direction:column
       <span class="m-t">Derecha</span></div>
   </div>
   <div class="cartela" id="cartela" role="status" hidden></div>
+  <div class="perfo arriba" aria-hidden="true"></div>
   <div class="campo">
     <div class="mazo" aria-hidden="true"><i class="lomo"></i><i class="canto-i"></i><i class="canto-d"></i><i class="hoja-vuelta"></i><i class="mazo-esquina"></i></div>
         <div class="dial" id="dial" hidden></div>
@@ -1595,6 +1611,7 @@ body[data-modo="calc"] .cartela:not([hidden]){display:flex;flex-direction:column
     </div>
     </div>
   </div>
+  <div class="perfo abajo" aria-hidden="true"></div>
   <div class="manaza" id="manaza" aria-hidden="true"></div>
     <div class="fila pasos-m" id="opPasos" hidden>
     <button id="opAtras" aria-label="Atrás">◀</button>
@@ -2281,7 +2298,7 @@ function ajustaPaso(){
   return PASO !== antes;
 }
 function pintaRegla(){
-  const t = suma();
+  const t = congelaTotal === null ? suma() : congelaTotal;   // con término abierto, lo que enseña la bandera
     const vivaD = !!(diana && diana.esperando);
   /* en el folioscopio, antes de un paso clave, la regla se toca para decir
      dónde acabará la bandera */
@@ -4928,6 +4945,7 @@ $('aVolverRuta').addEventListener('click', () => {
   else if(!retomaTurno()) arrancaMision(0);   // vuelve a la misión y los aciertos que llevaba
 });
 function modoBotones(m){
+  congelaTotal = null; congelaLados = null;   // una bandera quieta de la tablilla no se queda en otro modo
   document.body.dataset.fase = m === 'taller' ? 'taller' : 'juego';
   document.body.dataset.modo = m;
   $('bTablilla').setAttribute('aria-pressed', String(m === 'calc'));
@@ -5455,6 +5473,7 @@ function teclaCalc(tk){
 }
 /* si la cuenta cambia, el mazo de fotogramas de la anterior ya no vale */
 function sinFotogramas(){
+  congelaTotal = null; congelaLados = null;
   if(!calc) return;
   if(calc.pel){ calc.pel = null; calc.teatro++; calc.jugando = false; }
   $('opPasos').hidden = true;
@@ -5582,11 +5601,17 @@ async function juegaExpr(e, ambito, B){
         await B.retira(idF, {m: conSi(t, [t.factor.a]), x: 'se va el ' + conSigno(f)});
       }
     }else{
+      /* un término compuesto (pociones, potencia o su propio menos) se
+         calcula aparte: el backend puede quedarse la bandera quieta hasta
+         que se cierra, y así no pasa por valores que no están en la cuenta */
+      const compuesto = !!(t.pre.length || t.post.length || t.exp > 1 || t.sign === '-');
+      if(compuesto && B.abre) B.abre();
       const ids = await juegaTermino(t, B);
       if(t.sign === '-')
         await B.bebe(ids, -1, null, {m: conSi(t, rango(t.pre.length ? t.pre[0].ti : t.factor.a,
           t.postI.length ? t.postI[t.postI.length - 1] : (t.ei !== null ? t.ei : t.factor.z))),
           x: ids.length > 1 ? 'el menos: todos cambian de bando' : 'el menos: cambia de bando', flip: true});
+      if(compuesto && B.cierra) B.cierra();
       ambito.push(...ids);
     }
   }
@@ -5812,18 +5837,26 @@ async function igualCalc(){
      preguntar «¿qué pasará ahora?» antes de pasar */
   const textos = [];
   const cuenta = simulador();
-  const tipos = [], sumas = [];
+  /* dónde queda la bandera en cada fotograma. Mientras un término compuesto
+     está abierto, la bandera se queda donde estaba al abrirse (durante y al
+     final del fotograma); se mueve de golpe cuando el término se cierra */
+  const tipos = [], sumas = [], durante = [], quieta = [];
+  let hondo = 0, antesDe = 0;
   const apunta = (tipo, fn) => async (...a) => { textos.push(a[a.length - 1] || ''); tipos.push(tipo);
-    const r = await fn(...a); sumas.push(cuenta.suma()); return r; };
+    durante.push(hondo ? antesDe : null);
+    const r = await fn(...a); sumas.push(cuenta.suma()); quieta.push(hondo ? antesDe : null); return r; };
   const C = {f: cuenta.f, entra: apunta('entra', cuenta.entra), retira: apunta('retira', cuenta.retira),
              pareja: apunta('pareja', cuenta.pareja), saco: apunta('saco', cuenta.saco),
-             bebe: apunta('bebe', cuenta.bebe), junta: apunta('junta', cuenta.junta)};
+             bebe: apunta('bebe', cuenta.bebe), junta: apunta('junta', cuenta.junta),
+             abre: () => { if(!hondo++) antesDe = cuenta.suma(); },
+             cierra: () => { hondo--; if(!hondo) quieta[quieta.length - 1] = null; }};
   await juegaExpr(p.arbol, [], C);
+  const vista = sumas.map((v, i) => quieta[i] !== null ? quieta[i] : v);
   /* pasos clave: una poción o alguien que se retira, y que muevan la
      bandera. Antes de jugarlos se pregunta dónde acabará */
-  const clave = tipos.map((t, i) => (t === 'bebe' || t === 'retira') && sumas[i] !== (i ? sumas[i - 1] : 0));
+  const clave = tipos.map((t, i) => (t === 'bebe' || t === 'retira') && vista[i] !== (i ? vista[i - 1] : 0));
   calc.pel = {arbol: p.arbol, valor, textos, n: textos.length, k: 0, bancos: prefijos(p.arbol, []),
-              sumas, clave, dichos: {}, pregunta: 0, pin: null, pinPara: 0, visto: false, repaso: 0};
+              sumas: vista, durante, quieta, clave, dichos: {}, pregunta: 0, pin: null, pinPara: 0, visto: false, repaso: 0};
   calc.ultimo = null; calc.arbol = p.arbol;
   $('clAviso').innerHTML = '';
   $('opPasos').hidden = false;
@@ -5871,6 +5904,18 @@ function hojeo(si){
     '<path d="M65 58 q3 -2.5 6 0" fill="none" stroke="' + S + '" stroke-width="1.4" stroke-linecap="round"/>' +
     '</g></svg>';
 })();
+/* el aspecto del campo: librito si el alumno pasa fotogramas (la tablilla,
+   o cuando están ◀ ▶), carrete de película en lo demás */
+function aspectoCampo(){
+  const libro = document.body.dataset.modo === 'calc' || !$('opPasos').hidden;
+  $('panelCampo').classList.toggle('carrete', !libro);
+}
+(() => {
+  const mo = new MutationObserver(aspectoCampo);
+  mo.observe(document.body, {attributes: true, attributeFilter: ['data-modo']});
+  mo.observe($('opPasos'), {attributes: true, attributeFilter: ['hidden']});
+  aspectoCampo();
+})();
 /* una hoja entera que se vuelve sobre el lomo: hacia delante (1) o atrás (-1) */
 function pasaHoja(dir){
   if(MOV_REDUCIDO) return;
@@ -5894,6 +5939,8 @@ async function vaFotograma(k, anima){
   quitaHitos();
   tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
   bebiendoIds.clear(); retirandoIds.clear();
+  congelaLados = null;
+  congelaTotal = k > 0 ? (anima ? P.durante[k - 1] : P.quieta[k - 1]) : null;
   const gastados = new Set();
   const T = teatro(tokT);
   const ultimo = anima ? k - 1 : k;         // los pasos antes de este, al instante
@@ -5941,6 +5988,7 @@ async function vaFotograma(k, anima){
   if(!calc || calc.teatro !== tokT) return;
   calc.jugando = false;
   base = suma(); previo = suma();
+  congelaTotal = k > 0 ? P.quieta[k - 1] : null; congelaLados = null;
   pinta();
   pintaBanco(P.bancos.filter(b => !gastados.has(b.b)));
   let o = P.textos[k - 1];
