@@ -1319,6 +1319,31 @@ body:not([data-modo="calc"]) .manaza{margin-bottom:26px}
 .manaza.pasa .mano{animation:manoPasa .5s steps(6, end)}
 @keyframes manoPasa{35%{transform:rotate(-7deg) translate(-2px,1px)}70%{transform:rotate(5deg)}}
 #opPasoTxt{padding-right:52px;white-space:nowrap}
+/* ── EL BANQUILLO: un término compuesto se prepara aquí, fuera de la cuerda,
+   y sale a tirar ya hecho. Lo que tira en la cuerda es lo que suma ── */
+.banquillo{display:none}
+body[data-modo="calc"] .banquillo:not([hidden]){display:block;position:relative;height:112px;margin:0 0 8px;
+  border-radius:10px;overflow:hidden;border:1px dashed rgba(233,184,78,.35);
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.18))}
+.banquillo::after{content:"";position:absolute;left:14%;right:14%;bottom:12px;height:9px;border-radius:3px;
+  background:linear-gradient(180deg,#8a6a3b,#5c4424);box-shadow:0 3px 0 #3a2a14}
+.bq-t{position:absolute;left:8px;top:5px;font:600 10px/1 'Oswald',sans-serif;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted)}
+.bq-sitio{position:absolute;left:0;right:0;bottom:17px;display:flex;justify-content:center;align-items:flex-end;gap:6px;z-index:1}
+.bq{position:relative;line-height:0;transition:transform .3s ease, opacity .3s ease}
+.bq svg{height:72px;width:auto}
+.bq .num{display:none}   /* el número va fuera, con su signo */
+.bq .bq-f{position:absolute;left:50%;top:-16px;transform:translateX(-50%);font:700 13px/1 'Oswald',sans-serif;color:var(--ink);white-space:nowrap}
+.bq.llega{animation:bqLlega .45s cubic-bezier(.34,1.56,.64,1) backwards}
+@keyframes bqLlega{from{transform:translateY(-24px);opacity:0}}
+.bq.trago{animation:bqTrago .5s ease}
+@keyframes bqTrago{40%{transform:scale(1.18) rotate(-6deg)}}
+.bq.sale{transform:translateY(60px);opacity:0}
+.bq-frasco{position:absolute;left:78%;top:-4px;width:30px;z-index:2;filter:drop-shadow(0 0 4px rgba(249,217,138,.7));transform:translateX(-50%);animation:bqFrasco 1.1s ease forwards;line-height:0}
+.bq-frasco svg{width:30px;height:auto}
+@keyframes bqFrasco{0%{transform:translate(-50%,-26px) scale(.6);opacity:0}25%{transform:translate(-50%,-18px) scale(1);opacity:1}
+  70%{transform:translate(-50%,2px) rotate(-60deg);opacity:1}100%{transform:translate(-50%,6px) rotate(-80deg);opacity:0}}
+[data-tema="tablilla"] body[data-modo="calc"] .banquillo:not([hidden]){border-color:#b9a47a;background:rgba(138,106,59,.08)}
 /* ── DOS ASPECTOS DEL CAMPO ──
    FOLIOSCOPIO (el librito con la pezuña): cuando el alumno pasa los
    fotogramas a mano. CARRETE de película: en lo demás, con el movimiento
@@ -1459,7 +1484,7 @@ body[data-modo="calc"] .cartela:not([hidden]){display:flex;flex-direction:column
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.4</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.5</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1589,6 +1614,7 @@ body[data-modo="calc"] .cartela:not([hidden]){display:flex;flex-direction:column
       <span class="m-t">Derecha</span></div>
   </div>
   <div class="cartela" id="cartela" role="status" hidden></div>
+  <div class="banquillo" id="banquillo" hidden><span class="bq-t">banquillo</span><div class="bq-sitio" id="bqSitio"></div></div>
   <div class="perfo arriba" aria-hidden="true"></div>
   <div class="campo">
     <div class="mazo" aria-hidden="true"><i class="lomo"></i><i class="canto-i"></i><i class="canto-d"></i><i class="hoja-vuelta"></i><i class="mazo-esquina"></i></div>
@@ -5474,6 +5500,7 @@ function teclaCalc(tk){
 /* si la cuenta cambia, el mazo de fotogramas de la anterior ya no vale */
 function sinFotogramas(){
   congelaTotal = null; congelaLados = null;
+  banquillo = []; pintaBanquillo(); if($('banquillo')) $('banquillo').hidden = true;
   if(!calc) return;
   if(calc.pel){ calc.pel = null; calc.teatro++; calc.jugando = false; }
   $('opPasos').hidden = true;
@@ -5605,13 +5632,23 @@ async function juegaExpr(e, ambito, B){
          calcula aparte: el backend puede quedarse la bandera quieta hasta
          que se cierra, y así no pasa por valores que no están en la cuenta */
       const compuesto = !!(t.pre.length || t.post.length || t.exp > 1 || t.sign === '-');
-      if(compuesto && B.abre) B.abre();
-      const ids = await juegaTermino(t, B);
+      /* NIVEL 1: un jugador solo se prepara en el banquillo y sale ya hecho.
+         (Un paréntesis que bebe todavía se hace en la cuerda, con la bandera quieta) */
+      const alBanco = compuesto && t.factor.t === 'n' && !!B.banquillo;
+      if(alBanco) B.banquillo(true);
+      else if(compuesto && B.abre) B.abre();
+      let ids = await juegaTermino(t, B);
       if(t.sign === '-')
         await B.bebe(ids, -1, null, {m: conSi(t, rango(t.pre.length ? t.pre[0].ti : t.factor.a,
           t.postI.length ? t.postI[t.postI.length - 1] : (t.ei !== null ? t.ei : t.factor.z))),
           x: ids.length > 1 ? 'el menos: todos cambian de bando' : 'el menos: cambia de bando', flip: true});
-      if(compuesto && B.cierra) B.cierra();
+      if(alBanco){
+        B.banquillo(false);
+        const desde = t.pre.length ? t.pre[0].ti : t.factor.a;
+        const hasta = t.postI.length ? t.postI[t.postI.length - 1] : (t.ei !== null ? t.ei : t.factor.z);
+        const v = ids.length === 1 ? B.f(ids[0]) : undefined;
+        ids = await B.sale(ids, {m: conSi(t, rango(desde, hasta)), x: v !== undefined ? 'sale a tirar el <b>' + conSigno(v) + '</b>' : 'sale a tirar', sale: true});
+      }else if(compuesto && B.cierra) B.cierra();
       ambito.push(...ids);
     }
   }
@@ -5666,7 +5703,7 @@ async function juegaTermino(t, B){
 }
 /* la simulación: sin dibujar, para avisar antes de salir a escena */
 function simulador(){
-  const m = new Map(); let n = 1, lejos = 0;
+  const m = new Map(), bq = new Map(); let n = 1, lejos = 0, enBanco = false;
   const suma = () => [...m.values()].reduce((a, b) => a + b, 0);
   const mira = () => {
     const izq = [...m.values()].filter(f => f < 0).length, der = m.size - izq;
@@ -5678,8 +5715,10 @@ function simulador(){
       ': acabaría en <b>' + conSigno(s) + '</b>.');
   };
   return {
-    f: id => m.get(id), suma, lejos: () => lejos,
-    entra: async f => { const id = n++; m.set(id, f); mira(); return id; },
+    f: id => m.has(id) ? m.get(id) : bq.get(id), suma, lejos: () => lejos,
+    banquillo: si => { enBanco = si; },
+    sale: async ids => { ids.forEach(id => { m.set(id, bq.get(id)); bq.delete(id); }); mira(); return ids; },
+    entra: async f => { const id = n++; if(enBanco){ bq.set(id, f); return id; } m.set(id, f); mira(); return id; },
     junta: async ids => {
       const s = ids.reduce((a, id) => a + m.get(id), 0);
       ids.forEach(id => m.delete(id));
@@ -5691,13 +5730,14 @@ function simulador(){
     saco: async () => {},
     bebe: async (ids, k) => {
       ids.forEach(id => {
-        const v = m.get(id) * k;
-        if(!Number.isInteger(v)) throw new Error('El de <b>' + conSigno(m.get(id)) + '</b> no se puede repartir ' +
+        const M = bq.has(id) ? bq : m;
+        const v = M.get(id) * k;
+        if(!Number.isInteger(v)) throw new Error('El de <b>' + conSigno(M.get(id)) + '</b> no se puede repartir ' +
           'así: le tocaría <b>' + String(Math.round(v * 100) / 100).replace('.', ',') + '</b>, y aquí se tira con fuerzas enteras.' +
           (ids.length > 1 ? ' En un paréntesis el frasco se lo bebe <b>cada uno</b> de dentro.' : ''));
         if(Math.abs(v) > MAX_F) throw new Error('Un tirador de fuerza <b>' + Math.abs(v) + '</b> no cabe en la ' +
           'palestra: como mucho ' + MAX_F + '.');
-        m.set(id, v);
+        M.set(id, v);
       });
       mira();
     }
@@ -5717,9 +5757,34 @@ function teatro(tokT){
     mira();
   });
   const dice = h => cartela(h);
+  let enBanco = false;
+  const deBanco = id => banquillo.find(q => q.id === id);
   return {
-    f: id => { const p = tiradores.find(q => q.id === id); return p ? p.f : undefined; },
-    entra: async (f, txt) => { await quieto(); dice(txt); const id = sigId; alta(f); await pausa(1100); return id; },
+    f: id => { const p = tiradores.find(q => q.id === id) || deBanco(id); return p ? p.f : undefined; },
+    banquillo: si => { enBanco = si; },
+    entra: async (f, txt) => {
+      await quieto();
+      if(enBanco){
+        dice(txt && typeof txt === 'object' && !txt.x ? Object.assign({}, txt, {x: 'se prepara en el banquillo'}) : txt);
+        const id = sigId++; banquillo.push({id, f}); pintaBanquillo({llega: id});
+        await pausa(900); return id;
+      }
+      dice(txt); const id = sigId; alta(f); await pausa(1100); return id;
+    },
+    sale: async (ids, txt) => {
+      await quieto(); dice(txt);
+      pintaBanquillo({sale: ids}); await pausa(450);
+      const nuevos = [];
+      for(const id of ids){
+        const q = deBanco(id); if(!q) continue;
+        banquillo = banquillo.filter(x => x.id !== id); pintaBanquillo();
+        const n = sigId; alta(q.f);
+        const p = tiradores.find(x => x.id === n);
+        if(p){ if(q.venia) p.venia = q.venia; pinta(); nuevos.push(n); }
+        await pausa(1100);
+      }
+      return nuevos;
+    },
     retira: async (id, txt) => {
       await quieto(); dice(txt); retira(id);
       await new Promise(ok => trasRetirar(id, ok)); if(!vivo()) throw new Error('corte');
@@ -5751,6 +5816,16 @@ function teatro(tokT){
         if(ch) ch.classList.add('baja');
         await pausa(650);
       }
+      /* en el banquillo: se bebe sentado, sin cuerda y sin mover la bandera */
+      if(ids.length && ids.every(id => deBanco(id))){
+        for(const id of ids){
+          pintaBanquillo({bebe: id, k}); await pausa(1000);
+          const q = deBanco(id);
+          if(q){ const nuevo = q.f * k; if((q.f < 0) !== (nuevo < 0)) q.venia = q.venia || (q.f < 0 ? 'izq' : 'der'); q.f = nuevo; }
+          pintaBanquillo({trago: id}); await pausa(900);
+        }
+        return;
+      }
       const po = POCIONES.find(x => Math.abs(x.k - k) < 1e-9) || {n:'el menos', e:'·(−1)'};
       const nom = txt && txt.flip ? 'el menos de delante' : po.n;
       ids.forEach((id, i) => setTimeout(() => {
@@ -5761,6 +5836,21 @@ function teatro(tokT){
       await quieto();
     }
   };
+}
+var banquillo = [];   // {id, f, venia}: los que se preparan fuera de la cuerda
+function pintaBanquillo(anim){
+  const el = $('bqSitio');
+  if(!el) return;
+  anim = anim || {};
+  el.innerHTML = banquillo.map(q => {
+    let c = 'bq tirador ' + (q.f < 0 ? 'izq' : 'der') + (q.venia ? ' venia-' + q.venia : '');
+    if(anim.llega === q.id) c += ' llega';
+    if(anim.trago === q.id) c += ' trago';
+    if(anim.sale && anim.sale.indexOf(q.id) >= 0) c += ' sale';
+    const po = anim.bebe === q.id ? (POCIONES.find(x => Math.abs(x.k - anim.k) < 1e-9) || POCIONES.find(x => x.k === -1)) : null;
+    return '<span class="' + c + '" data-bq="' + q.id + '">' + dibujaTirador(q, 13) +
+      '<b class="bq-f">' + conSigno(q.f) + '</b>' + (po ? '<span class="bq-frasco">' + frascoHtml(po) + '</span>' : '') + '</span>';
+  }).join('');
 }
 function pintaBanco(lista){
   const campo = document.querySelector('.campo');
@@ -5848,15 +5938,16 @@ async function igualCalc(){
   const C = {f: cuenta.f, entra: apunta('entra', cuenta.entra), retira: apunta('retira', cuenta.retira),
              pareja: apunta('pareja', cuenta.pareja), saco: apunta('saco', cuenta.saco),
              bebe: apunta('bebe', cuenta.bebe), junta: apunta('junta', cuenta.junta),
+             banquillo: si => cuenta.banquillo(si), sale: apunta('sale', cuenta.sale),
              abre: () => { if(!hondo++) antesDe = cuenta.suma(); },
              cierra: () => { hondo--; if(!hondo) quieta[quieta.length - 1] = null; }};
   await juegaExpr(p.arbol, [], C);
   const vista = sumas.map((v, i) => quieta[i] !== null ? quieta[i] : v);
   /* pasos clave: una poción o alguien que se retira, y que muevan la
      bandera. Antes de jugarlos se pregunta dónde acabará */
-  const clave = tipos.map((t, i) => (t === 'bebe' || t === 'retira') && vista[i] !== (i ? vista[i - 1] : 0));
+  const clave = tipos.map((t, i) => (t === 'bebe' || t === 'retira' || t === 'sale') && vista[i] !== (i ? vista[i - 1] : 0));
   calc.pel = {arbol: p.arbol, valor, textos, n: textos.length, k: 0, bancos: prefijos(p.arbol, []),
-              sumas: vista, durante, quieta, clave, dichos: {}, pregunta: 0, pin: null, pinPara: 0, visto: false, repaso: 0};
+              sumas: vista, durante, quieta, clave, conBanco: tipos.indexOf('sale') >= 0, dichos: {}, pregunta: 0, pin: null, pinPara: 0, visto: false, repaso: 0};
   calc.ultimo = null; calc.arbol = p.arbol;
   $('clAviso').innerHTML = '';
   $('opPasos').hidden = false;
@@ -5937,27 +6028,39 @@ async function vaFotograma(k, anima){
   P.jugados = new Set();
   P.textos.slice(0, Math.max(0, k - 1)).forEach(o => (o.m || []).forEach(q => P.jugados.add(q)));
   quitaHitos();
-  tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
+  tiradores = []; banquillo = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
   bebiendoIds.clear(); retirandoIds.clear();
+  $('banquillo').hidden = !P.conBanco;
   congelaLados = null;
   congelaTotal = k > 0 ? (anima ? P.durante[k - 1] : P.quieta[k - 1]) : null;
   const gastados = new Set();
   const T = teatro(tokT);
   const ultimo = anima ? k - 1 : k;         // los pasos antes de este, al instante
   let i = 0, pintado = false;
-  const prepara = () => { if(!pintado){ pinta(); pintaBanco(P.bancos.filter(b => !gastados.has(b.b))); pintado = true; } };
+  const prepara = () => { if(!pintado){ pinta(); pintaBanquillo(); pintaBanco(P.bancos.filter(b => !gastados.has(b.b))); pintado = true; } };
+  let enBanco = false;
   const turno = () => { const j = i++; if(j >= k) throw PARA; return j < ultimo; };
   const B = {
     f: T.f,
-    entra: async (f, txt) => { if(turno()){ const id = sigId++; tiradores.push({id, f}); return id; } prepara(); return T.entra(f, txt); },
+    banquillo: si => { enBanco = si; T.banquillo(si); },
+    entra: async (f, txt) => { if(turno()){ const id = sigId++; (enBanco ? banquillo : tiradores).push({id, f}); return id; }
+                               prepara(); return T.entra(f, txt); },
+    sale: async (ids, txt) => {
+      if(turno()){
+        ids.forEach(id => { const q = banquillo.find(x => x.id === id); if(!q) return;
+          banquillo = banquillo.filter(x => x.id !== id); tiradores.push(q); });
+        return ids;
+      }
+      prepara(); return T.sale(ids, txt);
+    },
     retira: async (id, txt) => { if(turno()){ tiradores = tiradores.filter(q => q.id !== id); return; } prepara(); return T.retira(id, txt); },
     pareja: async (f, txt) => { if(turno()){ const a = sigId++, b = sigId++; tiradores.push({id:a, f}, {id:b, f:-f}); return [a, b]; }
                                 prepara(); return T.pareja(f, txt); },
     saco: async (ids, txt) => { if(turno()) return; prepara(); return T.saco(ids, txt); },
     bebe: async (ids, kk, banco, txt) => {
       if(turno()){
-        ids.forEach(id => { const q = tiradores.find(x => x.id === id); if(!q) return;
-          const nuevo = q.f * kk; if((q.f < 0) !== (nuevo < 0)) q.venia = q.f < 0 ? 'izq' : 'der'; q.f = nuevo; });
+        ids.forEach(id => { const q = tiradores.find(x => x.id === id) || banquillo.find(x => x.id === id); if(!q) return;
+          const nuevo = q.f * kk; if((q.f < 0) !== (nuevo < 0)) q.venia = q.venia || (q.f < 0 ? 'izq' : 'der'); q.f = nuevo; });
         if(banco !== null && banco !== undefined) gastados.add(banco);
         return;
       }
@@ -5989,7 +6092,7 @@ async function vaFotograma(k, anima){
   calc.jugando = false;
   base = suma(); previo = suma();
   congelaTotal = k > 0 ? P.quieta[k - 1] : null; congelaLados = null;
-  pinta();
+  pinta(); pintaBanquillo();
   pintaBanco(P.bancos.filter(b => !gastados.has(b.b)));
   let o = P.textos[k - 1];
   if(k > 0 && anima && P.pinPara === k && P.pin !== null) o = Object.assign({}, o, {x: veredicto(P, k, o)});
