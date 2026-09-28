@@ -1484,7 +1484,7 @@ body[data-modo="calc"] .cartela:not([hidden]){display:flex;flex-direction:column
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.5</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.6</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -6164,14 +6164,15 @@ function finFuncion(P, paso){
   cartela({m: [], x: paso && paso.x ? paso.x : ''}, totalHtml(calc.ultimo));
   let h = '';
   if(calc.ultimo !== P.valor) h += 'Algo se ha torcido en escena: debía dar ' + totalHtml(P.valor) + '. ';
-  if(P.bancos.length)
-    h += '<b>' + escribeArbol(P.arbol, false, true) + '</b> ⟶ <b>' + escribeArbol(P.arbol, true, true) + '</b>';
+  /* (antes aquí se reescribía «3·(−2)» como «−2·3»: sobraba. El −2 entra y
+     se bebe el Triplón, y la cuenta se queda como está escrita) */
   const g = grupoQueBebe(P.arbol);
   if(g){
+    if(h) h += '<br>';
     const k = (g.pre[0] && g.pre[0].k) || g.post[0];
     const partes = g.factor.expr.terms.filter(t => t.factor.t === 'n');
     if(partes.length === g.factor.expr.terms.length && Number.isInteger(k))
-      h += '<br><b>' + (k < 0 ? '(' + conSigno(k) + ')' : k) + '·(' + escribeArbol(g.factor.expr, false, true) + ') = ' +
+      h += '<b>' + (k < 0 ? '(' + conSigno(k) + ')' : k) + '·(' + escribeArbol(g.factor.expr, false, true) + ') = ' +
         partes.map((t, n) => (t.sign === '-' ? (n ? ' − ' : '−') : (n ? ' + ' : '')) +
           (k < 0 ? '(' + conSigno(k) + ')' : k) + '·' + numCuaderno(t.factor.f, false)).join('') + '</b>';
   }
