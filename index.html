@@ -1373,7 +1373,7 @@ body[data-modo="calc"] .flota{display:none}
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.3</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.4</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1660,9 +1660,7 @@ function abreCuadrilla(id){
   if(bebiendoIds.has(id) || retirandoIds.has(id)) return;
   sel = null;
   cuadrilla.add(id);
-  $('aviso').innerHTML = 'Cuadrilla abierta. Toca a los demás para <b>sumarlos</b> ' +
-    'o quitarlos. Luego, o les cae <b>el rayo</b> a todos —restarlos de golpe— ' +
-    'o se beben <b>el mismo frasco</b>: eso es un paréntesis.';
+  $('aviso').innerHTML = 'Cuadrilla: toca a otros. Luego, <b>rayo</b> o <b>frasco</b> para todos: ( ).';
   pinta();
 }
 function deshazCuadrilla(){
@@ -2471,9 +2469,7 @@ function pinta(){
         return;
       }
       sel = (sel === p.id ? null : p.id);
-      if(sel && !diana && !cron) $('aviso').innerHTML = 'Tirador marcado. Frascos: <b>verde</b> da ' +
-        'fuerza, <b>azul</b> reparte (divide), <b>magenta</b> cambia de bando. ' +
-        'La cruz lo retira: restar.';
+      if(sel && !diana && !cron) $('aviso').innerHTML = 'Marcado: dale un frasco, o <b>✕</b> para retirarlo.';
       pinta();
     });
     (p.f < 0 ? izq : der).appendChild(el);
@@ -2869,21 +2865,20 @@ function cuentaBandera(desde, hasta){
 function alta(f){
   if(alguienBebe()){ $('aviso').textContent = 'Espera: hay alguien bebiendo.'; return; }
   if(!diana && !cron && !calc && RETOS[reto].sinAltas){
-    $('aviso').textContent = 'En este encargo no entra nadie nuevo: solo se puede retirar gente.';
+    $('aviso').textContent = 'En este encargo solo se retira.';
     return;
   }
   if(!diana && !cron && !calc && RETOS[reto].soloDerecha && f < 0){
-    $('aviso').textContent = 'En este encargo solo puedes meter gente por la derecha.';
+    $('aviso').textContent = 'En este encargo, solo por la derecha.';
     return;
   }
   const enEseLado = tiradores.filter(q => (q.f < 0) === (f < 0)).length;
-  if(enEseLado >= 5){ $('aviso').textContent = 'Ese lado ya tiene cinco tirando; no cabe nadie más.'; return; }
+  if(enEseLado >= 5){ $('aviso').textContent = 'En ese lado ya hay cinco.'; return; }
   vuelveAMontar();
   if(!cinta.length) base = suma();
   tiradores.push({id: sigId++, f});
   cinta.push({op:'+', f});
-  if(!mudo) $('aviso').innerHTML = 'Entra un tirador de fuerza <b>' + Math.abs(f) + '</b> por la ' +
-    (f < 0 ? 'izquierda' : 'derecha') + ': eso es <b>+ (' + conSigno(f) + ')</b>.';
+  if(!mudo) $('aviso').innerHTML = '<b>+ (' + conSigno(f) + ')</b>';
   pinta();
     if(congelaTotal === null)
     flotaSobre([...document.querySelectorAll('.tirador')].find(e => e.dataset.id == (sigId - 1)),
@@ -2910,12 +2905,8 @@ function retira(id){
     retiros++;
     cinta.push({op:'−', f:quitado0});
     const ahora = suma();
-    if(!mudo) $('aviso').innerHTML = 'Se retira un tirador de <b>' + conSigno(quitado0) + '</b>: eso es ' +
-      '<b>− (' + conSigno(quitado0) + ')</b>. El total pasa de ' + conSigno(antes) + ' a <b>' +
-      (ahora === 0 ? '0' : conSigno(ahora)) + '</b>' +
-      (quitado0 < 0
-        ? ', y <b>sube</b>: se ha ido alguien que tiraba hacia los negativos, así que restar un negativo suma.'
-        : ', y baja: se ha ido alguien que tiraba hacia los positivos.');
+    if(!mudo) $('aviso').innerHTML = '<b>− (' + conSigno(quitado0) + ')</b>: de ' + conSigno(antes) + ' a <b>' +
+      (ahora === 0 ? '0' : conSigno(ahora)) + '</b>' + (quitado0 < 0 ? ', <b>sube</b>.' : ', baja.');
     pinta();
     asienta();
   };
@@ -2958,10 +2949,7 @@ function pocion(k, nombre, etq){
     const rotos = ids.map(id => tiradores.find(p => p.id === id))
       .filter(p => !Number.isInteger(p.f * k) || p.f * k === 0);
     if(rotos.length){
-      $('aviso').innerHTML = 'A la cuadrilla entera no le vale: al de <b>' +
-        conSigno(rotos[0].f) + '</b> le dejaría <b>' +
-        (Math.round(rotos[0].f * k * 100) / 100) + '</b>. Un paréntesis se ' +
-        'reparte a todos por igual, así que quita a ese o prueba otro frasco.';
+      $('aviso').innerHTML = 'El de <b>' + conSigno(rotos[0].f) + '</b> no se puede repartir así.';
       return;
     }
     cuadrilla = new Set();
@@ -2984,13 +2972,11 @@ function pocion(k, nombre, etq){
   const antes = p.f;
   const nuevo = antes * k;
   if(!Number.isInteger(nuevo)){
-    $('aviso').innerHTML = 'Esa poción dejaría una fuerza de <b>' + (Math.round(nuevo*100)/100) +
-      '</b>, y aquí solo se tira con fuerzas enteras: el reparto tiene que ser exacto. ' +
-      'Prueba con un tirador cuya fuerza se pueda repartir en partes iguales.';
+    $('aviso').innerHTML = 'Quedaría <b>' + String(Math.round(nuevo*100)/100).replace('.', ',') + '</b>: solo se tira con enteros.';
     return;
   }
   if(nuevo === 0){
-    $('aviso').innerHTML = 'Con fuerza 0 no se tira: eso sería retirarse del campo, y para eso está la cruz.';
+    $('aviso').innerHTML = 'Con fuerza 0 no se tira.';
     return;
   }
   const cambiaBando = (antes < 0) !== (nuevo < 0);
@@ -3029,11 +3015,8 @@ function hacePocion(p, antes, nuevo, nombre, cambiaBando, tono, color, etq){
     if(cambiaBando) p.venia = antes < 0 ? 'izq' : 'der';
   p.f = nuevo;
   base = suma();
-  if(!mudo) $('aviso').innerHTML = 'Poción <b>' + nombre + '</b>: ' + conSigno(antes) + ' pasa a ' +
-    '<b>' + conSigno(nuevo) + '</b>. ' +
-    (cambiaBando
-      ? 'El signo era negativo, así que además de cambiar de fuerza <b>se ha pasado al otro bando</b>: eso es lo que hace el menos.'
-      : 'Mismo bando, otra fuerza.');
+  if(!mudo) $('aviso').innerHTML = '(' + conSigno(antes) + ')' + etq + ' = <b>' + conSigno(nuevo) + '</b>' +
+    (cambiaBando ? ': <b>cambia de bando</b>.' : '.');
   pinta();
   asienta();
     const nodo = document.querySelector('.tirador[data-id="' + p.id + '"]');
@@ -3100,9 +3083,7 @@ function entraPareja(f){
   setTimeout(() => ids.forEach(id =>
     sacoSobre([document.querySelector('.tirador[data-id="' + id + '"]')], '±' + Math.abs(f), 1400)),
     ms(1000));      // cuando ya han llegado a su sitio
-  if(!mudo) $('aviso').innerHTML = 'Entra una <b>pareja nula</b>: ' + conSigno(f) +
-    ' y ' + conSigno(-f) + '. Tiran lo mismo en contra, así que la bandera <b>no se mueve</b>: ' +
-    conSigno(f) + ' + (' + conSigno(-f) + ') = 0.';
+  if(!mudo) $('aviso').innerHTML = 'Pareja nula: <b>' + conSigno(f) + ' + (' + conSigno(-f) + ') = 0</b>.';
   return n;
 }
 const filaPar = document.createElement('div');
@@ -3290,8 +3271,7 @@ function pideEstaca(){
   $('dnClava').disabled = true;
     $('dnTxt').innerHTML = textoPlan() + '<span class="dn-pide">' +
     (diana.ronda <= 1
-      ? 'Arrastra el dedo por el campo hasta donde va a parar la bandera; al soltar, ' +
-        'la estaca se queda ahí.'
+      ? 'Arrastra hasta donde parará.'
       : (g.jugadas > 1 ? '¿Dónde queda <b>al final</b>?' : '¿Dónde va a parar?')) +
     '</span>';
   $('dnJugada').hidden = false;
@@ -3314,8 +3294,7 @@ function juzga(dicho, real){
     apuntaFallo();
     destella(false);
     quitaEstaca();
-        $('dnAviso').innerHTML = 'Queda en <b>' + conSigno(real) +
-      '</b>, y tu estaca estaba en <b>' + txtEstaca(dicho) + '</b>.';
+        $('dnAviso').innerHTML = 'Queda en <b>' + conSigno(real) + '</b>.';
   }
   pintaDiana();
   diana.paso = diana.plan.length;
@@ -3388,7 +3367,7 @@ function arrancaDiana(grado){
   $('zonaEncargo').hidden = true;
   $('dnOp').hidden = true;
   caraJuego(true);
-  $('dnAviso').innerHTML = 'Clava la estaca donde va a parar la bandera.';
+  $('dnAviso').innerHTML = '';
   pinta();
   if(grado !== undefined) diana.grado = grado;
   rondaDiana();
@@ -3890,13 +3869,12 @@ function rondaCanon(){
     let a = pick(CON_CERO), b = pick(CON_CERO);
     while(b === a) b = pick(CON_CERO);
     canon.ej = {tipo, a, b, valor: Math.min(a, b),
-      txt: 'De ' + numHtml(a) + ' y ' + numHtml(b) +
-           ', ¿cuál es <b>menor</b>, o sea cuál queda más a la izquierda?'};
+      txt: '¿Cuál es <b>menor</b>: ' + numHtml(a) + ' o ' + numHtml(b) + '?'};
   }
   canon.resp = '';
   canon.visto = false;
   $('cnResp').value = '';
-  $('cnAviso').innerHTML = 'Si no lo ves, ábrelo en el campo.';
+  $('cnAviso').innerHTML = '';
   campoEnEspera();
   pintaCanon();
 }
@@ -3924,16 +3902,14 @@ function canonAlCampo(){
     previo = suma();
     pinta();
     $('aviso').hidden = false;
-    $('aviso').innerHTML = 'Ahí lo tienes. El número que lleva <b>encima de la cabeza</b> ' +
-      'es su fuerza, y no lleva signo: el signo dice para qué lado tira, no cuánto.';
+    $('aviso').innerHTML = 'Encima de la cabeza: su <b>fuerza</b>, sin signo.';
   }else{
     tiradores = [];
     previo = 0;
     pinta();
     ponHitos([canon.ej.a, canon.ej.b]);
     $('aviso').hidden = false;
-    $('aviso').innerHTML = 'Los dos, clavados en la regla. <b>El de más a la izquierda ' +
-      'es el menor</b>.';
+    $('aviso').innerHTML = 'Más a la izquierda, <b>menor</b>.';
   }
   asomaCampo();
   pintaCanon();
@@ -3951,20 +3927,15 @@ function compruebaCanon(){
     canon.aciertos++;
     if(!canon.visto) canon.solas++;
     $('cnAviso').innerHTML = e.tipo === 'fuerza'
-      ? '<b>Eso es.</b> Tira con <b>' + e.valor + '</b>. El signo dice para qué lado; ' +
-        'el número, cuánto. Escrito en corto: |' + conSigno(e.f) + '| = ' + e.valor + '.'
-      : '<b>Eso es.</b> <b>' + conSigno(e.valor) + '</b> queda más a la izquierda, así ' +
-        'que es el menor: ' + conSigno(Math.min(e.a, e.b)) + ' &lt; ' +
-        conSigno(Math.max(e.a, e.b)) + '.';
+      ? '<b>¡Eso es!</b> |' + conSigno(e.f) + '| = ' + e.valor
+      : '<b>¡Eso es!</b> ' + conSigno(Math.min(e.a, e.b)) + ' &lt; ' + conSigno(Math.max(e.a, e.b));
     destella(true);
     apuntaLogro();
     { const yo = canon; setTimeout(() => { if(canon && canon === yo) rondaCanon(); }, ms(2200)); }
   }else{
     $('cnAviso').innerHTML = e.tipo === 'fuerza'
-      ? 'No. La fuerza va <b>sin signo</b>: el de ' + conSigno(e.f) + ' tira con <b>' +
-        Math.abs(e.f) + '</b> hacia su lado.'
-      : 'No. Con los negativos, <b>cuanto más fuerte tiran, más a la izquierda quedan</b>: ' +
-        'ábrelo en el campo y míralo en la regla.';
+      ? 'No. La fuerza va <b>sin signo</b>.'
+      : 'No. Mira cuál queda <b>más a la izquierda</b>.';
     canon.resp = '';
     $('cnResp').value = '';
     apuntaFallo();
@@ -4024,10 +3995,8 @@ function rondaArgos(){
     argos.dichos.push(sumaSim(estadoDe(pasos, i, argos.malo)));
   argos.hecho = false;
   argos.elegido = -1;
-  $('agTxt').innerHTML = 'Alguien ha resuelto esto y <b>en un paso se ha equivocado ' +
-    'de signo</b>. Señala el <b>primer renglón que está mal</b>.';
-  $('agAviso').innerHTML = 'Desde el fallo, todo lo que viene detrás sale torcido: ' +
-    'pero culpable solo hay uno.';
+  $('agTxt').innerHTML = 'Señala el <b>primer renglón</b> que está mal.';
+  $('agAviso').innerHTML = '';
   $('agOtra').hidden = true;
   pintaArgos();
 }
@@ -4082,30 +4051,18 @@ function juzgaArgos(i){
   const debia = sumaSim(estadoDe(argos.ej.pasos, argos.malo + 1));
   let porque;
   if(j.tipo === 'purga')
-    porque = 'El menos de delante del paréntesis alcanza a <b>todos</b> los de dentro: ' +
-      'tenían que caer <b>dos rayos</b>, no uno. Se van el ' + conSigno(j.fs[0]) +
-      ' y el ' + conSigno(j.fs[1]) + ', así que debía quedar en <b>' +
-      conSigno(debia) + '</b>.';
+    porque = 'El menos alcanza a <b>todos</b>. Era <b>' + conSigno(debia) + '</b>.';
   else if(j.tipo === 'baja')
-    porque = 'Retirar a uno de <b>' + conSigno(j.f) + '</b> es <b>− (' + conSigno(j.f) +
-      ')</b>, y ahí se ha <b>sumado</b> en vez de restar. Se va quien tiraba de ese ' +
-      'lado, así que el total se mueve al contrario de su signo: debía quedar en <b>' +
-      conSigno(debia) + '</b>.';
+    porque = '<b>− (' + conSigno(j.f) + ')</b> se sumó. Era <b>' + conSigno(debia) + '</b>.';
   else if(j.tipo === 'alta')
-    porque = 'Al que entra se le suma su fuerza <b>con su signo</b>, y ese es <b>' +
-      conSigno(j.f) + '</b>. Debía quedar en <b>' + conSigno(debia) + '</b>.';
+    porque = 'Entra con <b>su signo</b>. Era <b>' + conSigno(debia) + '</b>.';
   else if(j.tipo === 'potencia')
     porque = (j.menos
-      ? 'Ahí no hay paréntesis: en <b>−' + j.f + '<sup>' + j.n + '</sup></b> el menos ' +
-        'se aplica <b>al final</b>, no a la base. Entra un <b>' + j.f + '</b>.'
-      : 'El paréntesis mete el menos <b>dentro</b>: en <b>(' + conSigno(j.f) + ')<sup>' +
-        j.n + '</sup></b> el que entra al campo ya es un <b>' + conSigno(j.f) + '</b>.') +
-      ' Debía quedar en <b>' + conSigno(debia) + '</b>.';
+      ? '<b>−' + j.f + '<sup>' + j.n + '</sup></b>: el menos, al final.'
+      : '<b>(' + conSigno(j.f) + ')<sup>' + j.n + '</sup></b>: el menos, dentro.') +
+      ' Era <b>' + conSigno(debia) + '</b>.';
   else
-    porque = 'El frasco es <b>' + j.e + '</b>, con su signo: cambiarle el menos ' +
-      'cambia de bando al que bebe. Y el producto se hace <b>antes</b> de sumar, ' +
-      'que por eso entra y bebe de una vez. Debía quedar en <b>' +
-      conSigno(debia) + '</b>.';
+    porque = 'El frasco es <b>' + j.e + '</b>, con su signo. Era <b>' + conSigno(debia) + '</b>.';
   if(bien){
     argos.aciertos++;
     $('agAviso').innerHTML = porque;
@@ -4114,9 +4071,7 @@ function juzgaArgos(i){
     apuntaLogro();
   }else{
     argos.fallos++;
-    $('agAviso').innerHTML = 'El primero que falla es el <b>' + (argos.malo + 1) +
-      '</b>' + (i > argos.malo ? ', no el ' + (i + 1) + ': ese ya viene torcido de antes.'
-                               : ', no el ' + (i + 1) + '.') + ' ' + porque;
+    $('agAviso').innerHTML = 'Era el <b>' + (argos.malo + 1) + '</b>. ' + porque;
     apuntaFallo();
   }
   $('agOtra').hidden = false;
@@ -4256,10 +4211,8 @@ function aEscribir(){
   $('opPasos').hidden = false;
   pintaPasosCron();
     const n = cron.sucesos.length;
-  $('crTxt').innerHTML = 'Vuelta al principio. ' +
-    (n === 1 ? 'Ha pasado <b>una</b> cosa. ' : 'Han pasado <b>' + n + '</b> cosas. ') +
-    '<b>¿Cuál de estas cuatro lo dice?</b>';
-  $('aviso').innerHTML = 'El campo vuelve a como estaba.';
+  $('crTxt').innerHTML = '<b>¿Cuál lo dice?</b>';
+  $('aviso').innerHTML = '';
   pinta(); pintaCron();
 }
 function cronVePaso(k, animado){
@@ -4353,15 +4306,13 @@ function juzgaCron(){
       'Solo se puede retirar a quien está. Lo que pasó fue <b>' + verdad + '</b>.';
   }else if(mismo){
     bien = true;
-    txt = '<b>Clavado.</b> Eso es exactamente lo que pasó.';
+    txt = '<b>¡Clavado!</b>';
   }else if(dicho === cron.fin){
     bien = true;
-    txt = '<b>La bandera acaba en el mismo sitio</b> (' + conSigno(dicho) + '), así que tu cuenta ' +
-      'vale. Pero el campo no quedó igual: lo que pasó fue <b>' + verdad + '</b>.' + equivale();
+    txt = '<b>Vale:</b> la bandera acaba igual. Lo que pasó: <b>' + verdad + '</b>.';
   }else{
     bien = false;
-    txt = 'Con lo tuyo la bandera acaba en <b>' + conSigno(dicho) + '</b>, y lo que pasó la dejó ' +
-      'en <b>' + conSigno(cron.fin) + '</b>. Fue <b>' + verdad + '</b>.';
+    txt = 'No: acaba en <b>' + conSigno(dicho) + '</b>, no en ' + conSigno(cron.fin) + '. Fue <b>' + verdad + '</b>.';
   }
   if(bien){
     cron.aciertos++; cron.racha++; cron.seguidas++; cron.tropiezos = 0;
@@ -4400,8 +4351,7 @@ function arrancaCronista(grado){
   $('zonaEncargo').hidden = true;
   $('zonaCuenta').hidden = true;
   caraJuego(true);
-  $('crAviso').innerHTML = 'Escribe con signos lo que pase en el campo. Se corrige ' +
-    'jugando tu operación: si dice lo mismo, pasa lo mismo.';
+  $('crAviso').innerHTML = '';
   if(grado !== undefined) cron.grado = grado;
   rondaCron();
 }
@@ -4952,7 +4902,7 @@ function caraJuego(on){
 }
 function glosarioSegunHaga(hace){
   $('cajonPociones').hidden = !hace;
-  $('cajonPociones').open = !!hace;
+  $('cajonPociones').open = false;       // plegado: se abre con un toque si hace falta
 }
 function alTaller(){
     diana = null; cron = null; oper = null; argos = null; canon = null;
@@ -5063,23 +5013,23 @@ $('aLetra').addEventListener('click', () => {
 /* LA GUÍA (v7): cinco paradas comunes y, si se ven, la del modo que toca */
 const VISITA = [
   {sel:'#ruta', c:'La ruta',
-   t:'Diez misiones, de una en una. Aquí ves la que toca y cuántas llevas.'},
+   t:'Diez misiones, de una en una.'},
   {sel:'.cl-tabla', c:'La tablilla',
-   t:'La cuenta, escrita como en el cuaderno. Es la herramienta de toda la app: con ella se aprende y con ella se comprueba.'},
+   t:'La cuenta, como en el cuaderno.'},
   {sel:'#clResp', c:'Tu respuesta',
-   t:'Escribe <b>dónde acabará la bandera</b>. Si dudas, <b>▶</b> juega la cuenta en el campo.'},
+   t:'¿Dónde acaba la bandera? Si dudas, <b>▶</b>.'},
   {sel:'#cnLinea', c:'La pregunta',
-   t:'Aquí no hay nada que calcular: se pregunta por la <b>fuerza</b> de un tirador —el número sin el signo— o por <b>cuál de dos queda más a la izquierda</b>. Es la vara con la que se mide todo lo demás.'},
+   t:'La <b>fuerza</b> (sin signo) o cuál queda <b>más a la izquierda</b>.'},
   {sel:'#dnJugada', c:'Lo que va a pasar',
-   t:'Al revés que en las demás: aquí se anuncia la jugada y <b>tú dices dónde parará la bandera</b>. Arrastra el dedo por la regla y clava la estaca antes de comprobar.'},
+   t:'Se anuncia la jugada: <b>arrastra</b> hasta donde parará la bandera.'},
   {sel:'#crOpciones', c:'Escribirlo con signos',
-   t:'Pasa algo en el campo y tú lo <b>escribes como una operación</b>. Si tu escritura deja la bandera en el mismo sitio, vale: dos cuentas que acaban en el mismo punto son la misma cuenta.'},
+   t:'Elige la operación que dice <b>lo que pasó</b>.'},
   {sel:'#agLista', c:'El ojo de Argos',
-   t:'Alguien ha resuelto la cadena y en un renglón se equivocó de signo. Desde ahí todo sale torcido, pero <b>culpable solo hay uno</b>: señala el primero.'},
+   t:'Un renglón se equivocó: señala <b>el primero</b>.'},
   {sel:'.campo', siempre:true, c:'El campo',
-   t:'Los de la derecha tiran hacia los <b>positivos</b> y los de la izquierda hacia los <b>negativos</b>. Entrar es sumar; retirarse, restar. Donde para la bandera, el resultado.'},
+   t:'Derecha, <b>positivos</b>; izquierda, <b>negativos</b>. Entrar suma; retirarse resta.'},
   {sel:'.menus', siempre:true, c:'Y ya está',
-   t:'Arriba: la <b>tablilla</b> libre, el <b>taller</b> para trastear y los ajustes. A jugar.'}
+   t:'Arriba, la <b>tablilla</b> libre y el <b>taller</b>. ¡A jugar!'}
 ];
 let visita = -1, paradas = [], tourRetoque = 0;
 function seVe(el){
@@ -5282,9 +5232,7 @@ function montaCampoDeReto(){
 function cambiaReto(d){
   reto = (reto + RETOS.length + d) % RETOS.length;
   montaCampoDeReto();
-  $('aviso').textContent = RETOS[reto].inicio
-    ? 'Encargo nuevo: el campo viene ya montado.'
-    : 'Encargo nuevo, campo limpio.';
+  $('aviso').textContent = '';
   pinta();
 }
 $('otroReto').addEventListener('click', () => cambiaReto(1));
@@ -5307,9 +5255,7 @@ aplicaPandeo();
 ajustaPaso();
 if(typeof window !== 'undefined' && window.addEventListener)
   window.addEventListener('resize', () => { if(ajustaPaso()) pinta(); });
-$('aviso').innerHTML = 'Pulsa un tirador para marcarlo: podrás darle una poción o ' +
-  'retirarlo con la cruz. Retirar es <b>restar</b>. Los frascos <b>estrechos</b> ' +
-  'reparten (dividen) y los de <b>calavera</b> cambian de bando.';
+$('aviso').innerHTML = '';
 /* el arranque (retomar el turno o la misión 1) va al final del todo: la
    tablilla y las entrevistas tienen que estar montadas antes */
 
