@@ -1338,7 +1338,7 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.1</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.2</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1394,7 +1394,7 @@ body[data-fase="juego"] .marcador, body[data-fase="juego"] .veredicto{display:no
   <div id="clTeclas"></div>
   <div class="habla"><span class="cara lis" aria-hidden="true"></span><p class="aviso" id="clAviso" role="status"></p></div>
   <div class="fila" id="clPie" style="margin-top:8px">
-    <button id="clOtra">▶ Otra vez la función</button>
+    <button id="clOtra">⟲ Desde el primer fotograma</button>
     <button id="clLimpia">Tablilla limpia</button>
     <button id="clSalir">Volver al taller</button>
   </div>
@@ -5128,15 +5128,18 @@ $('tSig').addEventListener('click', () => vaVisita(visita + 1));
 $('tSalta').addEventListener('click', paraVisita);
 $('opVer').addEventListener('click', abreCampo);
 $('opSig').addEventListener('click', () => {
-  if(oper){ if(!oper.ocupado) vePaso(oper.paso + 1, true); }
+  if(calc && calc.pel){ if(!calc.jugando) vaFotograma(calc.pel.k + 1, true); }
+  else if(oper){ if(!oper.ocupado) vePaso(oper.paso + 1, true); }
   else if(cron) cronVePaso(cron.paso + 1, true);
 });
 $('opAtras').addEventListener('click', () => {
-  if(oper) vePaso(oper.paso - 1, false);
+  if(calc && calc.pel){ if(!calc.jugando) vaFotograma(calc.pel.k - 1, false); }
+  else if(oper) vePaso(oper.paso - 1, false);
   else if(cron) cronVePaso(cron.paso - 1, false);
 });
 $('opReset').addEventListener('click', () => {
-  if(oper) vePaso(0, false);
+  if(calc && calc.pel){ if(!calc.jugando) vaFotograma(0, false); }
+  else if(oper) vePaso(0, false);
   else if(cron) cronVePaso(0, false);
 });
 $('opVale').addEventListener('click', compruebaOper);
@@ -5383,7 +5386,14 @@ function teclaCalc(tk){
     T.pop();
   }
   calc.ultimo = null; calc.ultimoTxt = null;
+  sinFotogramas();
   pintaCalc();
+}
+/* si la cuenta cambia, el mazo de fotogramas de la anterior ya no vale */
+function sinFotogramas(){
+  if(!calc) return;
+  if(calc.pel){ calc.pel = null; calc.teatro++; calc.jugando = false; }
+  $('opPasos').hidden = true;
 }
 const preTxt = k => (k < 0 ? '(' + conSigno(k) + ')' : String(k)) + '·';
 /* en la tablilla se escribe como en el cuaderno: el primero sin paréntesis,
@@ -5536,13 +5546,13 @@ async function juegaTermino(t, B){
   for(const p of t.pre.slice().reverse()){
     await juntaSiHaceFalta(p.k);
     const po = POCIONES.find(x => x.k === p.k);
-    await B.bebe(ids, p.k, p.b, 'El <b>' + po.n + ' (' + preTxt(p.k) + ')</b> esperaba en el banco: ahora que ' +
+    await B.bebe(ids, p.k, p.b, 'La poción <b>' + po.n + ' (' + preTxt(p.k) + ')</b> esperaba en el banco: ahora que ' +
       (ids.length > 1 ? 'están todos, baja y <b>se lo beben todos</b>.' : 'ya está en el campo, baja y se lo bebe.'));
   }
   for(const k of t.post){
     await juntaSiHaceFalta(k);
     const po = POCIONES.find(x => Math.abs(x.k - k) < 1e-9);
-    await B.bebe(ids, k, null, (ids.length > 1 ? 'Se beben todos ' : 'Se bebe ') + 'el <b>' + po.n +
+    await B.bebe(ids, k, null, (ids.length > 1 ? 'Se beben todos ' : 'Se bebe ') + 'la poción <b>' + po.n +
       ' (' + po.e + ')</b>.');
   }
   return ids;
@@ -5714,38 +5724,104 @@ async function igualCalc(){
   /* la regla se alarga lo justo para que la bandera no se salga */
   const alcance = Math.max(8, Math.min(MAX_F, Math.ceil(lejos)));
   if(alcance !== ALCANCE){ ALCANCE = alcance; ajustaPaso(); }
-  /* a escena */
-  const tokT = calc.teatro = calc.teatro + 1;
-  calc.jugando = true; calc.ultimo = null; calc.arbol = p.arbol;
+  /* a escena, en fotogramas: un mazo de imágenes quietas que se pasan con
+     ▶ y ◀. Solo se anima el paso que toca; el resto se recompone al
+     instante. Así cada uno va a su ritmo, y en la pizarra se puede parar y
+     preguntar «¿qué pasará ahora?» antes de pasar */
+  const textos = [];
+  const cuenta = simulador();
+  const apunta = fn => async (...a) => { textos.push(a[a.length - 1] || ''); return fn(...a); };
+  const C = {f: cuenta.f, entra: apunta(cuenta.entra), retira: apunta(cuenta.retira), pareja: apunta(cuenta.pareja),
+             saco: apunta(cuenta.saco), bebe: apunta(cuenta.bebe), junta: apunta(cuenta.junta)};
+  await juegaExpr(p.arbol, [], C);
+  calc.pel = {arbol: p.arbol, valor, textos, n: textos.length, k: 0, bancos: prefijos(p.arbol, [])};
+  calc.ultimo = null; calc.arbol = p.arbol;
   $('clEscena').hidden = false;
+  $('opPasos').hidden = false;
+  pintaCalc();
+  asomaCampo();
+  await vaFotograma(0, false);
+}
+const PARA = new Error('para');
+/* recompone el campo hasta el fotograma k; si «anima», el último se juega */
+async function vaFotograma(k, anima){
+  if(!calc || !calc.pel) return;
+  const P = calc.pel;
+  k = Math.max(0, Math.min(P.n, k));
+  const tokT = calc.teatro = calc.teatro + 1;
+  calc.jugando = !!anima && k > 0;
+  P.k = k;
   quitaHitos();
   tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
   bebiendoIds.clear(); retirandoIds.clear();
-  pinta();
-  const bancos = prefijos(p.arbol, []);
-  pintaBanco(bancos);
-  pintaCalc();
-  asomaCampo();
-  if(bancos.length)
-    $('clAviso').innerHTML = $('clEscena').innerHTML = 'Los frascos escritos <b>delante</b> no tienen ' +
-      'todavía a quién dárselos: se quedan en el <b>banco</b>, esperando.';
-  else $('clEscena').innerHTML = 'Empieza la función.';
-  try{
-    if(bancos.length) await new Promise(ok => setTimeout(ok, ms(1800)));
-    await juegaExpr(p.arbol, [], teatro(tokT));
-  }catch(e){ if(e.message === 'corte') return; throw e; }
+  const gastados = new Set();
+  const T = teatro(tokT);
+  const ultimo = anima ? k - 1 : k;         // los pasos antes de este, al instante
+  let i = 0, pintado = false;
+  const prepara = () => { if(!pintado){ pinta(); pintaBanco(P.bancos.filter(b => !gastados.has(b.b))); pintado = true; } };
+  const turno = () => { const j = i++; if(j >= k) throw PARA; return j < ultimo; };
+  const B = {
+    f: T.f,
+    entra: async (f, txt) => { if(turno()){ const id = sigId++; tiradores.push({id, f}); return id; } prepara(); return T.entra(f, txt); },
+    retira: async (id, txt) => { if(turno()){ tiradores = tiradores.filter(q => q.id !== id); return; } prepara(); return T.retira(id, txt); },
+    pareja: async (f, txt) => { if(turno()){ const a = sigId++, b = sigId++; tiradores.push({id:a, f}, {id:b, f:-f}); return [a, b]; }
+                                prepara(); return T.pareja(f, txt); },
+    saco: async (ids, txt) => { if(turno()) return; prepara(); return T.saco(ids, txt); },
+    bebe: async (ids, kk, banco, txt) => {
+      if(turno()){
+        ids.forEach(id => { const q = tiradores.find(x => x.id === id); if(!q) return;
+          const nuevo = q.f * kk; if((q.f < 0) !== (nuevo < 0)) q.venia = q.f < 0 ? 'izq' : 'der'; q.f = nuevo; });
+        if(banco !== null && banco !== undefined) gastados.add(banco);
+        return;
+      }
+      prepara(); if(banco !== null && banco !== undefined) gastados.add(banco);
+      return T.bebe(ids, kk, banco, txt);
+    },
+    junta: async (ids, txt) => {
+      if(turno()){
+        const s = ids.reduce((a, id) => a + ((tiradores.find(q => q.id === id) || {f:0}).f), 0);
+        tiradores = tiradores.filter(q => ids.indexOf(q.id) < 0);
+        if(!s) return [];
+        const id = sigId++; tiradores.push({id, f:s}); return [id];
+      }
+      prepara(); return T.junta(ids, txt);
+    }
+  };
+  pintaPasosCalc();
+  try{ await juegaExpr(P.arbol, [], B); }
+  catch(e){ if(e !== PARA){ if(e.message === 'corte') return; throw e; } }
   if(!calc || calc.teatro !== tokT) return;
   calc.jugando = false;
+  base = suma(); previo = suma();
+  pinta();
+  pintaBanco(P.bancos.filter(b => !gastados.has(b.b)));
+  const dice = h => { $('clAviso').innerHTML = h; $('clEscena').innerHTML = h; };
+  if(k === 0){
+    dice((P.bancos.length ? 'Los frascos escritos <b>delante</b> no tienen todavía a quién dárselos: esperan en el <b>banco</b>. '
+                          : 'El campo, vacío. ') + 'Pulsa <b>▶</b> para pasar al primer fotograma.');
+  }else if(k < P.n) dice(P.textos[k - 1]);
+  else finFuncion(P, P.textos[k - 1]);
+  pintaPasosCalc();
+}
+function pintaPasosCalc(){
+  if(!calc || !calc.pel) return;
+  const P = calc.pel;
+  $('opPasoTxt').textContent = 'fotograma ' + P.k + ' de ' + P.n;
+  $('opAtras').disabled = P.k === 0 || calc.jugando;
+  $('opSig').disabled = P.k >= P.n || calc.jugando;
+  $('opReset').disabled = calc.jugando;
+}
+function finFuncion(P, paso){
   calc.ultimo = suma();
   pintaBanco([]);
   pintaCalc();
-  let h = 'La bandera acaba en <b>' + totalHtml(calc.ultimo) + '</b>.';
-  if(calc.ultimo !== valor) h += ' (Y debería haber acabado en ' + totalHtml(valor) + ': algo se ha torcido en escena.)';
-  if(bancos.length)
-    h += ' Lo escribiste <b>' + escribeArbol(p.arbol, false, true) + '</b> y se jugó <b>' +
-      escribeArbol(p.arbol, true, true) + '</b>: el frasco tuvo que esperar a que estuviera ' +
+  let h = (paso ? paso + ' ' : '') + 'La bandera acaba en <b>' + totalHtml(calc.ultimo) + '</b>.';
+  if(calc.ultimo !== P.valor) h += ' (Y debería haber acabado en ' + totalHtml(P.valor) + ': algo se ha torcido en escena.)';
+  if(P.bancos.length)
+    h += ' Lo escribiste <b>' + escribeArbol(P.arbol, false, true) + '</b> y se jugó <b>' +
+      escribeArbol(P.arbol, true, true) + '</b>: el frasco tuvo que esperar a que estuviera ' +
       'a quién dárselo. Es la misma cuenta, porque para multiplicar da igual el orden.';
-  const g = grupoQueBebe(p.arbol);
+  const g = grupoQueBebe(P.arbol);
   if(g){
     const k = (g.pre[0] && g.pre[0].k) || g.post[0];
     const partes = g.factor.expr.terms.filter(t => t.factor.t === 'n');
@@ -5808,6 +5884,7 @@ function arrancaTabla(m){
 async function rondaTabla(){
   if(!calc || !calc.ej) return;
   const yo = calc;
+  sinFotogramas();
   calc.teatro++; calc.jugando = false; calc.ultimo = null; calc.ultimoTxt = null;
   reglaNormal();
   let ej, tok;
@@ -5903,6 +5980,7 @@ $('clVer').addEventListener('click', () => {
   $('clOtra').addEventListener('click', () => { if(calc && !calc.jugando && calc.tok.length) igualCalc(); });
   $('clLimpia').addEventListener('click', () => {
     if(!calc) return;
+    sinFotogramas();
     calc.teatro++; calc.jugando = false; calc.tok = []; calc.ultimo = null; calc.ultimoTxt = null;
     reglaNormal();
     tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
@@ -5915,6 +5993,14 @@ $('clVer').addEventListener('click', () => {
     if(!calc || $('calc').hidden) return;
     if(ev.target && /INPUT|TEXTAREA/.test(ev.target.tagName)) return;
     const m = {'+':{t:'+'}, '-':{t:'-'}, '(':{t:'('}, ')':{t:')'}, 'Backspace':{t:'borra'}};
+    /* los fotogramas, con las flechas o con un mando de diapositivas */
+    if(calc.pel && ['ArrowRight', 'PageDown', 'ArrowLeft', 'PageUp'].indexOf(ev.key) >= 0){
+      ev.preventDefault();
+      if(!calc.jugando) vaFotograma(calc.pel.k + (ev.key === 'ArrowRight' || ev.key === 'PageDown' ? 1 : -1),
+                                    ev.key === 'ArrowRight' || ev.key === 'PageDown');
+      return;
+    }
+    if(calc.ej) return;                  // en los ejercicios no se escribe con el teclado
     if(ev.key === '=' || ev.key === 'Enter'){ ev.preventDefault(); igualCalc(); }
     else if(m[ev.key]){ ev.preventDefault(); teclaCalc(m[ev.key]); }
   });
