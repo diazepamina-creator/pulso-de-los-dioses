@@ -1330,6 +1330,15 @@ body[data-modo="calc"] .manaza{display:block;position:relative;height:0;z-index:
 .manaza.pasa .mano{animation:manoPasa .5s steps(6, end)}
 @keyframes manoPasa{35%{transform:rotate(-7deg) translate(-2px,1px)}70%{transform:rotate(5deg)}}
 body[data-modo="calc"] #opPasoTxt{padding-right:52px;white-space:nowrap}
+body:not([data-modo="calc"]) #opTodo{display:none}
+.pasos-m .op-todo{font-size:13px;letter-spacing:-2px}
+/* el pronóstico del alumno, marcado en la regla mientras se juega el paso */
+.marca-n.pronostico{color:var(--ambar);font-weight:700;background:rgba(233,184,78,.18)}
+.marca-n.pronostico::before{content:"tú";position:absolute;left:50%;top:-15px;transform:translateX(-50%);
+  font-size:9px;line-height:1.3;padding:0 3px;border-radius:3px;background:#E9B84E;color:#1A1206;font-weight:700}
+/* mientras se espera el pronóstico, la regla llama la atención */
+body[data-modo="calc"] .regla.viva{animation:reglaLlama 1.2s ease-in-out infinite alternate}
+@keyframes reglaLlama{to{border-top-color:#F9D98A;box-shadow:inset 0 1px 0 rgba(255,236,196,.3), 0 -8px 18px rgba(233,184,78,.25)}}
 @media (prefers-reduced-motion: reduce){ .hoja-vuelta.va, .hoja-vuelta.vuelve, .manaza.pasa *{animation:none} }
 /* ── la cartela karaoke ── */
 body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;width:max-content;padding:4px 12px}
@@ -1443,7 +1452,7 @@ body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;w
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.8</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v7.9</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -1599,6 +1608,7 @@ body[data-modo="calc"] .cartela:not([hidden]){white-space:normal;max-width:94%;w
     <button id="opAtras" aria-label="Atrás">◀</button>
     <button id="opSig" class="scan" aria-label="Adelante">▶</button>
     <button id="opReset" aria-label="Volver al principio">⟲</button>
+    <button id="opTodo" class="op-todo" aria-label="Repasar de un tirón" hidden>▶▶</button>
     <span class="pasos-t" id="opPasoTxt"></span>
   </div>
   <p class="veredicto" id="veredicto"></p>
@@ -2280,19 +2290,24 @@ function ajustaPaso(){
 }
 function pintaRegla(){
   const t = suma();
-    const viva = !!(diana && diana.esperando);
+    const vivaD = !!(diana && diana.esperando);
+  /* en el folioscopio, antes de un paso clave, la regla se toca para decir
+     dónde acabará la bandera */
+  const Pc = calc && calc.pel, vivaC = !!(Pc && Pc.pregunta);
+  const viva = vivaD || vivaC;
   let h = '';
   for(let v = -ALCANCE; v <= ALCANCE; v++){
     const clase = (v === 0 ? ' cero' : (tirado && v === t ? ' diana' : '')) +
       (prediccion !== null && v === prediccion ? ' elegida' : '') +
-                  (viva && prediccion === v ? ' elegida' : '');
+                  (vivaD && prediccion === v ? ' elegida' : '') +
+      (Pc && Pc.pin === v ? ' elegida pronostico' : '');
     /* «par» iba por error dentro de data-v y nunca llegaba a la clase */
     h += '<span class="marca-n' + clase + (v % 2 === 0 ? ' par' : ' impar') +
          '" data-v="' + v +
          '" style="left:calc(50% + ' + (v * PASO) + 'px)">' +
          '<i></i>' + v + '</span>';
   }
-  if(viva){
+  if(vivaD){
         h += '<span class="marca-n masalla' + (prediccion === -99 ? ' elegida' : '') +
          '" data-v="-99" style="left:calc(50% - ' + (9.4 * PASO) + 'px)"><i></i>«</span>' +
          '<span class="marca-n masalla' + (prediccion === 99 ? ' elegida' : '') +
@@ -2303,9 +2318,9 @@ function pintaRegla(){
   $('regla').classList.toggle('ancha', PASO >= 19);
   $('regla').classList.toggle('estrecha', PASO < 18 || ALCANCE > 8);
   $('regla').classList.toggle('viva', viva);
-  document.querySelector('.campo').classList.toggle('eligiendo', viva);
-  $('dial').hidden = !viva;
-  if(viva) marcaElegida();
+  document.querySelector('.campo').classList.toggle('eligiendo', vivaD);
+  $('dial').hidden = !vivaD;
+  if(vivaD) marcaElegida();
 }
 function ponHitos(vals){
   quitaHitos();
@@ -2427,6 +2442,7 @@ let arrastrando = false;
 })();
 $('regla').addEventListener('click', ev => {
   const m = ev.target.closest('.marca-n');
+  if(m && calc && calc.pel && calc.pel.pregunta){ eligeFotograma(parseInt(m.dataset.v, 10)); return; }
   if(!m || !diana || !diana.esperando) return;
   ponPrediccion(parseInt(m.dataset.v, 10));
 });
@@ -5186,7 +5202,7 @@ $('tSig').addEventListener('click', () => vaVisita(visita + 1));
 $('tSalta').addEventListener('click', paraVisita);
 $('opVer').addEventListener('click', abreCampo);
 $('opSig').addEventListener('click', () => {
-  if(calc && calc.pel){ if(!calc.jugando) vaFotograma(calc.pel.k + 1, true); }
+  if(calc && calc.pel) avanzaFotograma();
   else if(oper){ if(!oper.ocupado) vePaso(oper.paso + 1, true); }
   else if(cron) cronVePaso(cron.paso + 1, true);
 });
@@ -5195,6 +5211,7 @@ $('opAtras').addEventListener('click', () => {
   else if(oper) vePaso(oper.paso - 1, false);
   else if(cron) cronVePaso(cron.paso - 1, false);
 });
+$('opTodo').addEventListener('click', repasaFuncion);
 $('opReset').addEventListener('click', () => {
   if(calc && calc.pel){ if(!calc.jugando) vaFotograma(0, false); }
   else if(oper) vePaso(0, false);
@@ -5801,11 +5818,18 @@ async function igualCalc(){
      preguntar «¿qué pasará ahora?» antes de pasar */
   const textos = [];
   const cuenta = simulador();
-  const apunta = fn => async (...a) => { textos.push(a[a.length - 1] || ''); return fn(...a); };
-  const C = {f: cuenta.f, entra: apunta(cuenta.entra), retira: apunta(cuenta.retira), pareja: apunta(cuenta.pareja),
-             saco: apunta(cuenta.saco), bebe: apunta(cuenta.bebe), junta: apunta(cuenta.junta)};
+  const tipos = [], sumas = [];
+  const apunta = (tipo, fn) => async (...a) => { textos.push(a[a.length - 1] || ''); tipos.push(tipo);
+    const r = await fn(...a); sumas.push(cuenta.suma()); return r; };
+  const C = {f: cuenta.f, entra: apunta('entra', cuenta.entra), retira: apunta('retira', cuenta.retira),
+             pareja: apunta('pareja', cuenta.pareja), saco: apunta('saco', cuenta.saco),
+             bebe: apunta('bebe', cuenta.bebe), junta: apunta('junta', cuenta.junta)};
   await juegaExpr(p.arbol, [], C);
-  calc.pel = {arbol: p.arbol, valor, textos, n: textos.length, k: 0, bancos: prefijos(p.arbol, [])};
+  /* pasos clave: una poción o alguien que se retira, y que muevan la
+     bandera. Antes de jugarlos se pregunta dónde acabará */
+  const clave = tipos.map((t, i) => (t === 'bebe' || t === 'retira') && sumas[i] !== (i ? sumas[i - 1] : 0));
+  calc.pel = {arbol: p.arbol, valor, textos, n: textos.length, k: 0, bancos: prefijos(p.arbol, []),
+              sumas, clave, dichos: {}, pregunta: 0, pin: null, pinPara: 0, visto: false, repaso: 0};
   calc.ultimo = null; calc.arbol = p.arbol;
   $('clAviso').innerHTML = '';
   $('opPasos').hidden = false;
@@ -5881,6 +5905,8 @@ async function vaFotograma(k, anima){
   if(!calc || !calc.pel) return;
   const P = calc.pel;
   k = Math.max(0, Math.min(P.n, k));
+  P.pregunta = 0;
+  if(P.pinPara !== k) P.pin = null;
   if(k !== P.k) pasaHoja(k > P.k ? 1 : -1);
   const tokT = calc.teatro = calc.teatro + 1;
   calc.jugando = !!anima && k > 0;
@@ -5939,20 +5965,68 @@ async function vaFotograma(k, anima){
   base = suma(); previo = suma();
   pinta();
   pintaBanco(P.bancos.filter(b => !gastados.has(b.b)));
+  let o = P.textos[k - 1];
+  if(k > 0 && anima && P.pinPara === k && P.pin !== null) o = Object.assign({}, o, {x: veredicto(P, k, o)});
   if(k === 0) cartela({m: P.bancos.map(b => b.ti), x: P.bancos.length ? 'espera en el banco' : 'pulsa ▶'});
-  else if(k < P.n) cartela(P.textos[k - 1]);
-  else finFuncion(P, P.textos[k - 1]);
+  else if(k < P.n) cartela(o);
+  else finFuncion(P, o);
   pintaPasosCalc();
+}
+/* ▶ adelante; antes de un paso clave, primero la pregunta. Un segundo ▶
+   sin tocar la regla lo juega igual (para el profe en la pizarra) */
+function avanzaFotograma(){
+  if(!calc || !calc.pel || calc.jugando) return;
+  const P = calc.pel, k = P.k;
+  if(k >= P.n) return;
+  if(P.clave[k] && !(k in P.dichos) && !P.pregunta){
+    P.pregunta = k + 1;
+    cartela({m: P.textos[k].m, x: '¿dónde acabará? <b>toca la regla</b>'});
+    pinta();
+    pintaPasosCalc();
+    return;
+  }
+  vaFotograma(k + 1, true);
+}
+function eligeFotograma(v){
+  const P = calc && calc.pel;
+  if(!P || !P.pregunta || calc.jugando) return;
+  const k = P.pregunta;
+  P.dichos[k - 1] = v; P.pin = v; P.pinPara = k;
+  vaFotograma(k, true);
+}
+function veredicto(P, k, o){
+  const dicho = P.dichos[k - 1], real = P.sumas[k - 1];
+  const v = dicho === real ? '<b>¡clavado!</b>'
+    : 'dijiste ' + conSigno(dicho) + ', acaba en <b>' + conSigno(real) + '</b>';
+  return (o && o.x ? o.x + ' · ' : '') + v;
+}
+/* ▶▶ repasa la función entera de un tirón, sin preguntas. Se para en
+   cuanto se toca otro botón */
+async function repasaFuncion(){
+  const P = calc && calc.pel;
+  if(!P || calc.jugando) return;
+  const yo = ++P.repaso;
+  const sigue = k => calc && calc.pel === P && P.repaso === yo && P.k === k;
+  await vaFotograma(0, false);
+  for(let k = 1; k <= P.n; k++){
+    if(!sigue(k - 1)) return;
+    await new Promise(ok => setTimeout(ok, ms(k === 1 ? 250 : 550)));
+    if(!sigue(k - 1)) return;
+    await vaFotograma(k, true);
+  }
 }
 function pintaPasosCalc(){
   if(!calc || !calc.pel) return;
   const P = calc.pel;
   $('opPasoTxt').textContent = 'fotograma ' + P.k + ' de ' + P.n;
+  $('opTodo').hidden = !P.visto;
+  $('opTodo').disabled = calc.jugando;
   $('opAtras').disabled = P.k === 0 || calc.jugando;
   $('opSig').disabled = P.k >= P.n || calc.jugando;
   $('opReset').disabled = calc.jugando;
 }
 function finFuncion(P, paso){
+  P.visto = true;
   calc.ultimo = suma();
   pintaBanco([]);
   pintaCalc();
@@ -6151,8 +6225,8 @@ $('clVer').addEventListener('click', () => {
     /* los fotogramas, con las flechas o con un mando de diapositivas */
     if(calc.pel && ['ArrowRight', 'PageDown', 'ArrowLeft', 'PageUp'].indexOf(ev.key) >= 0){
       ev.preventDefault();
-      if(!calc.jugando) vaFotograma(calc.pel.k + (ev.key === 'ArrowRight' || ev.key === 'PageDown' ? 1 : -1),
-                                    ev.key === 'ArrowRight' || ev.key === 'PageDown');
+      if(ev.key === 'ArrowRight' || ev.key === 'PageDown') avanzaFotograma();
+      else if(!calc.jugando) vaFotograma(calc.pel.k - 1, false);
       return;
     }
     if(calc.ej) return;                  // en los ejercicios no se escribe con el teclado
