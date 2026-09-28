@@ -5839,16 +5839,31 @@ function hojeo(si){
 (() => {
   const m = $('manaza'); if(!m) return;
   const P = JV.piel, S = JV.sombra, T = TINTA;
-  /* una sola silueta: el pulgar encima de la esquina y el puño debajo */
+  /* una pezuña gorda, como sus manos de bola: dos dedos rechonchos con la
+     punta de cuerno apretando la esquina, y la manga morada de su banda.
+     Las formas se pintan dos veces (contorno y relleno) para que el
+     contorno salga de una pieza */
+  const dedo = (cx, cy, a) => '<ellipse transform="translate(' + cx + ' ' + cy + ') rotate(' + a + ')" rx="10.5" ry="7.5"/>';
+  const formas = ['<ellipse cx="62" cy="46" rx="15" ry="12.5"/>', dedo(43, 37, 28), dedo(57, 26, 72),
+    '<path d="M64 52 L86 45.5 L86 63.5 L66 61 Z"/>'];
+  const capa = (fill, st) => '<g fill="' + fill + '"' + (st ? ' stroke="' + T + '" stroke-width="3.6" stroke-linejoin="round"' : '') + '>' + formas.join('') + '</g>';
+  /* la punta de cuerno: el extremo del dedo, cortado en recto */
+  const cuerno = (cx, cy, a, id) => '<g transform="translate(' + cx + ' ' + cy + ') rotate(' + a + ')">' +
+    '<clipPath id="' + id + '"><ellipse rx="10.5" ry="7.5"/></clipPath>' +
+    '<g clip-path="url(#' + id + ')"><rect x="-12" y="-9" width="8.5" height="18" fill="#9A7650"/>' +
+    '<rect x="-12" y="2" width="8.5" height="7" fill="#7A5A3A"/>' +
+    '<path d="M-3.5 -9 Q-2 0 -3.5 9" fill="none" stroke="' + T + '" stroke-width="1.5"/>' +
+    '<path d="M-9 -3.5 q.6 -2.2 2.6 -3" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity=".6"/></g></g>';
   m.innerHTML = '<svg viewBox="0 0 84 64"><g class="mano">' +
-    '<path d="M36 23 Q41 20 46 25 L58 38 Q60 33 66 34 Q70 30 75 34 Q80 32 83 38 Q88 46 84 56 L87 72 L64 72 ' +
-      'Q61 61 54 57 Q46 51 40 41 Q34 32 33 28 Q33 24 36 23 Z" fill="' + P + '" stroke="' + T + '" stroke-width="1.8" stroke-linejoin="round"/>' +
-    /* la uña del pulgar */
-    '<path d="M35.5 24 Q33.5 27 35 31 Q39 30 40.5 26 Q38.5 23.5 35.5 24 Z" fill="#F3EAD0" stroke="' + T + '" stroke-width="1"/>' +
-    /* los dedos doblados y el pliegue del pulgar */
-    '<path d="M66 35 q1.5 4 -.5 8 M75 35 q1.5 4 -.5 8 M45 37 q3 -1.5 5.5 1.5" fill="none" stroke="' + T + '" stroke-width="1.2" stroke-linecap="round"/>' +
-    /* escamas */
-    '<path d="M64 50 q4 -3 8 0 M72 58 q4 -3 8 0 M65 64 q4 -3 8 0" fill="none" stroke="' + S + '" stroke-width="1.5" stroke-linecap="round"/>' +
+    capa(T, true) + capa(P, false) +
+    cuerno(43, 37, 28, 'mzA') + cuerno(57, 26, 72, 'mzB') +
+    /* la hendidura de la pezuña */
+    '<path d="M49.5 32.5 q3.5 3 3.5 8" fill="none" stroke="' + T + '" stroke-width="1.5" stroke-linecap="round"/>' +
+    /* un brillo, y la manga con su ribete de oro */
+    '<ellipse cx="60" cy="43" rx="5" ry="3" fill="#fff" opacity=".22" transform="rotate(-20 60 43)"/>' +
+    '<path d="M74 48.5 L86 45.5 L86 63.5 L75 62.5 Z" fill="' + JV.banda + '" stroke="' + T + '" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<path d="M74 48.5 L75 62.5" stroke="' + JV.oro + '" stroke-width="2.4"/>' +
+    '<path d="M65 58 q3 -2.5 6 0" fill="none" stroke="' + S + '" stroke-width="1.4" stroke-linecap="round"/>' +
     '</g></svg>';
 })();
 /* una hoja entera que se vuelve sobre el lomo: hacia delante (1) o atrás (-1) */
