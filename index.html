@@ -670,58 +670,58 @@
   .reto.hecho{border-color:var(--green);border-style:solid;
     background:linear-gradient(180deg,rgba(155,209,100,.08),var(--panel-2))}
   button.vetada{opacity:.2;pointer-events:none;filter:grayscale(1)}
-    button.poc{position:relative;display:flex;flex-direction:column;align-items:center;
+    :is(button,span).poc{position:relative;display:flex;flex-direction:column;align-items:center;
     gap:3px;padding:8px 8px 6px;min-width:60px;border-color:var(--line);
     color:var(--ink);background:var(--panel-2)}
-    button.poc .frasco{position:relative;width:24px;height:34px}
-  button.poc .frasco::after{content:'';position:absolute;left:8px;right:8px;bottom:0;
+    :is(button,span).poc .frasco{position:relative;width:24px;height:34px}
+  :is(button,span).poc .frasco::after{content:'';position:absolute;left:8px;right:8px;bottom:0;
     height:4px;border-radius:1px 1px 3px 3px;
     background:rgba(244,240,230,.1);border:1px solid rgba(244,240,230,.26);border-top:0}
-  button.poc.mengua .frasco::after{left:9px;right:9px}
-    button.poc .vidrio{position:absolute;left:2px;right:2px;bottom:4px;height:22px;
+  :is(button,span).poc.mengua .frasco::after{left:9px;right:9px}
+    :is(button,span).poc .vidrio{position:absolute;left:2px;right:2px;bottom:4px;height:22px;
     border-radius:10px 10px 8px 8px / 8px 8px 15px 15px;
     background:rgba(244,240,230,.05);
     border:1px solid rgba(244,240,230,.24);overflow:hidden}
-    button.poc .asa{position:absolute;top:8px;width:7px;height:11px;
+    :is(button,span).poc .asa{position:absolute;top:8px;width:7px;height:11px;
     border:1.5px solid rgba(244,240,230,.3);background:none}
-  button.poc .asa.i{left:-1px;border-right:0;border-radius:7px 0 0 7px}
-  button.poc .asa.d{right:-1px;border-left:0;border-radius:0 7px 7px 0}
-  button.poc.mengua .asa{display:none}        button.poc .liquido{position:absolute;left:0;right:0;bottom:0;height:64%;
+  :is(button,span).poc .asa.i{left:-1px;border-right:0;border-radius:7px 0 0 7px}
+  :is(button,span).poc .asa.d{right:-1px;border-left:0;border-radius:0 7px 7px 0}
+  :is(button,span).poc.mengua .asa{display:none}        :is(button,span).poc .liquido{position:absolute;left:0;right:0;bottom:0;height:64%;
     background:currentColor;opacity:.85}
-  button.poc.mengua .liquido{height:34%}
-    button.poc.mengua .vidrio{left:6px;right:6px;border-radius:4px 4px 6px 6px / 4px 4px 9px 9px}
-  button.poc.mengua .cuello{left:9px;right:9px}
-  button.poc.mengua .corcho{left:7px;right:7px}
-  button.poc .liquido::after{content:'';position:absolute;left:0;right:0;top:-3px;height:6px;
+  :is(button,span).poc.mengua .liquido{height:34%}
+    :is(button,span).poc.mengua .vidrio{left:6px;right:6px;border-radius:4px 4px 6px 6px / 4px 4px 9px 9px}
+  :is(button,span).poc.mengua .cuello{left:9px;right:9px}
+  :is(button,span).poc.mengua .corcho{left:7px;right:7px}
+  :is(button,span).poc .liquido::after{content:'';position:absolute;left:0;right:0;top:-3px;height:6px;
     border-radius:50%;background:currentColor;opacity:.55}
-  button.poc .burbu{position:absolute;width:4px;height:4px;border-radius:50%;
+  :is(button,span).poc .burbu{position:absolute;width:4px;height:4px;border-radius:50%;
     background:rgba(244,240,230,.6);bottom:6px;animation:burbuja 2.4s ease-in-out infinite}
-  button.poc .burbu.b1{left:6px} button.poc .burbu.b2{left:13px;width:3px;height:3px;
+  :is(button,span).poc .burbu.b1{left:6px} :is(button,span).poc .burbu.b2{left:13px;width:3px;height:3px;
     animation-delay:.9s}
   @keyframes burbuja{0%{transform:translateY(0);opacity:0}
     20%{opacity:.8}80%{opacity:.5}100%{transform:translateY(-16px);opacity:0}}
-  button.poc .cuello{position:absolute;left:8px;right:8px;top:4px;height:7px;
+  :is(button,span).poc .cuello{position:absolute;left:8px;right:8px;top:4px;height:7px;
     background:rgba(244,240,230,.09);border-left:1px solid rgba(244,240,230,.22);
     border-right:1px solid rgba(244,240,230,.22)}
-  button.poc .corcho{position:absolute;left:6px;right:6px;top:0;height:5px;border-radius:2px;
+  :is(button,span).poc .corcho{position:absolute;left:6px;right:6px;top:0;height:5px;border-radius:2px;
     background:#8a6f45;box-shadow:inset 0 -2px 0 rgba(0,0,0,.25)}
-  button.poc .nom{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.6px;
+  :is(button,span).poc .nom{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.6px;
     text-transform:uppercase;line-height:1.1;max-width:66px}
-    button.poc .etq{letter-spacing:1px;font-size:12.5px;
+    :is(button,span).poc .etq{letter-spacing:1px;font-size:12.5px;
     font-family:'Space Mono',monospace;font-size:11px;opacity:.75}
-  button.poc.crece{color:var(--green)} button.poc.mengua{color:#86A7E8}
-  button.poc.bando{color:#E14FC6}
-  button.poc.bando .vidrio{border-color:rgba(225,79,198,.55);
+  :is(button,span).poc.crece{color:var(--green)} :is(button,span).poc.mengua{color:#86A7E8}
+  :is(button,span).poc.bando{color:#E14FC6}
+  :is(button,span).poc.bando .vidrio{border-color:rgba(225,79,198,.55);
     box-shadow:0 0 8px rgba(225,79,198,.25)}
-    button.poc:disabled{opacity:.32}
-  #cajonPociones.glosario button.poc:disabled{opacity:1;cursor:default;
+    :is(button,span).poc:disabled{opacity:.32}
+  #cajonPociones.glosario :is(button,span).poc:disabled{opacity:1;cursor:default;
     background:transparent;border-color:rgba(244,240,230,.06)}
-  #cajonPociones.glosario button.poc:disabled .poc-n{color:var(--ink)}
-      button.poc .calavera{position:absolute;top:-8px;right:-9px;width:21px;height:21px;
+  #cajonPociones.glosario :is(button,span).poc:disabled .poc-n{color:var(--ink)}
+      :is(button,span).poc .calavera{position:absolute;top:-8px;right:-9px;width:21px;height:21px;
     border-radius:50%;background:#fff;border:1.5px solid #E14FC6;
     display:flex;align-items:center;justify-content:center;
     box-shadow:0 0 10px rgba(225,79,198,.55);animation:late 2s ease-in-out infinite}
-  button.poc .calavera svg{width:14px;height:14px;display:block}
+  :is(button,span).poc .calavera svg{width:14px;height:14px;display:block}
   @keyframes late{0%,100%{transform:scale(1);box-shadow:0 0 10px rgba(225,79,198,.5)}
     50%{transform:scale(1.13);box-shadow:0 0 16px rgba(225,79,198,.8)}}
   .aviso{font-size:13px;line-height:1.6;color:var(--muted);margin:8px 0 0;min-height:32px}
@@ -1025,8 +1025,8 @@ html[data-tema="tablilla"]{min-height:100%;
 [data-tema="tablilla"] .sello{color:#fff8e6;background:var(--marco);box-shadow:none}
 [data-tema="tablilla"] button:where(:not(.tirador):not(.poc)){background:var(--panel-2);border-color:var(--line);color:var(--ink)}
 /* las pociones guardan su color, en tono de tinta para leerse sobre el barro */
-[data-tema="tablilla"] button.poc.mengua{color:#3d63b0}
-[data-tema="tablilla"] button.poc.bando{color:#a5308f}
+[data-tema="tablilla"] :is(button,span).poc.mengua{color:#3d63b0}
+[data-tema="tablilla"] :is(button,span).poc.bando{color:#a5308f}
 [data-tema="tablilla"] .panel{padding:11px}
 [data-tema="tablilla"] button.scan, [data-tema="tablilla"] #bTormenta{
   background:#d7a646;border-color:#a67a1f;color:#241b36}
@@ -1160,6 +1160,16 @@ html[data-tema="tablilla"]{--habla-j:#faf1ef; --habla-j-b:#d48b7a;
 .banco-f .frasco{zoom:.55}
 .banco-f i{font-style:normal;font-family:'Space Mono',monospace;font-size:13px;font-weight:700}
 .banco-f.baja{transform:translateY(40px) scale(.6);opacity:0}
+/* en el banquillo: los frascos esperan de pie a la derecha, grandes, y bajan
+   hacia el jugador cuando le toca beber */
+.banquillo .banco{top:auto;left:auto;right:10px;bottom:24px;z-index:2;background:none;border:0;box-shadow:none;padding:0;gap:8px}
+.banquillo .banco-t{display:none}
+.banquillo .banco-f{flex-direction:column;gap:1px;animation:frascoEspera 2.4s ease-in-out infinite alternate}
+.banquillo .banco-f .frasco{zoom:.95}
+.banquillo .banco-f i{font-size:12px}
+@keyframes frascoEspera{to{transform:translateY(-3px)}}
+.banquillo .banco-f.baja{animation:none;transform:translateX(-80px) translateY(10px) scale(.5);opacity:0}
+@media (prefers-reduced-motion: reduce){ .banquillo .banco-f{animation:none} }
 
 /* ── LAS ENTREVISTAS ── */
 .ev-quien{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 8px}
@@ -1339,6 +1349,10 @@ body[data-modo="calc"] .banquillo:not([hidden]){display:block;position:relative;
 .bq.trago{animation:bqTrago .5s ease}
 @keyframes bqTrago{40%{transform:scale(1.18) rotate(-6deg)}}
 .bq.sale{transform:translateY(60px);opacity:0}
+.bq.junta{animation:bqJunta 1s ease forwards}
+@keyframes bqJunta{60%{transform:scale(.8);opacity:.9}100%{transform:scale(.3);opacity:0}}
+/* el banquillo, en fila: si son muchos, más pequeños */
+.bq-sitio:has(.bq:nth-child(4)) .bq svg{height:56px}
 .bq-frasco{position:absolute;left:78%;top:-4px;width:30px;z-index:2;filter:drop-shadow(0 0 4px rgba(249,217,138,.7));transform:translateX(-50%);animation:bqFrasco 1.1s ease forwards;line-height:0}
 .bq-frasco svg{width:30px;height:auto}
 @keyframes bqFrasco{0%{transform:translate(-50%,-26px) scale(.6);opacity:0}25%{transform:translate(-50%,-18px) scale(1);opacity:1}
@@ -1484,7 +1498,7 @@ body[data-modo="calc"] .cartela:not([hidden]){display:flex;flex-direction:column
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.6</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.7</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -3507,7 +3521,7 @@ const NIVELES_OP = [
   {ops:3, tipos:['mas','menos'],        t:'tres operaciones', libre:true},
   {ops:2, tipos:['mas','menos','por'],  t:'con pociones: el frasco va antes', obliga:'termino'},
   {ops:3, tipos:['mas','menos','por'],  t:'tres operaciones y pociones', libre:true, obliga:'termino'},
-  {ops:0, forma:'parentesis',           t:'paréntesis: todos beben'},
+  {ops:0, forma:'parentesis',           t:'paréntesis: primero se reduce'},
   {ops:0, forma:'menosgrupo',           t:'menos delante del paréntesis'},
   {ops:0, forma:'potencias',            t:'potencias: dónde está el paréntesis'}
 ];
@@ -5610,7 +5624,7 @@ const rango = (a, z) => { const r = []; for(let q = a; q <= z; q++) r.push(q); r
 const conSi = (t, r) => t.si === null || t.si === undefined ? r : [t.si].concat(r);
 const trozoFactor = t => rango(t.factor.a, t.factor.z).concat(t.ei !== null && t.ei !== undefined ? [t.ei] : []);
 const opTxt = k => Number.isInteger(k) ? '·' + (k < 0 ? '(' + conSigno(k) + ')' : k) : etqDe(k);
-const cuentaBebe = (B, ids, k) => ids.slice(0, 3).map(id => '(' + conSigno(B.f(id)) + ')' + opTxt(k) + ' = ' +
+const cuentaBebe = (B, ids, k) => !ids.length ? '0' + opTxt(k) + ' = 0' : ids.slice(0, 3).map(id => '(' + conSigno(B.f(id)) + ')' + opTxt(k) + ' = ' +
   conSigno(B.f(id) * k)).join(' &nbsp; ') + (ids.length > 3 ? ' …' : '');
 async function juegaExpr(e, ambito, B){
   for(const t of e.terms){
@@ -5634,7 +5648,13 @@ async function juegaExpr(e, ambito, B){
       const compuesto = !!(t.pre.length || t.post.length || t.exp > 1 || t.sign === '-');
       /* NIVEL 1: un jugador solo se prepara en el banquillo y sale ya hecho.
          (Un paréntesis que bebe todavía se hace en la cuerda, con la bandera quieta) */
-      const alBanco = compuesto && t.factor.t === 'n' && !!B.banquillo;
+      /* NIVEL 2: un paréntesis de sumas sueltas también va al banquillo: allí
+         se reduce a uno solo y luego bebe. Más hondo (nivel 3), sin teatro */
+      const simple = t.factor.t === 'n' || t.factor.expr.terms.every(u =>
+        u.factor.t === 'n' && !u.pre.length && !u.post.length && !(u.exp > 1));
+      if(compuesto && !simple && B.banquillo && t.factor.t === 'g' && (t.pre.length || t.post.length || t.exp > 1 || t.sign === '-'))
+        throw new Error('Aquí hay un paréntesis que bebe con otra operación dentro: demasiados niveles para el teatro.');
+      const alBanco = compuesto && simple && !!B.banquillo;
       if(alBanco) B.banquillo(true);
       else if(compuesto && B.abre) B.abre();
       let ids = await juegaTermino(t, B);
@@ -5647,7 +5667,8 @@ async function juegaExpr(e, ambito, B){
         const desde = t.pre.length ? t.pre[0].ti : t.factor.a;
         const hasta = t.postI.length ? t.postI[t.postI.length - 1] : (t.ei !== null ? t.ei : t.factor.z);
         const v = ids.length === 1 ? B.f(ids[0]) : undefined;
-        ids = await B.sale(ids, {m: conSi(t, rango(desde, hasta)), x: v !== undefined ? 'sale a tirar el <b>' + conSigno(v) + '</b>' : 'sale a tirar', sale: true});
+        ids = await B.sale(ids, {m: conSi(t, rango(desde, hasta)), sale: true,
+          x: !ids.length ? 'vale 0: no sale nadie' : (v !== undefined ? 'sale a tirar el <b>' + conSigno(v) + '</b>' : 'salen a tirar')});
       }else if(compuesto && B.cierra) B.cierra();
       ambito.push(...ids);
     }
@@ -5660,7 +5681,12 @@ async function juegaTermino(t, B){
     ids = [await B.entra(t.factor.f, {m: t.pre.length || t.sign === '-' ? [t.factor.a] : conSi(t, [t.factor.a]), x: ''})];
   }else{
     ids = await juegaExpr(t.factor.expr, [], B);
-    if(t.pre.length || t.post.length)
+    if(B.dentro && B.dentro()){
+      /* en el banquillo, lo normal: primero se reduce el paréntesis a uno solo */
+      const s = ids.reduce((a, id) => a + B.f(id), 0);
+      if(ids.length > 1 || !ids.length)
+        ids = await B.junta(ids, {m: rango(t.factor.a, t.factor.z), x: 'el paréntesis vale <b>' + (s ? conSigno(s) : '0') + '</b>'});
+    }else if(t.pre.length || t.post.length)
       await B.saco(ids, {m: rango(t.factor.a, t.factor.z), x: ids.length ? 'la cuadrilla, lista' : 'vacía: vale 0'});
   }
   /* LA POTENCIA: elevar es multiplicar por sí mismo, así que el tirador se
@@ -5716,25 +5742,26 @@ function simulador(){
   };
   return {
     f: id => m.has(id) ? m.get(id) : bq.get(id), suma, lejos: () => lejos,
-    banquillo: si => { enBanco = si; },
+    banquillo: si => { enBanco = si; }, dentro: () => enBanco,
     sale: async ids => { ids.forEach(id => { m.set(id, bq.get(id)); bq.delete(id); }); mira(); return ids; },
     entra: async f => { const id = n++; if(enBanco){ bq.set(id, f); return id; } m.set(id, f); mira(); return id; },
     junta: async ids => {
-      const s = ids.reduce((a, id) => a + m.get(id), 0);
-      ids.forEach(id => m.delete(id));
+      const M = ids.length && bq.has(ids[0]) ? bq : m;
+      const s = ids.reduce((a, id) => a + M.get(id), 0);
+      ids.forEach(id => M.delete(id));
       if(!s) return [];
-      const id = n++; m.set(id, s); mira(); return [id];
+      const id = n++; M.set(id, s); if(M === m) mira(); return [id];
     },
-    retira: async id => { m.delete(id); mira(); },
-    pareja: async f => { const a = n++, b = n++; m.set(a, f); m.set(b, -f); mira(); return [a, b]; },
+    retira: async id => { if(bq.has(id)){ bq.delete(id); return; } m.delete(id); mira(); },
+    pareja: async f => { const a = n++, b = n++; if(enBanco){ bq.set(a, f); bq.set(b, -f); return [a, b]; }
+                         m.set(a, f); m.set(b, -f); mira(); return [a, b]; },
     saco: async () => {},
     bebe: async (ids, k) => {
       ids.forEach(id => {
         const M = bq.has(id) ? bq : m;
         const v = M.get(id) * k;
         if(!Number.isInteger(v)) throw new Error('El de <b>' + conSigno(M.get(id)) + '</b> no se puede repartir ' +
-          'así: le tocaría <b>' + String(Math.round(v * 100) / 100).replace('.', ',') + '</b>, y aquí se tira con fuerzas enteras.' +
-          (ids.length > 1 ? ' En un paréntesis el frasco se lo bebe <b>cada uno</b> de dentro.' : ''));
+          'así: le tocaría <b>' + String(Math.round(v * 100) / 100).replace('.', ',') + '</b>, y aquí se tira con fuerzas enteras.');
         if(Math.abs(v) > MAX_F) throw new Error('Un tirador de fuerza <b>' + Math.abs(v) + '</b> no cabe en la ' +
           'palestra: como mucho ' + MAX_F + '.');
         M.set(id, v);
@@ -5761,7 +5788,7 @@ function teatro(tokT){
   const deBanco = id => banquillo.find(q => q.id === id);
   return {
     f: id => { const p = tiradores.find(q => q.id === id) || deBanco(id); return p ? p.f : undefined; },
-    banquillo: si => { enBanco = si; },
+    banquillo: si => { enBanco = si; }, dentro: () => enBanco,
     entra: async (f, txt) => {
       await quieto();
       if(enBanco){
@@ -5786,12 +5813,30 @@ function teatro(tokT){
       return nuevos;
     },
     retira: async (id, txt) => {
-      await quieto(); dice(txt); retira(id);
+      await quieto(); dice(txt);
+      if(deBanco(id)){ pintaBanquillo({sale: [id]}); await pausa(600); banquillo = banquillo.filter(x => x.id !== id); pintaBanquillo(); return; }
+      retira(id);
       await new Promise(ok => trasRetirar(id, ok)); if(!vivo()) throw new Error('corte');
     },
-    pareja: async (f, txt) => { await quieto(); const id = entraPareja(f); dice(txt); await pausa(2500); return [id, id + 1]; },
+    pareja: async (f, txt) => {
+      await quieto();
+      if(enBanco){ dice(txt); const a = sigId++, b = sigId++; banquillo.push({id: a, f}, {id: b, f: -f});
+        pintaBanquillo({llega: a}); await pausa(1300); return [a, b]; }
+      const id = entraPareja(f); dice(txt); await pausa(2500); return [id, id + 1];
+    },
     junta: async (ids, txt) => {
       await quieto(); dice(txt);
+      /* en el banquillo: el paréntesis se reduce a uno solo */
+      if(ids.length && ids.every(id => deBanco(id))){
+        const s = ids.reduce((a, id) => a + deBanco(id).f, 0);
+        pintaBanquillo({junta: ids}); await pausa(1100);
+        banquillo = banquillo.filter(q => ids.indexOf(q.id) < 0);
+        let nuevo = [];
+        if(s){ const id = sigId++; banquillo.push({id, f: s}); nuevo = [id]; pintaBanquillo({llega: id}); }
+        else pintaBanquillo();
+        await pausa(900);
+        return nuevo;
+      }
       const s = ids.reduce((a, id) => a + ((tiradores.find(q => q.id === id) || {f:0}).f), 0);
       sacoSobre(ids.map(id => document.querySelector('.tirador[data-id="' + id + '"]')), '= ' + (s ? conSigno(s) : '0'), 1700);
       await pausa(1500);
@@ -5847,15 +5892,18 @@ function pintaBanquillo(anim){
     if(anim.llega === q.id) c += ' llega';
     if(anim.trago === q.id) c += ' trago';
     if(anim.sale && anim.sale.indexOf(q.id) >= 0) c += ' sale';
+    if(anim.junta && anim.junta.indexOf(q.id) >= 0) c += ' junta';
     const po = anim.bebe === q.id ? (POCIONES.find(x => Math.abs(x.k - anim.k) < 1e-9) || POCIONES.find(x => x.k === -1)) : null;
     return '<span class="' + c + '" data-bq="' + q.id + '">' + dibujaTirador(q, 13) +
-      '<b class="bq-f">' + conSigno(q.f) + '</b>' + (po ? '<span class="bq-frasco">' + frascoHtml(po) + '</span>' : '') + '</span>';
+      '<b class="bq-f">' + conSigno(q.f) + '</b>' + (po ? '<span class="bq-frasco ' + clasePoc(po) + '">' + frascoHtml(po) + '</span>' : '') + '</span>';
   }).join('');
 }
 function pintaBanco(lista){
-  const campo = document.querySelector('.campo');
-  let b = campo.querySelector('.banco');
-  if(!b){ b = document.createElement('div'); b.className = 'banco'; campo.appendChild(b); }
+  /* las pociones que esperan van al banquillo, junto a quien se las beberá */
+  const casa = $('banquillo') || document.querySelector('.campo');
+  document.querySelectorAll('.campo > .banco').forEach(e => e.remove());
+  let b = casa.querySelector('.banco');
+  if(!b){ b = document.createElement('div'); b.className = 'banco'; casa.appendChild(b); }
   b.innerHTML = lista.length ? '<span class="banco-t">banco</span>' + lista.map(p => {
     const po = POCIONES.find(x => x.k === p.k);
     return '<span class="banco-f ' + clasePoc(po) + '" data-b="' + p.b + '" title="' + po.n + '">' +
@@ -5938,7 +5986,7 @@ async function igualCalc(){
   const C = {f: cuenta.f, entra: apunta('entra', cuenta.entra), retira: apunta('retira', cuenta.retira),
              pareja: apunta('pareja', cuenta.pareja), saco: apunta('saco', cuenta.saco),
              bebe: apunta('bebe', cuenta.bebe), junta: apunta('junta', cuenta.junta),
-             banquillo: si => cuenta.banquillo(si), sale: apunta('sale', cuenta.sale),
+             banquillo: si => cuenta.banquillo(si), dentro: () => cuenta.dentro(), sale: apunta('sale', cuenta.sale),
              abre: () => { if(!hondo++) antesDe = cuenta.suma(); },
              cierra: () => { hondo--; if(!hondo) quieta[quieta.length - 1] = null; }};
   await juegaExpr(p.arbol, [], C);
@@ -6042,7 +6090,7 @@ async function vaFotograma(k, anima){
   const turno = () => { const j = i++; if(j >= k) throw PARA; return j < ultimo; };
   const B = {
     f: T.f,
-    banquillo: si => { enBanco = si; T.banquillo(si); },
+    banquillo: si => { enBanco = si; T.banquillo(si); }, dentro: () => enBanco,
     entra: async (f, txt) => { if(turno()){ const id = sigId++; (enBanco ? banquillo : tiradores).push({id, f}); return id; }
                                prepara(); return T.entra(f, txt); },
     sale: async (ids, txt) => {
@@ -6053,8 +6101,9 @@ async function vaFotograma(k, anima){
       }
       prepara(); return T.sale(ids, txt);
     },
-    retira: async (id, txt) => { if(turno()){ tiradores = tiradores.filter(q => q.id !== id); return; } prepara(); return T.retira(id, txt); },
-    pareja: async (f, txt) => { if(turno()){ const a = sigId++, b = sigId++; tiradores.push({id:a, f}, {id:b, f:-f}); return [a, b]; }
+    retira: async (id, txt) => { if(turno()){ tiradores = tiradores.filter(q => q.id !== id); banquillo = banquillo.filter(q => q.id !== id); return; }
+                                 prepara(); return T.retira(id, txt); },
+    pareja: async (f, txt) => { if(turno()){ const a = sigId++, b = sigId++; (enBanco ? banquillo : tiradores).push({id:a, f}, {id:b, f:-f}); return [a, b]; }
                                 prepara(); return T.pareja(f, txt); },
     saco: async (ids, txt) => { if(turno()) return; prepara(); return T.saco(ids, txt); },
     bebe: async (ids, kk, banco, txt) => {
@@ -6069,10 +6118,13 @@ async function vaFotograma(k, anima){
     },
     junta: async (ids, txt) => {
       if(turno()){
-        const s = ids.reduce((a, id) => a + ((tiradores.find(q => q.id === id) || {f:0}).f), 0);
-        tiradores = tiradores.filter(q => ids.indexOf(q.id) < 0);
-        if(!s) return [];
-        const id = sigId++; tiradores.push({id, f:s}); return [id];
+        const L = ids.length && banquillo.some(q => q.id === ids[0]) ? 'b' : 't';
+        const lista = L === 'b' ? banquillo : tiradores;
+        const s = ids.reduce((a, id) => a + ((lista.find(q => q.id === id) || {f:0}).f), 0);
+        const resto = lista.filter(q => ids.indexOf(q.id) < 0);
+        if(s) resto.push({id: sigId++, f: s});
+        if(L === 'b') banquillo = resto; else tiradores = resto;
+        return s ? [sigId - 1] : [];
       }
       prepara(); return T.junta(ids, txt);
     }
@@ -6096,7 +6148,7 @@ async function vaFotograma(k, anima){
   pintaBanco(P.bancos.filter(b => !gastados.has(b.b)));
   let o = P.textos[k - 1];
   if(k > 0 && anima && P.pinPara === k && P.pin !== null) o = Object.assign({}, o, {x: veredicto(P, k, o)});
-  if(k === 0) cartela({m: P.bancos.map(b => b.ti), x: P.bancos.length ? 'espera en el banco' : 'pulsa ▶'});
+  if(k === 0) cartela({m: P.bancos.map(b => b.ti), x: P.bancos.length ? 'la poción espera en el banquillo' : 'pulsa ▶'});
   else if(k < P.n) cartela(o);
   else finFuncion(P, o);
   pintaPasosCalc();
@@ -6166,16 +6218,7 @@ function finFuncion(P, paso){
   if(calc.ultimo !== P.valor) h += 'Algo se ha torcido en escena: debía dar ' + totalHtml(P.valor) + '. ';
   /* (antes aquí se reescribía «3·(−2)» como «−2·3»: sobraba. El −2 entra y
      se bebe el Triplón, y la cuenta se queda como está escrita) */
-  const g = grupoQueBebe(P.arbol);
-  if(g){
-    if(h) h += '<br>';
-    const k = (g.pre[0] && g.pre[0].k) || g.post[0];
-    const partes = g.factor.expr.terms.filter(t => t.factor.t === 'n');
-    if(partes.length === g.factor.expr.terms.length && Number.isInteger(k))
-      h += '<b>' + (k < 0 ? '(' + conSigno(k) + ')' : k) + '·(' + escribeArbol(g.factor.expr, false, true) + ') = ' +
-        partes.map((t, n) => (t.sign === '-' ? (n ? ' − ' : '−') : (n ? ' + ' : '')) +
-          (k < 0 ? '(' + conSigno(k) + ')' : k) + '·' + numCuaderno(t.factor.f, false)).join('') + '</b>';
-  }
+  /* (la distributiva ya no se escribe aquí: el paréntesis se reduce antes de beber) */
   $('clAviso').innerHTML = h;
 }
 /* la cartela de cine mudo, arriba del teatro: la cuenta escrita, con el
