@@ -1459,7 +1459,7 @@ body[data-modo="calc"] .cartela:not([hidden]){display:flex;flex-direction:column
   <button class="vel-b" id="aVolverRuta" aria-pressed="false">Volver a la ruta</button>
 </div>
 <p class="aj-nota" style="margin-top:0">El pulso de los dioses ·
-  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.3</p>
+  <b>ἑλκυστίνδα</b>, el tira y afloja de la palestra · prototipo v8.4</p>
 <div class="veloc" data-solo-debug>
   <span>Paréntesis</span>
   <button class="vel-b" data-par="auto" aria-pressed="true">Según la misión</button>
@@ -2298,7 +2298,7 @@ function ajustaPaso(){
   return PASO !== antes;
 }
 function pintaRegla(){
-  const t = suma();
+  const t = congelaTotal === null ? suma() : congelaTotal;   // con término abierto, lo que enseña la bandera
     const vivaD = !!(diana && diana.esperando);
   /* en el folioscopio, antes de un paso clave, la regla se toca para decir
      dónde acabará la bandera */
@@ -4945,6 +4945,7 @@ $('aVolverRuta').addEventListener('click', () => {
   else if(!retomaTurno()) arrancaMision(0);   // vuelve a la misión y los aciertos que llevaba
 });
 function modoBotones(m){
+  congelaTotal = null; congelaLados = null;   // una bandera quieta de la tablilla no se queda en otro modo
   document.body.dataset.fase = m === 'taller' ? 'taller' : 'juego';
   document.body.dataset.modo = m;
   $('bTablilla').setAttribute('aria-pressed', String(m === 'calc'));
@@ -5472,6 +5473,7 @@ function teclaCalc(tk){
 }
 /* si la cuenta cambia, el mazo de fotogramas de la anterior ya no vale */
 function sinFotogramas(){
+  congelaTotal = null; congelaLados = null;
   if(!calc) return;
   if(calc.pel){ calc.pel = null; calc.teatro++; calc.jugando = false; }
   $('opPasos').hidden = true;
@@ -5599,11 +5601,17 @@ async function juegaExpr(e, ambito, B){
         await B.retira(idF, {m: conSi(t, [t.factor.a]), x: 'se va el ' + conSigno(f)});
       }
     }else{
+      /* un término compuesto (pociones, potencia o su propio menos) se
+         calcula aparte: el backend puede quedarse la bandera quieta hasta
+         que se cierra, y así no pasa por valores que no están en la cuenta */
+      const compuesto = !!(t.pre.length || t.post.length || t.exp > 1 || t.sign === '-');
+      if(compuesto && B.abre) B.abre();
       const ids = await juegaTermino(t, B);
       if(t.sign === '-')
         await B.bebe(ids, -1, null, {m: conSi(t, rango(t.pre.length ? t.pre[0].ti : t.factor.a,
           t.postI.length ? t.postI[t.postI.length - 1] : (t.ei !== null ? t.ei : t.factor.z))),
           x: ids.length > 1 ? 'el menos: todos cambian de bando' : 'el menos: cambia de bando', flip: true});
+      if(compuesto && B.cierra) B.cierra();
       ambito.push(...ids);
     }
   }
@@ -5829,18 +5837,26 @@ async function igualCalc(){
      preguntar «¿qué pasará ahora?» antes de pasar */
   const textos = [];
   const cuenta = simulador();
-  const tipos = [], sumas = [];
+  /* dónde queda la bandera en cada fotograma. Mientras un término compuesto
+     está abierto, la bandera se queda donde estaba al abrirse (durante y al
+     final del fotograma); se mueve de golpe cuando el término se cierra */
+  const tipos = [], sumas = [], durante = [], quieta = [];
+  let hondo = 0, antesDe = 0;
   const apunta = (tipo, fn) => async (...a) => { textos.push(a[a.length - 1] || ''); tipos.push(tipo);
-    const r = await fn(...a); sumas.push(cuenta.suma()); return r; };
+    durante.push(hondo ? antesDe : null);
+    const r = await fn(...a); sumas.push(cuenta.suma()); quieta.push(hondo ? antesDe : null); return r; };
   const C = {f: cuenta.f, entra: apunta('entra', cuenta.entra), retira: apunta('retira', cuenta.retira),
              pareja: apunta('pareja', cuenta.pareja), saco: apunta('saco', cuenta.saco),
-             bebe: apunta('bebe', cuenta.bebe), junta: apunta('junta', cuenta.junta)};
+             bebe: apunta('bebe', cuenta.bebe), junta: apunta('junta', cuenta.junta),
+             abre: () => { if(!hondo++) antesDe = cuenta.suma(); },
+             cierra: () => { hondo--; if(!hondo) quieta[quieta.length - 1] = null; }};
   await juegaExpr(p.arbol, [], C);
+  const vista = sumas.map((v, i) => quieta[i] !== null ? quieta[i] : v);
   /* pasos clave: una poción o alguien que se retira, y que muevan la
      bandera. Antes de jugarlos se pregunta dónde acabará */
-  const clave = tipos.map((t, i) => (t === 'bebe' || t === 'retira') && sumas[i] !== (i ? sumas[i - 1] : 0));
+  const clave = tipos.map((t, i) => (t === 'bebe' || t === 'retira') && vista[i] !== (i ? vista[i - 1] : 0));
   calc.pel = {arbol: p.arbol, valor, textos, n: textos.length, k: 0, bancos: prefijos(p.arbol, []),
-              sumas, clave, dichos: {}, pregunta: 0, pin: null, pinPara: 0, visto: false, repaso: 0};
+              sumas: vista, durante, quieta, clave, dichos: {}, pregunta: 0, pin: null, pinPara: 0, visto: false, repaso: 0};
   calc.ultimo = null; calc.arbol = p.arbol;
   $('clAviso').innerHTML = '';
   $('opPasos').hidden = false;
@@ -5923,6 +5939,8 @@ async function vaFotograma(k, anima){
   quitaHitos();
   tiradores = []; sel = null; cinta = []; lineas = []; base = 0; previo = 0;
   bebiendoIds.clear(); retirandoIds.clear();
+  congelaLados = null;
+  congelaTotal = k > 0 ? (anima ? P.durante[k - 1] : P.quieta[k - 1]) : null;
   const gastados = new Set();
   const T = teatro(tokT);
   const ultimo = anima ? k - 1 : k;         // los pasos antes de este, al instante
@@ -5970,6 +5988,7 @@ async function vaFotograma(k, anima){
   if(!calc || calc.teatro !== tokT) return;
   calc.jugando = false;
   base = suma(); previo = suma();
+  congelaTotal = k > 0 ? P.quieta[k - 1] : null; congelaLados = null;
   pinta();
   pintaBanco(P.bancos.filter(b => !gastados.has(b.b)));
   let o = P.textos[k - 1];
